@@ -11,6 +11,9 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
-
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    <Grid ColumnDefinitions="*,*,*" Margin="5">
+        <UserControl Content="{Binding Hungarian}" />
+        <UserControl Grid.Column="1" Content="{Binding English}" />
+        <UserControl Grid.Column="2" Content="{Binding Global}" />
+    </Grid>
 </UserControl>

@@ -8,4 +8,8 @@
         <PackageReference Include="NAudio.Vorbis" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="../Katie.Core/Katie.Core.csproj" />
+    </ItemGroup>
+
 </Project>

@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../Katie.Core/Katie.Core.csproj" />
+        <ProjectReference Include="../Katie.NAudio/Katie.NAudio.csproj" />
     </ItemGroup>
     
 </Project>
