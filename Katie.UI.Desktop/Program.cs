@@ -3,7 +3,7 @@ using Avalonia;
 
 namespace Katie.UI.Desktop;
 
-sealed class Program
+internal static class Program
 {
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any

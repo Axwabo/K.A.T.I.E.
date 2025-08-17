@@ -1,8 +1,9 @@
 <Solution>
-    <Project Path="Katie.Core/Katie.Core.csproj" />
     <Folder Name="/UI/">
-        <Project Path="Katie.UI/Katie.UI.csproj" />
         <Project Path="Katie.UI.Browser/Katie.UI.Browser.csproj" />
         <Project Path="Katie.UI.Desktop/Katie.UI.Desktop.csproj" />
+        <Project Path="Katie.UI/Katie.UI.csproj" />
     </Folder>
+    <Project Path="Katie.Core/Katie.Core.csproj" />
+    <Project Path="Katie.NAudio/Katie.NAudio.csproj" />
 </Solution>
