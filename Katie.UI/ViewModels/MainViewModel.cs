@@ -11,15 +11,11 @@ public sealed class MainViewModel : ViewModelBase
 
     public PhrasePackViewModel Global { get; }
 
-    public MainViewModel(Control? host)
+    public MainViewModel(Control? host = null)
     {
         English = new PhrasePackViewModel {Host = host, Language = "English"};
         Global = new PhrasePackViewModel {Host = host, Language = "Global"};
         Hungarian = new PhrasePackViewModel {Host = host, Language = "Hungarian"};
-    }
-
-    public MainViewModel() : this(null)
-    {
     }
 
 }

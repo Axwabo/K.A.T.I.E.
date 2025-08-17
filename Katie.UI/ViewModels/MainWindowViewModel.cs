@@ -7,10 +7,6 @@ public sealed class MainWindowViewModel
 
     public MainViewModel? ViewModel { get; }
 
-    public MainWindowViewModel(MainWindow? window) => ViewModel = new MainViewModel(window);
-
-    public MainWindowViewModel() : this(null)
-    {
-    }
+    public MainWindowViewModel(MainWindow? window = null) => ViewModel = new MainViewModel(window);
 
 }
