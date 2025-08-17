@@ -5,7 +5,7 @@ namespace Katie.Core.Extensions;
 public static class SpanExtensions
 {
 
-    private const string Delimiters = " ,.";
+    public const string Delimiters = " ,.";
 
     public static int IndexOfWordDelimiter(this ReadOnlySpan<char> span, int start)
     {

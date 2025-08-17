@@ -14,6 +14,8 @@ public sealed class PhraseTreeNode<T> where T : PhraseBase
 
     public T? Value { get; set; }
 
+    public bool HasDescendants => _descendants.Count != 0;
+
     public PhraseTreeNode(string key, T? value = null)
     {
         Key = key;
