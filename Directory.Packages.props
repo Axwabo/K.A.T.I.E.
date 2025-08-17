@@ -21,6 +21,7 @@
     
     <ItemGroup>
         <PackageVersion Include="NAudio.Core" Version="2.2.1" />
+        <PackageVersion Include="NAudio.Wasapi" Version="2.2.1" />
         <PackageVersion Include="NLayer" Version="1.16.0" />
         <PackageVersion Include="NLayer.NAudioSupport" Version="1.4.0" />
         <PackageVersion Include="NVorbis" Version="0.10.5" />

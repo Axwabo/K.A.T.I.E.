@@ -21,4 +21,6 @@ public static class SpanExtensions
         return code;
     }
 
+    public static ReadOnlySpan<char> TrimDelimeters(this ReadOnlySpan<char> span) => span.Trim(Delimiters);
+
 }

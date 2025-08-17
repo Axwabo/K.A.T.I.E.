@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -33,6 +34,8 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
 
     public ObservableCollection<WavePhrase> List { get; } = [];
 
+    public event Action? PhrasesChanged;
+
     [RelayCommand]
     public async Task AddPhrases()
     {
@@ -41,6 +44,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
         var files = await storage.OpenFilePickerAsync(Options);
         foreach (var file in files)
             List.Add(new WavePhrase(await file.OpenReadAsync(), Path.GetFileNameWithoutExtension(file.Name)));
+        PhrasesChanged?.InvokeOnUIThread();
     }
 
 }

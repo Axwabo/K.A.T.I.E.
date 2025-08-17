@@ -23,6 +23,12 @@ public sealed class WavePhrase : PhraseBase, IDisposable
 
     public override TimeSpan Duration { get; }
 
+    public ISampleProvider ToSampleProvider()
+    {
+        _stream.Position = 0;
+        return _stream.ToSampleProvider();
+    }
+
     public void Dispose()
     {
         _stream.Dispose();

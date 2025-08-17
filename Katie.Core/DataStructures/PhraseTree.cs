@@ -39,7 +39,7 @@ public sealed class PhraseTree<T> where T : PhraseBase
             var currentToken = span[previousIndex..index];
             node = node.TryGetDescendant(currentToken, out var nextNode)
                 ? nextNode
-                : node.Set(currentToken, null);
+                : node.Set(currentToken.Trim(), null);
             previousIndex = index;
             index = span.IndexOfWordDelimiter(index + 1);
         }
@@ -47,7 +47,7 @@ public sealed class PhraseTree<T> where T : PhraseBase
         if (node.Key == span)
             node.Value = phrase;
         else
-            node.Set(span[previousIndex..], phrase);
+            node.Set(span[previousIndex..].Trim(), phrase);
     }
 
     public bool TryGetRootNode(ReadOnlySpan<char> token, [NotNullWhen(true)] out PhraseTreeNode<T>? node)

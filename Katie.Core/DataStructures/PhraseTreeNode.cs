@@ -21,10 +21,7 @@ public sealed class PhraseTreeNode<T> where T : PhraseBase
     }
 
     public PhraseTreeNode<T> Set(ReadOnlySpan<char> key, T? value)
-    {
-        key = key.Trim();
-        return _descendants[key.LowercaseHashCode()] = new PhraseTreeNode<T>(key.ToString(), value);
-    }
+        => _descendants[key.LowercaseHashCode()] = new PhraseTreeNode<T>(key.ToString(), value);
 
     public bool TryGetDescendant(ReadOnlySpan<char> key, [NotNullWhen(true)] out PhraseTreeNode<T>? value)
         => _descendants.TryGetValue(key.LowercaseHashCode(), out value);

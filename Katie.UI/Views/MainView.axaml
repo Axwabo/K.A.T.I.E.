@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Katie.UI.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
              x:Class="Katie.UI.Views.MainView"
              x:DataType="vm:MainViewModel">
     <Design.DataContext>
@@ -11,9 +11,18 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
-    <Grid ColumnDefinitions="*,*,*" Margin="5">
-        <UserControl Content="{Binding Hungarian}" />
-        <UserControl Grid.Column="1" Content="{Binding English}" />
-        <UserControl Grid.Column="2" Content="{Binding Global}" />
+    <Grid RowDefinitions="*,60,Auto" Margin="5">
+        <Grid ColumnDefinitions="*,*,*">
+            <UserControl Content="{Binding Hungarian}" />
+            <UserControl Grid.Column="1" Content="{Binding English}" />
+            <UserControl Grid.Column="2" Content="{Binding Global}" />
+        </Grid>
+        <TextBox Grid.Row="1" Text="{Binding Text}" Watermark="Enter the text to announce">
+
+        </TextBox>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button Command="{Binding PlayCommand}" CommandParameter="Hungarian">Play Hungarian announcement</Button>
+            <Button Command="{Binding PlayCommand}" CommandParameter="English">Play English announcement</Button>
+        </StackPanel>
     </Grid>
 </UserControl>
