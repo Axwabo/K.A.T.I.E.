@@ -5,7 +5,7 @@ using NAudio.Wave;
 
 namespace Katie.NAudio;
 
-public sealed class WavePhrase : IPhrase, IDisposable
+public sealed class WavePhrase : PhraseBase, IDisposable
 {
 
     private readonly Stream _source;
@@ -19,9 +19,9 @@ public sealed class WavePhrase : IPhrase, IDisposable
         Duration = _stream.TotalTime;
     }
 
-    public string Text { get; }
+    public override string Text { get; }
 
-    public TimeSpan Duration { get; }
+    public override TimeSpan Duration { get; }
 
     public void Dispose()
     {
