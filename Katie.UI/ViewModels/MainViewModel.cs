@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -17,6 +18,8 @@ public sealed partial class MainViewModel : ViewModelBase
     public static Thickness Margin { get; } = new(5);
 
     private readonly Control? _host;
+
+    private int _playIndex;
 
     [ObservableProperty]
     private string _text = "";
@@ -60,6 +63,7 @@ public sealed partial class MainViewModel : ViewModelBase
     [RelayCommand]
     public async Task Play(string language)
     {
+        var index = ++_playIndex;
         // TODO: replace with a SoundFlow backend
         var provider = PhraseChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree);
         if (provider == null)
@@ -67,15 +71,22 @@ public sealed partial class MainViewModel : ViewModelBase
         using var device = new WasapiOut();
         device.Init(provider, true);
         device.Play();
+        var divisor = device.OutputWaveFormat.BitsPerSample / 8d * device.OutputWaveFormat.SampleRate * device.OutputWaveFormat.Channels;
         while (device.PlaybackState == PlaybackState.Playing)
         {
+            if (index != _playIndex)
+                device.Stop();
+            var currentTime = TimeSpan.FromSeconds(device.GetPosition() / divisor);
             Dispatcher.UIThread.Post(() =>
             {
                 CurrentPhrase = provider.Current.Text;
-                TimeWidth = (_host?.Width - Margin.Left - Margin.Right ?? 0) * (provider.CurrentTime / provider.TotalTime);
+                TimeWidth = (_host?.Width - Margin.Left - Margin.Right ?? 0) * (currentTime / provider.TotalTime);
             });
             await Task.Delay(10);
         }
     }
+
+    [RelayCommand]
+    public void Stop() => _playIndex = -1;
 
 }
