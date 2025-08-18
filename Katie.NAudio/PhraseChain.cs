@@ -13,7 +13,7 @@ public sealed class PhraseChain : ISampleProvider
 
     public static WaveFormat Format { get; } = WaveFormat.CreateIeeeFloatWaveFormat(48000, 1);
 
-    public static PhraseChain Parse(ReadOnlySpan<char> text, PhraseTree<WavePhrase> tree)
+    public static PhraseChain? Parse(ReadOnlySpan<char> text, PhraseTree<WavePhrase> tree)
     {
         var providers = new Queue<Clip>();
         var parser = new PhraseParser<WavePhrase>(text, tree);
@@ -28,7 +28,7 @@ public sealed class PhraseChain : ISampleProvider
                     break;
             }
 
-        return new PhraseChain(providers);
+        return providers.Count == 0 ? null : new PhraseChain(providers);
     }
 
     private readonly Queue<Clip> _remaining;
@@ -37,11 +37,10 @@ public sealed class PhraseChain : ISampleProvider
 
     public Clip Current { get; private set; }
 
-    public PhraseChain(Queue<Clip> remaining)
+    private PhraseChain(Queue<Clip> remaining)
     {
         _remaining = remaining;
-        _ended = _remaining.Count == 0;
-        Current = _ended ? (new DurationSilenceSampleProvider(Format, 0), "") : remaining.Dequeue();
+        Current = remaining.Dequeue();
     }
 
     public WaveFormat WaveFormat => Format;
@@ -53,7 +52,7 @@ public sealed class PhraseChain : ISampleProvider
         var total = 0;
         while (total < count)
         {
-            var read = Current.Provider.Read(buffer, total, Math.Min(count, total - count));
+            var read = Current.Provider.Read(buffer, total, Math.Min(count, count - total));
             total += read;
             if (read > 0)
                 continue;

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Katie.Core.DataStructures;
@@ -14,6 +15,9 @@ public sealed partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _text = "";
+
+    [ObservableProperty]
+    private string _currentPhrase = "";
 
     private PhraseTree<WavePhrase> _englishTree = new([]);
 
@@ -55,7 +59,10 @@ public sealed partial class MainViewModel : ViewModelBase
         device.Init(provider, true);
         device.Play();
         while (device.PlaybackState == PlaybackState.Playing)
-            await Task.Delay(100);
+        {
+            Dispatcher.UIThread.Post(() => CurrentPhrase = provider.Current.Text);
+            await Task.Delay(10);
+        }
     }
 
 }

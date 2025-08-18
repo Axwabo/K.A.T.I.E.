@@ -19,8 +19,9 @@
         </Grid>
         <TextBox Grid.Row="1" Text="{Binding Text}" Watermark="Enter the text to announce" TextWrapping="Wrap" />
         <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <Button Command="{Binding PlayCommand}" CommandParameter="Hungarian">Play Hungarian announcement</Button>
-            <Button Command="{Binding PlayCommand}" CommandParameter="English">Play English announcement</Button>
+            <Button Command="{Binding PlayCommand}" CommandParameter="Hungarian">Play Hungarian</Button>
+            <Button Command="{Binding PlayCommand}" CommandParameter="English">Play English</Button>
+            <Label Content="{Binding CurrentPhrase}" VerticalAlignment="Center" />
         </StackPanel>
     </Grid>
 </UserControl>

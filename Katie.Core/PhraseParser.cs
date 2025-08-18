@@ -32,7 +32,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
         var trimmed = primaryToken.Trim().TrimDelimeters();
         if (!_tree.TryGetRootNode(trimmed, out var node))
         {
-            phrase = TimeSpan.FromMilliseconds(trimmed.Length * 30);
+            phrase = TimeSpan.FromMilliseconds(trimmed.Length * 100);
             return true;
         }
 
