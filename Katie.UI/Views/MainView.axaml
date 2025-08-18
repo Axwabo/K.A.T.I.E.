@@ -11,20 +11,21 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
-    <Grid RowDefinitions="Auto,*,60,Auto,Auto" Margin="5">
-        <ProgressBar IsVisible="{Binding !InitialsLoaded}" IsIndeterminate="{Binding !InitialsLoaded}" ShowProgressText="True" ProgressTextFormat="Loading phrases..." Margin="0,0,0,5" />
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*">
+    <Grid RowDefinitions="*,60,Auto,Auto" Margin="5">
+        <Grid Grid.Row="0" ColumnDefinitions="*,*,*" IsEnabled="{Binding InitialsLoaded}" Opacity="{Binding Opacity}">
             <UserControl Content="{Binding Hungarian}" />
             <UserControl Grid.Column="1" Content="{Binding English}" />
             <UserControl Grid.Column="2" Content="{Binding Global}" />
         </Grid>
-        <TextBox Grid.Row="2" Text="{Binding Text}" Watermark="Enter the text to announce" TextWrapping="Wrap" />
-        <StackPanel Grid.Row="3" Margin="0,5" Orientation="Horizontal">
-            <Button IsEnabled="{Binding InitialsLoaded}" Command="{Binding PlayCommand}" CommandParameter="Hungarian">Play Hungarian</Button>
-            <Button IsEnabled="{Binding InitialsLoaded}" Command="{Binding PlayCommand}" CommandParameter="English">Play English</Button>
+        <ProgressBar Grid.Row="0" IsVisible="{Binding !InitialsLoaded}" IsIndeterminate="{Binding !InitialsLoaded}"
+                     Foreground="DodgerBlue" ShowProgressText="True" ProgressTextFormat="Loading phrases..." MaxWidth="250" />
+        <TextBox Grid.Row="1" Text="{Binding Text}" Watermark="Enter the text to announce" TextWrapping="Wrap" />
+        <StackPanel Grid.Row="2" Margin="0,5" Orientation="Horizontal" IsEnabled="{Binding InitialsLoaded}">
+            <Button Command="{Binding PlayCommand}" CommandParameter="Hungarian">Play Hungarian</Button>
+            <Button Command="{Binding PlayCommand}" CommandParameter="English">Play English</Button>
             <Button Command="{Binding StopCommand}">Stop</Button>
             <Label Content="{Binding CurrentPhrase}" VerticalAlignment="Center" />
         </StackPanel>
-        <ProgressBar Grid.Row="4" Height="3" Maximum="1" Value="{Binding Progress}" Foreground="Red" />
+        <ProgressBar Grid.Row="3" Height="3" Maximum="1" Value="{Binding Progress}" Foreground="Red" />
     </Grid>
 </UserControl>

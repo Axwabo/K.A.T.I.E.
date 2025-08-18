@@ -18,7 +18,10 @@ public sealed partial class MainViewModel : ViewModelBase
     private int _playIndex;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Opacity))]
     private bool _initialsLoaded;
+
+    public double Opacity => InitialsLoaded ? 1 : 0.5;
 
     [ObservableProperty]
     private string _text = "";
