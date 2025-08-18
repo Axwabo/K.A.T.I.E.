@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Katie.Core;
 using Katie.Core.DataStructures;
 using NAudio.Wave;
@@ -11,7 +12,10 @@ using LabeledClip = (ISampleProvider Provider, string Text);
 public sealed class PhraseChain : ISampleProvider
 {
 
-    public static WaveFormat Format { get; } = WaveFormat.CreateIeeeFloatWaveFormat(48000, 1);
+    private const int SampleRate = 48000;
+    private const double SamplesToSeconds = 1d / SampleRate;
+
+    public static WaveFormat Format { get; } = WaveFormat.CreateIeeeFloatWaveFormat(SampleRate, 1);
 
     public static PhraseChain? Parse(ReadOnlySpan<char> text, PhraseTree<WavePhrase> tree)
     {
@@ -29,9 +33,14 @@ public sealed class PhraseChain : ISampleProvider
 
     public LabeledClip Current { get; private set; }
 
+    public TimeSpan CurrentTime { get; private set; }
+
+    public TimeSpan TotalTime { get; }
+
     private PhraseChain(Queue<UtteranceSegment<WavePhrase>> remaining)
     {
         _remaining = remaining;
+        TotalTime = remaining.Aggregate(TimeSpan.Zero, (prev, curr) => prev + curr.Duration);
         TryDequeue(out var current);
         Current = current;
     }
@@ -47,6 +56,7 @@ public sealed class PhraseChain : ISampleProvider
         {
             var read = Current.Provider.Read(buffer, total, Math.Min(count, count - total));
             total += read;
+            CurrentTime += TimeSpan.FromSeconds(read * SamplesToSeconds);
             if (read > 0)
                 continue;
             if (TryDequeue(out var result))

@@ -13,11 +13,18 @@ namespace Katie.UI.ViewModels;
 public sealed partial class MainViewModel : ViewModelBase
 {
 
+    public static double Margin => 5;
+
+    private readonly Control? _host;
+
     [ObservableProperty]
     private string _text = "";
 
     [ObservableProperty]
     private string _currentPhrase = "";
+
+    [ObservableProperty]
+    private double _timeWidth;
 
     private PhraseTree<WavePhrase> _englishTree = new([]);
 
@@ -31,6 +38,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public MainViewModel(Control? host)
     {
+        _host = host;
         English = new PhrasePackViewModel {Host = host, Language = "English"};
         Hungarian = new PhrasePackViewModel {Host = host, Language = "Hungarian"};
         Global = new PhrasePackViewModel {Host = host, Language = "Global"};
@@ -60,7 +68,11 @@ public sealed partial class MainViewModel : ViewModelBase
         device.Play();
         while (device.PlaybackState == PlaybackState.Playing)
         {
-            Dispatcher.UIThread.Post(() => CurrentPhrase = provider.Current.Text);
+            Dispatcher.UIThread.Post(() =>
+            {
+                CurrentPhrase = provider.Current.Text;
+                TimeWidth = (_host?.Width - Margin * 2 ?? 0) * (provider.CurrentTime / provider.TotalTime);
+            });
             await Task.Delay(10);
         }
     }
