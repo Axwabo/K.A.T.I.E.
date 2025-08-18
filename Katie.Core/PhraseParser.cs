@@ -121,15 +121,13 @@ public ref struct PhraseParser<T> where T : PhraseBase
             _index = endIndex;
         }
 
-        _index = start;
-
         if (lastSuccessful != null)
         {
-            Commit(lastSuccessful.Value!.Text);
             phrase = lastSuccessful.Value;
             return true;
         }
 
+        _index = start;
         phrase = null;
         return false;
     }
