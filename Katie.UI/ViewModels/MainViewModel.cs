@@ -44,9 +44,9 @@ public sealed partial class MainViewModel : ViewModelBase
     {
     }
 
-    private void RebuildHungarian() => _hungarianTree = new PhraseTree<WavePhrase>(Hungarian.List.Concat(Global.List));
+    private void RebuildHungarian() => _hungarianTree = new PhraseTree<WavePhrase>(Global.List.Concat(Hungarian.List));
 
-    private void RebuildEnglish() => _englishTree = new PhraseTree<WavePhrase>(English.List.Concat(Global.List));
+    private void RebuildEnglish() => _englishTree = new PhraseTree<WavePhrase>(Global.List.Concat(English.List));
 
     [RelayCommand]
     public async Task Play(string language)

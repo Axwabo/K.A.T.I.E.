@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Katie.Core.Extensions;
 
 namespace Katie.Core.DataStructures;
@@ -12,7 +13,7 @@ public sealed class PhraseTree<T> where T : PhraseBase
 
     public PhraseTree(IEnumerable<T> values)
     {
-        foreach (var phrase in values)
+        foreach (var phrase in values.OrderBy(e => e.Text.Length))
             Add(phrase);
     }
 
