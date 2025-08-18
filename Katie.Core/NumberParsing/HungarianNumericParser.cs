@@ -29,8 +29,28 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
             return true;
         }
 
-        phrase = default;
-        return false;
+        switch (_part)
+        {
+            case NumericTokenPart.HourNumber:
+                index++;
+                phrase = _tree.TryGetRootValue("óra", out var hour) ? hour : 3;
+                _part = NumericTokenPart.Hour;
+                return true;
+            case NumericTokenPart.Hour:
+                _numberParser = new HungarianNumberParser<T>(_text[index..(index + 2)], _tree);
+                _numberParser.Next(out phrase, out var advancedHour);
+                _part = NumericTokenPart.MinuteNumber;
+                index += advancedHour;
+                return true;
+            case NumericTokenPart.MinuteNumber:
+                index++;
+                phrase = _tree.TryGetRootValue("perc", out var minute) ? minute : 4;
+                _part = NumericTokenPart.None;
+                return true;
+            default:
+                phrase = default;
+                return false;
+        }
     }
 
     public bool Begin(ref int index, int tokenEnd, out UtteranceSegment<T> phrase)
@@ -57,8 +77,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         None,
         HourNumber,
         Hour,
-        MinuteNumber,
-        Minute
+        MinuteNumber
 
     }
 
