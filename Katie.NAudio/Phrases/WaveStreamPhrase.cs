@@ -1,18 +1,17 @@
 ﻿using System;
 using System.IO;
-using Katie.Core;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
-namespace Katie.NAudio;
+namespace Katie.NAudio.Phrases;
 
-public sealed class WavePhrase : PhraseBase, IDisposable
+public sealed class WaveStreamPhrase : SamplePhraseBase, IDisposable
 {
 
     private readonly Stream _source;
     private readonly WaveStream _stream;
 
-    public WavePhrase(Stream source, string name)
+    public WaveStreamPhrase(Stream source, string name)
     {
         _source = source;
         _stream = new WaveFileReader(source);
@@ -24,7 +23,7 @@ public sealed class WavePhrase : PhraseBase, IDisposable
 
     public override TimeSpan Duration { get; }
 
-    public ISampleProvider ToSampleProvider()
+    public override ISampleProvider ToSampleProvider()
     {
         _stream.Position = 0;
         var provider = _stream.ToSampleProvider();

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Avalonia.Platform.Storage;
-using Katie.NAudio;
+using Katie.NAudio.Phrases;
 
 namespace Katie.UI.PhraseProviders;
 
@@ -26,10 +26,10 @@ internal sealed class FilePickerPhraseProvider : IPhraseProvider
 
     public FilePickerPhraseProvider(IStorageProvider storageProvider) => _storageProvider = storageProvider;
 
-    public async IAsyncEnumerable<WavePhrase> EnumeratePhrasesAsync()
+    public async IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync()
     {
         foreach (var file in await _storageProvider.OpenFilePickerAsync(Options))
-            yield return new WavePhrase(await file.OpenReadAsync(), Path.GetFileNameWithoutExtension(file.Name));
+            yield return new WaveStreamPhrase(await file.OpenReadAsync(), Path.GetFileNameWithoutExtension(file.Name));
     }
 
 }

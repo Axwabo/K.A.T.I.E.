@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Katie.Core.DataStructures;
 using Katie.NAudio;
+using Katie.NAudio.Phrases;
 using Katie.UI.PhraseProviders;
 using NAudio.Wave;
 
@@ -32,9 +33,9 @@ public sealed partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private double _progress;
 
-    private PhraseTree<WavePhrase> _englishTree = new([]);
+    private PhraseTree<SamplePhraseBase> _englishTree = new([]);
 
-    private PhraseTree<WavePhrase> _hungarianTree = new([]);
+    private PhraseTree<SamplePhraseBase> _hungarianTree = new([]);
 
     public PhrasePackViewModel Hungarian { get; }
 
@@ -59,9 +60,9 @@ public sealed partial class MainViewModel : ViewModelBase
     {
     }
 
-    private void RebuildHungarian() => _hungarianTree = new PhraseTree<WavePhrase>(Global.List.Concat(Hungarian.List));
+    private void RebuildHungarian() => _hungarianTree = new PhraseTree<SamplePhraseBase>(Global.List.Concat(Hungarian.List));
 
-    private void RebuildEnglish() => _englishTree = new PhraseTree<WavePhrase>(Global.List.Concat(English.List));
+    private void RebuildEnglish() => _englishTree = new PhraseTree<SamplePhraseBase>(Global.List.Concat(English.List));
 
     private async Task LoadInitialPhrases()
     {

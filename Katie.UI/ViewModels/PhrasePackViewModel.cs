@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
-using Katie.NAudio;
+using Katie.NAudio.Phrases;
 using Katie.UI.PhraseProviders;
 
 namespace Katie.UI.ViewModels;
@@ -19,7 +19,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
 
     public string Content => $"Add {Language} phrases";
 
-    public ObservableCollection<WavePhrase> List { get; } = [];
+    public ObservableCollection<SamplePhraseBase> List { get; } = [];
 
     public event Action? PhrasesChanged;
 

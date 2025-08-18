@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Katie.NAudio;
+using Katie.NAudio.Phrases;
 using Katie.UI.ViewModels;
 
 namespace Katie.UI.PhraseProviders;
@@ -9,7 +9,7 @@ namespace Katie.UI.PhraseProviders;
 public interface IPhraseProvider
 {
 
-    IAsyncEnumerable<WavePhrase> EnumeratePhrasesAsync();
+    IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync();
 
     public static Dictionary<string, IPhraseProvider> InitialProviders { get; } = new(StringComparer.OrdinalIgnoreCase);
 

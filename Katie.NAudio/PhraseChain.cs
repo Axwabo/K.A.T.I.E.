@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Katie.Core;
 using Katie.Core.DataStructures;
+using Katie.NAudio.Phrases;
 using NAudio.Wave;
 
 namespace Katie.NAudio;
@@ -12,22 +13,22 @@ using LabeledClip = (ISampleProvider Provider, string Text);
 public sealed class PhraseChain : ISampleProvider
 {
 
-    private const int SampleRate = 48000;
-    private const double SamplesToSeconds = 1d / SampleRate;
+    public const int SampleRate = 48000;
+    public const double SamplesToSeconds = 1d / SampleRate;
 
     public static WaveFormat Format { get; } = WaveFormat.CreateIeeeFloatWaveFormat(SampleRate, 1);
 
-    public static PhraseChain? Parse(ReadOnlySpan<char> text, PhraseTree<WavePhrase> tree)
+    public static PhraseChain? Parse(ReadOnlySpan<char> text, PhraseTree<SamplePhraseBase> tree)
     {
-        var segments = new Queue<UtteranceSegment<WavePhrase>>();
-        var parser = new PhraseParser<WavePhrase>(text, tree);
+        var segments = new Queue<UtteranceSegment<SamplePhraseBase>>();
+        var parser = new PhraseParser<SamplePhraseBase>(text, tree);
         while (parser.Next(out var phrase))
             if (phrase.Duration != TimeSpan.Zero)
                 segments.Enqueue(phrase);
         return segments.Count == 0 ? null : new PhraseChain(segments);
     }
 
-    private readonly Queue<UtteranceSegment<WavePhrase>> _remaining;
+    private readonly Queue<UtteranceSegment<SamplePhraseBase>> _remaining;
 
     private bool _ended;
 
@@ -37,7 +38,7 @@ public sealed class PhraseChain : ISampleProvider
 
     public TimeSpan TotalTime { get; }
 
-    private PhraseChain(Queue<UtteranceSegment<WavePhrase>> remaining)
+    private PhraseChain(Queue<UtteranceSegment<SamplePhraseBase>> remaining)
     {
         _remaining = remaining;
         TotalTime = remaining.Aggregate(TimeSpan.Zero, (prev, curr) => prev + curr.Duration);
