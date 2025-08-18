@@ -21,38 +21,67 @@ public ref struct PhraseParser<T> where T : PhraseBase
 
     public bool Next(out UtteranceSegment<T> phrase)
     {
-        if (!SkipDelimiters() || !TryLookAhead(out var primaryToken, out var primaryEnd))
+        if (!SkipWhitespaces())
         {
             phrase = default;
             return false;
         }
 
-        _index = primaryEnd;
-        // TODO: parse multiple tokens
-        var trimmed = primaryToken.Trim().TrimDelimeters();
-        if (!_tree.TryGetRootNode(trimmed, out var node))
+        if (TryParseSilence(out phrase))
+            return true;
+
+        if (!TryLookAhead(out var primaryToken, out _))
         {
-            phrase = TimeSpan.FromMilliseconds(trimmed.Length * 100);
+            phrase = default;
+            return false;
+        }
+
+        if (TryParsePhrase(primaryToken, out phrase))
+            return true;
+
+        if (primaryToken.Length > 0)
+        {
+            Commit(primaryToken);
+            phrase = primaryToken.Length;
             return true;
         }
 
-        phrase = node.Value;
-        return true;
+        phrase = default;
+        return false;
     }
 
-    private bool SkipDelimiters()
+    private bool SkipWhitespaces()
     {
         if (_index == -1)
             return false;
         while (_index < _text.Length - 1)
         {
-            if (!SpanExtensions.Delimiters.Contains(_text[_index]))
+            if (!char.IsWhiteSpace(_text[_index]))
                 return true;
             _index++;
         }
 
         _index = -1;
         return false;
+    }
+
+    private bool TryParseSilence(out UtteranceSegment<T> phrase)
+    {
+        var duration = _text[_index] switch
+        {
+            '.' => 0.5,
+            ',' => 0.3,
+            _ => 0
+        };
+        if (duration is 0)
+        {
+            phrase = default;
+            return false;
+        }
+
+        Commit(1);
+        phrase = duration;
+        return true;
     }
 
     private bool TryLookAhead(out ReadOnlySpan<char> token, out int endIndex)
@@ -69,6 +98,40 @@ public ref struct PhraseParser<T> where T : PhraseBase
         var length = endIndex - _index;
         token = _text[_index..endIndex];
         return length > 0;
+    }
+
+    private bool TryParsePhrase(ReadOnlySpan<char> primaryToken, out UtteranceSegment<T> phrase)
+    {
+        if (!_tree.TryGetRootNode(primaryToken, out var lastNode))
+        {
+            phrase = default;
+            return false;
+        }
+
+        var start = _index;
+        Commit(primaryToken);
+        var lastSuccessful = lastNode.Value != null ? lastNode : null;
+        while (lastNode is {HasDescendants: true})
+        {
+            SkipWhitespaces();
+            if (!TryLookAhead(out var token, out var endIndex)
+                || !lastNode.TryGetDescendant(token, out lastNode))
+                break;
+            lastSuccessful = lastNode.Value != null ? lastNode : lastSuccessful;
+            _index = endIndex;
+        }
+
+        _index = start;
+
+        if (lastSuccessful != null)
+        {
+            Commit(lastSuccessful.Value!.Text);
+            phrase = lastSuccessful.Value;
+            return true;
+        }
+
+        phrase = null;
+        return false;
     }
 
     private void Commit(ReadOnlySpan<char> phrase) => Commit(phrase.Length);
