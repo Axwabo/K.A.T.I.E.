@@ -1,6 +1,7 @@
 ﻿using System;
 using Katie.Core.DataStructures;
 using Katie.Core.Extensions;
+using Katie.Core.NumberParsing;
 
 namespace Katie.Core;
 
@@ -9,6 +10,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
 
     private readonly PhraseTree<T> _tree;
     private readonly ReadOnlySpan<char> _text;
+    private HungarianNumericParser<T> _hungarianNumericParser;
 
     private int _index;
 
@@ -20,6 +22,9 @@ public ref struct PhraseParser<T> where T : PhraseBase
 
     public bool Next(out UtteranceSegment<T> phrase)
     {
+        if (_hungarianNumericParser.IsActive && _hungarianNumericParser.Next(ref _index, out phrase))
+            return true;
+
         if (!SkipWhitespaces())
         {
             phrase = default;
@@ -29,10 +34,17 @@ public ref struct PhraseParser<T> where T : PhraseBase
         if (TryParseSilence(out phrase))
             return true;
 
-        if (!TryLookAhead(out var primaryToken, out _))
+        if (!TryLookAhead(out var primaryToken, out var primaryEnd))
         {
             phrase = default;
             return false;
+        }
+
+        if (char.IsDigit(_text[_index]))
+        {
+            _hungarianNumericParser = new HungarianNumericParser<T>(_text, _tree);
+            if (_hungarianNumericParser.Begin(ref _index, primaryEnd, out phrase))
+                return true;
         }
 
         if (TryParsePhrase(primaryToken, out phrase))
@@ -127,7 +139,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
         }
 
         _index = start;
-        phrase = null;
+        phrase = default;
         return false;
     }
 
