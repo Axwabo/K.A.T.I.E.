@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -13,7 +14,7 @@ namespace Katie.UI.ViewModels;
 public sealed partial class MainViewModel : ViewModelBase
 {
 
-    public static double Margin => 5;
+    public static Thickness Margin { get; } = new(5);
 
     private readonly Control? _host;
 
@@ -71,7 +72,7 @@ public sealed partial class MainViewModel : ViewModelBase
             Dispatcher.UIThread.Post(() =>
             {
                 CurrentPhrase = provider.Current.Text;
-                TimeWidth = (_host?.Width - Margin * 2 ?? 0) * (provider.CurrentTime / provider.TotalTime);
+                TimeWidth = (_host?.Width - Margin.Left - Margin.Right ?? 0) * (provider.CurrentTime / provider.TotalTime);
             });
             await Task.Delay(10);
         }
