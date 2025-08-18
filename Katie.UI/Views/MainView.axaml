@@ -11,7 +11,7 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
-    <Grid RowDefinitions="*,60,Auto,Auto" Margin="{Binding Margin}">
+    <Grid RowDefinitions="*,60,Auto,Auto" Margin="5">
         <Grid ColumnDefinitions="*,*,*">
             <UserControl Content="{Binding Hungarian}" />
             <UserControl Grid.Column="1" Content="{Binding English}" />
@@ -24,6 +24,6 @@
             <Button Command="{Binding StopCommand}">Stop</Button>
             <Label Content="{Binding CurrentPhrase}" VerticalAlignment="Center" />
         </StackPanel>
-        <Rectangle Grid.Row="3" Height="3" Fill="Red" Width="{Binding TimeWidth}" HorizontalAlignment="Left" />
+        <ProgressBar Grid.Row="3" Height="3" Maximum="1" Value="{Binding Progress}" Foreground="Red" />
     </Grid>
 </UserControl>

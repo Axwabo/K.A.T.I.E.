@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -16,10 +15,6 @@ namespace Katie.UI.ViewModels;
 public sealed partial class MainViewModel : ViewModelBase
 {
 
-    public static Thickness Margin { get; } = new(5);
-
-    private readonly Control? _host;
-
     private int _playIndex;
 
     [ObservableProperty]
@@ -29,7 +24,7 @@ public sealed partial class MainViewModel : ViewModelBase
     private string _currentPhrase = "";
 
     [ObservableProperty]
-    private double _timeWidth;
+    private double _progress;
 
     private PhraseTree<WavePhrase> _englishTree = new([]);
 
@@ -43,7 +38,6 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public MainViewModel(Control? host)
     {
-        _host = host;
         English = new PhrasePackViewModel {Host = host, Language = "English"};
         Hungarian = new PhrasePackViewModel {Host = host, Language = "Hungarian"};
         Global = new PhrasePackViewModel {Host = host, Language = "Global"};
@@ -82,7 +76,7 @@ public sealed partial class MainViewModel : ViewModelBase
             Dispatcher.UIThread.Post(() =>
             {
                 CurrentPhrase = provider.Current.Text;
-                TimeWidth = (_host?.Width - Margin.Left - Margin.Right ?? 0) * (currentTime / provider.TotalTime);
+                Progress = (currentTime / provider.TotalTime);
             });
             await Task.Delay(10);
         }
