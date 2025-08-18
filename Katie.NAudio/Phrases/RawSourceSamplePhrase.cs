@@ -14,7 +14,7 @@ public sealed class RawSourceSamplePhrase : SamplePhraseBase
             throw new ArgumentException("Wave format must match PhraseChain.Format");
         _provider = provider;
         Text = text;
-        Duration = TimeSpan.FromSeconds(text.Length * PhraseChain.SamplesToSeconds);
+        Duration = TimeSpan.FromSeconds(provider.Length * PhraseChain.SamplesToSeconds);
     }
 
     public override string Text { get; }

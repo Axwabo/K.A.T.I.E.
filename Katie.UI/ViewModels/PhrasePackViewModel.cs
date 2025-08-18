@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using Katie.NAudio.Phrases;
 using Katie.UI.PhraseProviders;
@@ -26,11 +27,8 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
     [RelayCommand]
     private async Task AddPhrases()
     {
-        if (TopLevel.GetTopLevel(Host) is not {StorageProvider: {CanOpen: true} storage})
-            return;
-        _fileProvider ??= new FilePickerPhraseProvider(storage);
-        var provider = _fileProvider;
-        await AddPhrases(provider);
+        if (TopLevel.GetTopLevel(Host) is {StorageProvider: {CanOpen: true} storage})
+            await AddPhrases(_fileProvider ??= new FilePickerPhraseProvider(storage));
     }
 
     public async Task AddPhrases(IPhraseProvider provider)
@@ -45,5 +43,16 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
         if (any)
             PhrasesChanged?.InvokeOnUIThread();
     }
+
+    public Task Cache() => Task.Run(() =>
+    {
+        var phrases = List.ToSamplePhrases();
+        Dispatcher.UIThread.Post(() =>
+        {
+            for (var i = 0; i < List.Count; i++)
+                List[i] = phrases[i];
+            PhrasesChanged?.Invoke();
+        });
+    });
 
 }

@@ -81,12 +81,12 @@ public sealed partial class MainViewModel : ViewModelBase
         using var device = new WasapiOut();
         device.Init(provider, true);
         device.Play();
-        var divisor = device.OutputWaveFormat.BitsPerSample / 8d * device.OutputWaveFormat.SampleRate * device.OutputWaveFormat.Channels;
+        var bytesPerSecond = (double) device.OutputWaveFormat.AverageBytesPerSecond;
         while (device.PlaybackState == PlaybackState.Playing)
         {
             if (index != _playIndex)
                 device.Stop();
-            var currentTime = TimeSpan.FromSeconds(device.GetPosition() / divisor);
+            var currentTime = TimeSpan.FromSeconds(device.GetPosition() / bytesPerSecond);
             Dispatcher.UIThread.Post(() =>
             {
                 CurrentPhrase = provider.Current.Text;
@@ -98,5 +98,12 @@ public sealed partial class MainViewModel : ViewModelBase
 
     [RelayCommand]
     public void Stop() => _playIndex = -1;
+
+    [RelayCommand]
+    public Task Cache() => Task.WhenAll(
+        Hungarian.Cache(),
+        English.Cache(),
+        Global.Cache()
+    );
 
 }
