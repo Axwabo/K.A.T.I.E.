@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Katie.NAudio;
 using Katie.UI.ViewModels;
 
@@ -12,17 +13,15 @@ public interface IPhraseProvider
 
     public static Dictionary<string, IPhraseProvider> InitialProviders { get; } = new(StringComparer.OrdinalIgnoreCase);
 
-    public static void LoadInitialPhrases(PhrasePackViewModel hungarian, PhrasePackViewModel english, PhrasePackViewModel global)
-    {
-        Add("Hungarian", hungarian);
-        Add("English", english);
-        Add("Global", global);
-    }
+    public static Task LoadInitialPhrases(PhrasePackViewModel hungarian, PhrasePackViewModel english, PhrasePackViewModel global) => Task.WhenAll(
+        Add("Hungarian", hungarian),
+        Add("English", english),
+        Add("Global", global)
+    );
 
-    private static void Add(string key, PhrasePackViewModel pack)
-    {
-        if (InitialProviders.TryGetValue(key, out var hungarianProvider))
-            _ = pack.AddPhrases(hungarianProvider);
-    }
+    private static Task Add(string key, PhrasePackViewModel pack)
+        => InitialProviders.TryGetValue(key, out var hungarianProvider)
+            ? pack.AddPhrases(hungarianProvider)
+            : Task.CompletedTask;
 
 }

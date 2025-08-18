@@ -18,6 +18,9 @@ public sealed partial class MainViewModel : ViewModelBase
     private int _playIndex;
 
     [ObservableProperty]
+    private bool _initialsLoaded;
+
+    [ObservableProperty]
     private string _text = "";
 
     [ObservableProperty]
@@ -45,7 +48,7 @@ public sealed partial class MainViewModel : ViewModelBase
         English.PhrasesChanged += RebuildEnglish;
         Global.PhrasesChanged += RebuildHungarian;
         Global.PhrasesChanged += RebuildEnglish;
-        IPhraseProvider.LoadInitialPhrases(Hungarian, English, Global);
+        LoadInitialPhrases().ConfigureAwait(false);
     }
 
     public MainViewModel() : this(null)
@@ -55,6 +58,12 @@ public sealed partial class MainViewModel : ViewModelBase
     private void RebuildHungarian() => _hungarianTree = new PhraseTree<WavePhrase>(Global.List.Concat(Hungarian.List));
 
     private void RebuildEnglish() => _englishTree = new PhraseTree<WavePhrase>(Global.List.Concat(English.List));
+
+    private async Task LoadInitialPhrases()
+    {
+        await IPhraseProvider.LoadInitialPhrases(Hungarian, English, Global);
+        Dispatcher.UIThread.Post(() => InitialsLoaded = true);
+    }
 
     [RelayCommand]
     public async Task Play(string language)
@@ -76,7 +85,7 @@ public sealed partial class MainViewModel : ViewModelBase
             Dispatcher.UIThread.Post(() =>
             {
                 CurrentPhrase = provider.Current.Text;
-                Progress = (currentTime / provider.TotalTime);
+                Progress = currentTime / provider.TotalTime;
             });
             await Task.Delay(10);
         }
