@@ -6,7 +6,7 @@ using NAudio.Wave;
 
 namespace Katie.NAudio;
 
-using Clip = (ISampleProvider Provider, string Text);
+using LabeledClip = (ISampleProvider Provider, string Text);
 
 public sealed class PhraseChain : ISampleProvider
 {
@@ -15,32 +15,25 @@ public sealed class PhraseChain : ISampleProvider
 
     public static PhraseChain? Parse(ReadOnlySpan<char> text, PhraseTree<WavePhrase> tree)
     {
-        var providers = new Queue<Clip>();
+        var segments = new Queue<UtteranceSegment<WavePhrase>>();
         var parser = new PhraseParser<WavePhrase>(text, tree);
         while (parser.Next(out var phrase))
-            switch (phrase)
-            {
-                case {Phrase: { } clip}:
-                    providers.Enqueue((clip.ToSampleProvider(), clip.Text));
-                    break;
-                case {Duration.TotalSeconds: not 0 and var seconds}:
-                    providers.Enqueue((new DurationSilenceSampleProvider(Format, seconds), ""));
-                    break;
-            }
-
-        return providers.Count == 0 ? null : new PhraseChain(providers);
+            if (phrase.Duration != TimeSpan.Zero)
+                segments.Enqueue(phrase);
+        return segments.Count == 0 ? null : new PhraseChain(segments);
     }
 
-    private readonly Queue<Clip> _remaining;
+    private readonly Queue<UtteranceSegment<WavePhrase>> _remaining;
 
     private bool _ended;
 
-    public Clip Current { get; private set; }
+    public LabeledClip Current { get; private set; }
 
-    private PhraseChain(Queue<Clip> remaining)
+    private PhraseChain(Queue<UtteranceSegment<WavePhrase>> remaining)
     {
         _remaining = remaining;
-        Current = remaining.Dequeue();
+        TryDequeue(out var current);
+        Current = current;
     }
 
     public WaveFormat WaveFormat => Format;
@@ -56,7 +49,7 @@ public sealed class PhraseChain : ISampleProvider
             total += read;
             if (read > 0)
                 continue;
-            if (_remaining.TryDequeue(out var result))
+            if (TryDequeue(out var result))
             {
                 Current = result;
                 continue;
@@ -67,6 +60,20 @@ public sealed class PhraseChain : ISampleProvider
         }
 
         return total;
+    }
+
+    private bool TryDequeue(out LabeledClip result)
+    {
+        if (!_remaining.TryDequeue(out var segment))
+        {
+            result = default;
+            return false;
+        }
+
+        result = segment is {Phrase: { } clip}
+            ? (clip.ToSampleProvider(), clip.Text)
+            : (new DurationSilenceSampleProvider(Format, segment.Duration.TotalSeconds), "");
+        return true;
     }
 
 }
