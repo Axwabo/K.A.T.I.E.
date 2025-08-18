@@ -48,7 +48,8 @@ public sealed partial class MainViewModel : ViewModelBase
         English.PhrasesChanged += RebuildEnglish;
         Global.PhrasesChanged += RebuildHungarian;
         Global.PhrasesChanged += RebuildEnglish;
-        LoadInitialPhrases().ConfigureAwait(false);
+        if (!Design.IsDesignMode)
+            LoadInitialPhrases().ConfigureAwait(false);
     }
 
     public MainViewModel() : this(null)
