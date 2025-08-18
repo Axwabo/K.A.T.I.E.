@@ -36,10 +36,10 @@ public sealed class PhraseTree<T> where T : PhraseBase
         index = span.IndexOfWordDelimiter(index + 1);
         while (index >= 0)
         {
-            var currentToken = span[previousIndex..index];
+            var currentToken = span[previousIndex..index].Trim();
             node = node.TryGetDescendant(currentToken, out var nextNode)
                 ? nextNode
-                : node.Set(currentToken.Trim(), null);
+                : node.Set(currentToken, null);
             previousIndex = index;
             index = span.IndexOfWordDelimiter(index + 1);
         }
