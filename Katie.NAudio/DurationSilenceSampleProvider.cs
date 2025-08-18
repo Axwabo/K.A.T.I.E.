@@ -18,6 +18,8 @@ public sealed class DurationSilenceSampleProvider : ISampleProvider
 
     public int Read(float[] buffer, int offset, int count)
     {
+        if (_remaining <= 0)
+            return 0;
         var read = Math.Min(count, _remaining);
         _remaining = Math.Max(0, _remaining - count);
         Array.Clear(buffer, offset, read);
