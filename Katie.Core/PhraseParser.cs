@@ -4,7 +4,6 @@ using Katie.Core.Extensions;
 
 namespace Katie.Core;
 
-// TODO: to struct
 public ref struct PhraseParser<T> where T : PhraseBase
 {
 
