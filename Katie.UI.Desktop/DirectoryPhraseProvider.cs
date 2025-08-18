@@ -16,11 +16,7 @@ public sealed class DirectoryPhraseProvider : IPhraseProvider
     public async IAsyncEnumerable<WavePhrase> EnumeratePhrasesAsync()
     {
         foreach (var file in Directory.EnumerateFiles(_directory, "*.wav"))
-        {
-            await Task.Delay(100);
             yield return new WavePhrase(File.OpenRead(file), Path.GetFileNameWithoutExtension(file));
-        }
-
         await Task.CompletedTask;
     }
 
