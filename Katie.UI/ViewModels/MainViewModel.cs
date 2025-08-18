@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Katie.Core.DataStructures;
 using Katie.NAudio;
+using Katie.UI.PhraseProviders;
 using NAudio.Wave;
 
 namespace Katie.UI.ViewModels;
@@ -50,6 +51,7 @@ public sealed partial class MainViewModel : ViewModelBase
         English.PhrasesChanged += RebuildEnglish;
         Global.PhrasesChanged += RebuildHungarian;
         Global.PhrasesChanged += RebuildEnglish;
+        IPhraseProvider.LoadInitialPhrases(Hungarian, English, Global);
     }
 
     public MainViewModel() : this(null)
