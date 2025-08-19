@@ -6,15 +6,17 @@ namespace Katie.Core.NumberParsing.English;
 public ref struct EnglishNumericParser<T> where T : PhraseBase
 {
 
+    private static readonly UtteranceSegment<T> Pause = 0.2;
+
     private readonly ReadOnlySpan<char> _text;
     private readonly PhraseTree<T> _tree;
 
     private EnglishNumberParser<T> _numberParser;
 
-    private bool _wasHour;
+    private NumericTokenPart _part;
     private NumericTokenShape _shape;
 
-    public bool IsActive => _wasHour || _numberParser.IsActive;
+    public bool IsActive => _part != NumericTokenPart.None || _numberParser.IsActive;
 
     public EnglishNumericParser(ReadOnlySpan<char> text, PhraseTree<T> tree)
     {
@@ -30,16 +32,21 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
             return true;
         }
 
-        if (_wasHour)
+        switch (_part)
         {
-            _wasHour = false;
-            phrase = BeginNumber(ref index, 2);
-            index++;
-            return true;
+            case NumericTokenPart.HourNumber:
+                _part = NumericTokenPart.HourPause;
+                phrase = Pause;
+                index++;
+                return true;
+            case NumericTokenPart.HourPause:
+                _part = NumericTokenPart.None;
+                phrase = BeginNumber(ref index, 2);
+                return true;
+            default:
+                phrase = default;
+                return false;
         }
-
-        phrase = default;
-        return false;
     }
 
     public bool Begin(ref int index, int tokenEnd, out UtteranceSegment<T> phrase)
@@ -51,22 +58,16 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
         }
 
         var length = tokenEnd - index;
-        _wasHour = false;
+        _part = NumericTokenPart.None;
         _shape = NumericShapeDetector.Identify(_text[index..], length);
-        if (_shape == NumericTokenShape.None)
+        (_part, phrase) = _shape switch
         {
-            phrase = default;
-            return false;
-        }
-
-        (_wasHour, phrase) = _shape switch
-        {
-            NumericTokenShape.Regular => (false, BeginNumber(ref index, length)),
-            NumericTokenShape.Ordinal => (false, BeginNumber(ref index, length, true)),
-            NumericTokenShape.Time => (true, BeginNumber(ref index, 2)),
-            _ => (false, default)
+            NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(ref index, length)),
+            NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, true)),
+            NumericTokenShape.Time => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
+            _ => (NumericTokenPart.None, default)
         };
-        return true;
+        return _shape != NumericTokenShape.None;
     }
 
     private UtteranceSegment<T> BeginNumber(ref int index, int length, bool ordinal = false)
@@ -77,6 +78,15 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
         if (ordinal)
             index++;
         return phrase;
+    }
+
+    private enum NumericTokenPart
+    {
+
+        None,
+        HourNumber,
+        HourPause
+
     }
 
 }
