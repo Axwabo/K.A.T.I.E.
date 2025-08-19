@@ -26,6 +26,8 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
             throw new ArgumentException("Text cannot be empty", nameof(text));
         if (text.Length > 2)
             throw new ArgumentException($"Cannot parse a number of {text.Length} digits", nameof(text));
+        if (!text.IsDigit())
+            throw new ArgumentException("Text must contain only digits", nameof(text));
         _text = text;
         _tree = tree;
         _mappers = mappers;
