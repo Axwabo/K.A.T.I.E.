@@ -38,7 +38,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
             case NumericTokenPart.HourNumber when _shape == NumericTokenShape.TimeHourOnly:
                 _part = NumericTokenPart.None;
                 phrase = _tree.RootPhrase("o'clock");
-                index += 2;
+                index += 3;
                 return true;
             case NumericTokenPart.HourNumber:
                 _part = NumericTokenPart.Minute;
