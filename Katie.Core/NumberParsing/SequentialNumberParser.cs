@@ -64,4 +64,11 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
         }
     }
 
+    public static SequentialNumberParser<T> CreateTrimmed(ReadOnlySpan<char> text, PhraseTree<T> tree, DigitMappers mappers, bool isOrdinal, out int advanced)
+    {
+        var trimmed = text.TrimStart('0');
+        advanced = text.Length - trimmed.Length;
+        return new SequentialNumberParser<T>(trimmed, tree, mappers, isOrdinal);
+    }
+
 }

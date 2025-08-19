@@ -41,11 +41,11 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
                 index += 2;
                 return true;
             case NumericTokenPart.HourNumber:
-                _part = NumericTokenPart.HourPause;
+                _part = NumericTokenPart.Minute;
                 phrase = Pause;
                 index++;
                 return true;
-            case NumericTokenPart.HourPause:
+            case NumericTokenPart.Minute:
                 _part = NumericTokenPart.None;
                 phrase = BeginNumber(ref index, 2);
                 return true;
@@ -69,17 +69,27 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
         (_part, phrase) = _shape switch
         {
             NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(ref index, length)),
-            NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, true)),
-            NumericTokenShape.TimeHourMinute or NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
+            NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, ordinal: true)),
+            NumericTokenShape.TimeHourMinute => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2, false)),
+            NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
             _ => (NumericTokenPart.None, default)
         };
         return _shape is not (NumericTokenShape.None or NumericTokenShape.RegularSuffixed);
     }
 
-    private UtteranceSegment<T> BeginNumber(ref int index, int length, bool ordinal = false)
+    private UtteranceSegment<T> BeginNumber(ref int index, int length, bool trim = true, bool ordinal = false)
     {
-        _numberParser = new EnglishNumberParser<T>(_text[index..(index + length)], _tree, ordinal);
-        _numberParser.Next(out var phrase, out var advanced);
+        var span = _text[index..(index + length)];
+        var advanced = 0;
+        if (trim)
+        {
+            _numberParser = EnglishNumberParser<T>.CreateTrimmed(span, _tree, ordinal, out advanced);
+            index += advanced;
+        }
+        else
+            _numberParser = new EnglishNumberParser<T>(span, _tree, ordinal);
+
+        _numberParser.Next(out var phrase, out advanced);
         index += advanced;
         if (ordinal)
             index++;
@@ -91,7 +101,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
 
         None,
         HourNumber,
-        HourPause
+        Minute
 
     }
 
