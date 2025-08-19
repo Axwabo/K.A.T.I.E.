@@ -1,5 +1,6 @@
 ﻿using System;
 using Katie.Core.DataStructures;
+using Katie.Core.Extensions;
 
 namespace Katie.Core.NumberParsing.English;
 
@@ -34,6 +35,11 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
 
         switch (_part)
         {
+            case NumericTokenPart.HourNumber when _shape == NumericTokenShape.TimeHourOnly:
+                _part = NumericTokenPart.None;
+                phrase = _tree.RootPhrase("o'clock");
+                index += 2;
+                return true;
             case NumericTokenPart.HourNumber:
                 _part = NumericTokenPart.HourPause;
                 phrase = Pause;
@@ -64,7 +70,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
         {
             NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(ref index, length)),
             NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, true)),
-            NumericTokenShape.Time => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
+            NumericTokenShape.TimeHourMinute or NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
             _ => (NumericTokenPart.None, default)
         };
         return _shape != NumericTokenShape.None;

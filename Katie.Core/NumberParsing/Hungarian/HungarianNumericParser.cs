@@ -7,16 +7,18 @@ namespace Katie.Core.NumberParsing.Hungarian;
 public ref struct HungarianNumericParser<T> where T : PhraseBase
 {
 
+    private static readonly UtteranceSegment<T> Pause = 0.2;
+
     private readonly ReadOnlySpan<char> _text;
     private readonly PhraseTree<T> _tree;
 
     private HungarianNumberParser<T> _numberParser;
 
-    private NumericTokenPart _previousPart;
+    private NumericTokenPart _part;
     private NumericTokenShape _shape;
     private int _end;
 
-    public bool IsActive => _previousPart != NumericTokenPart.None || _numberParser.IsActive;
+    public bool IsActive => _part != NumericTokenPart.None || _numberParser.IsActive;
 
     public HungarianNumericParser(ReadOnlySpan<char> text, PhraseTree<T> tree)
     {
@@ -32,37 +34,46 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
             return true;
         }
 
-        switch (_previousPart)
+        switch (_part)
         {
+            case NumericTokenPart.HourNumber when _shape == NumericTokenShape.TimeHourOnly:
+                _part = NumericTokenPart.None;
+                phrase = WithSuffix(ref index, "óra");
+                return true;
             case NumericTokenPart.HourNumber:
-                _previousPart = NumericTokenPart.Hour;
-                index++;
+                _part = NumericTokenPart.Hour;
                 phrase = _tree.RootPhrase("óra");
                 return true;
             case NumericTokenPart.Hour:
-                _previousPart = NumericTokenPart.MinuteNumber;
+                _part = NumericTokenPart.Hour;
+                phrase = Pause;
+                index++;
+                return true;
+            case NumericTokenPart.Minute:
+                _part = NumericTokenPart.MinuteNumber;
                 phrase = BeginNumber(ref index, 2);
                 return true;
             case NumericTokenPart.MinuteNumber:
-                _previousPart = NumericTokenPart.None;
-                var suffix = _text[index.._end];
-                index = _end;
-                if (suffix.IsEmpty)
-                {
-                    phrase = _tree.RootPhrase("perc");
-                    return true;
-                }
-
-                phrase = _tree.RootPhrase(new TreeKey
-                {
-                    First = "perc",
-                    Second = suffix.TrimStart('-')
-                });
+                _part = NumericTokenPart.None;
+                phrase = WithSuffix(ref index, "perc");
                 return true;
             default:
                 phrase = default;
                 return false;
         }
+    }
+
+    private UtteranceSegment<T> WithSuffix(ref int index, ReadOnlySpan<char> main)
+    {
+        var suffix = _text[index.._end];
+        index = _end;
+        return suffix.IsEmpty
+            ? _tree.RootPhrase(main)
+            : _tree.RootPhrase(new TreeKey
+            {
+                First = main,
+                Second = suffix.TrimStart('-')
+            });
     }
 
     public bool Begin(ref int index, int tokenEnd, out UtteranceSegment<T> phrase)
@@ -74,14 +85,14 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         }
 
         var length = tokenEnd - index;
-        _previousPart = NumericTokenPart.None;
+        _part = NumericTokenPart.None;
         _shape = NumericShapeDetector.Identify(_text[index..], length);
         _end = tokenEnd;
-        (_previousPart, phrase) = _shape switch
+        (_part, phrase) = _shape switch
         {
             NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(ref index, length)),
             NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, true)),
-            NumericTokenShape.Time => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
+            NumericTokenShape.TimeHourMinute or NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
             _ => (NumericTokenPart.None, default)
         };
         return _shape != NumericTokenShape.None;
@@ -104,6 +115,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         None,
         HourNumber,
         Hour,
+        Minute,
         MinuteNumber
 
     }

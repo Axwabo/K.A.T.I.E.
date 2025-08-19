@@ -6,6 +6,7 @@ public enum NumericTokenShape
     None,
     Regular,
     Ordinal,
-    Time
+    TimeHourMinute,
+    TimeHourOnly
 
 }
