@@ -20,7 +20,7 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
 
     public bool IsActive => PositionalIndex != -1 && !_text.IsEmpty;
 
-    public SequentialNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, DigitMappers mappers, bool isOrdinal, out UtteranceSegment<T> phrase, out int advanced)
+    public SequentialNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, DigitMappers mappers, bool isOrdinal)
     {
         if (text.IsEmpty)
             throw new ArgumentException("Text cannot be empty", nameof(text));
@@ -31,7 +31,6 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
         _mappers = mappers;
         _isOrdinal = isOrdinal;
         PositionalIndex = _text.Length - 1;
-        Next(out phrase, out advanced);
     }
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)

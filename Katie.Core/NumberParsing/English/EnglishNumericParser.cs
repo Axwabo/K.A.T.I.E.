@@ -71,7 +71,8 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
 
     private UtteranceSegment<T> BeginNumber(ref int index, int length, bool ordinal = false)
     {
-        _numberParser = new EnglishNumberParser<T>(_text[index..(index + length)], _tree, ordinal, out var phrase, out var advanced);
+        _numberParser = new EnglishNumberParser<T>(_text[index..(index + length)], _tree, ordinal);
+        _numberParser.Next(out var phrase, out var advanced);
         index += advanced;
         if (ordinal)
             index++;

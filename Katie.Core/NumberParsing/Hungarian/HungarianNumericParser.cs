@@ -95,7 +95,9 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
 
     private UtteranceSegment<T> BeginNumber(ref int index, int length, bool ordinal = false)
     {
-        _numberParser = new HungarianNumberParser<T>(_text[index..(index + length)], _tree, ordinal, out var phrase, out var advanced);
+        _numberParser = new HungarianNumberParser<T>(_text[index..(index + length)], _tree, ordinal, out var advanced);
+        index += advanced;
+        _numberParser.Next(out var phrase, out advanced);
         index += advanced;
         if (ordinal)
             index++;

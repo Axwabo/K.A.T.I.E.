@@ -13,10 +13,10 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
 
     public bool IsActive => _parser.IsActive;
 
-    public EnglishNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal, out UtteranceSegment<T> phrase, out int advanced)
+    public EnglishNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal)
     {
         _tree = tree;
-        _parser = new SequentialNumberParser<T>(text, tree, Map.Digits, ordinal, out phrase, out advanced);
+        _parser = new SequentialNumberParser<T>(text, tree, Map.Digits, ordinal);
     }
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
