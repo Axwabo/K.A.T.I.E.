@@ -11,6 +11,8 @@ public readonly ref struct TreeKey
 
     public ReadOnlySpan<char> Second { get; init; }
 
+    public int Length => First.Length + Second.Length;
+
     public override int GetHashCode() => First.LowercaseHashCode(Second);
 
     public override string ToString() => Second.IsEmpty ? First.ToString() : First.ToString() + Second.ToString();

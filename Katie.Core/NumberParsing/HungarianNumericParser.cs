@@ -42,8 +42,20 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
                 return true;
             case NumericTokenPart.MinuteNumber:
                 _previousPart = NumericTokenPart.None;
+                var suffix = _text[index..];
                 index++;
-                phrase = Phrase("perc");
+                if (suffix.IsEmpty)
+                {
+                    phrase = Phrase("perc");
+                    return true;
+                }
+
+                index += suffix.Length;
+                phrase = Phrase(new TreeKey
+                {
+                    First = "perc",
+                    Second = suffix.TrimStart('-')
+                });
                 return true;
             default:
                 phrase = default;
@@ -55,7 +67,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
     {
         _previousPart = NumericTokenPart.None;
         var length = tokenEnd - index;
-        if (length == 5 && char.IsDigit(_text[index + 1]) && _text[index + 2] == ':')
+        if (length >= 5 && char.IsDigit(_text[index + 1]) && _text[index + 2] == ':')
         {
             _previousPart = NumericTokenPart.HourNumber;
             BeginNumber(ref index, 2, out phrase);
@@ -67,8 +79,8 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         return false;
     }
 
-    private UtteranceSegment<T> Phrase(ReadOnlySpan<char> token)
-        => _tree.TryGetRootValue(token, out var value) ? value : token.Length;
+    private UtteranceSegment<T> Phrase(TreeKey key)
+        => _tree.TryGetRootValue(key, out var value) ? value : key.Length;
 
     private void BeginNumber(ref int index, int length, out UtteranceSegment<T> phrase)
     {
