@@ -75,14 +75,20 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         var length = tokenEnd - index;
         _previousPart = NumericTokenPart.None;
         _shape = NumericShapeDetector.Identify(_text[index..], length);
+        if (_shape == NumericTokenShape.None)
+        {
+            phrase = default;
+            return false;
+        }
+
         (_previousPart, phrase) = _shape switch
         {
             NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(ref index, length)),
             NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, true)),
             NumericTokenShape.Time => (NumericTokenPart.Hour, BeginNumber(ref index, 2)),
-            _ => (NumericTokenPart.None, default)
+            _ => (NumericTokenPart.None, length)
         };
-        return _previousPart != NumericTokenPart.None;
+        return true;
     }
 
     private UtteranceSegment<T> Phrase(TreeKey key)
@@ -92,6 +98,8 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
     {
         _numberParser = new HungarianNumberParser<T>(_text[index..(index + length)], _tree, ordinal, out var phrase, out var advanced);
         index += advanced;
+        if (ordinal)
+            index++;
         return phrase;
     }
 
