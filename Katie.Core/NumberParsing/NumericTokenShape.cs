@@ -5,6 +5,7 @@ public enum NumericTokenShape
 
     None,
     Regular,
+    RegularSuffixed,
     Ordinal,
     TimeHourMinute,
     TimeHourOnly

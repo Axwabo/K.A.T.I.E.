@@ -73,7 +73,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
             NumericTokenShape.TimeHourMinute or NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
             _ => (NumericTokenPart.None, default)
         };
-        return _shape != NumericTokenShape.None;
+        return _shape is not (NumericTokenShape.None or NumericTokenShape.RegularSuffixed);
     }
 
     private UtteranceSegment<T> BeginNumber(ref int index, int length, bool ordinal = false)

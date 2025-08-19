@@ -12,7 +12,7 @@ public static class NumericShapeDetector
             : length >= 5 && span[..2].IsDigit() && span[2] == ':' && span[3..5].IsDigit()
                 ? IdentifyTime(span[3..5])
                 : !span[..length].IsDigit()
-                    ? NumericTokenShape.None
+                    ? IdentifyNotFullyDigit(span[..length])
                     : span.Length > length && span[length] == '.'
                         ? NumericTokenShape.Ordinal
                         : NumericTokenShape.Regular;
@@ -21,5 +21,10 @@ public static class NumericShapeDetector
         => minute[0] == '0' && minute[1] == '0'
             ? NumericTokenShape.TimeHourOnly
             : NumericTokenShape.TimeHourMinute;
+
+    private static NumericTokenShape IdentifyNotFullyDigit(ReadOnlySpan<char> span)
+        => span.IndexOf('-') > 0
+            ? NumericTokenShape.RegularSuffixed
+            : NumericTokenShape.None;
 
 }

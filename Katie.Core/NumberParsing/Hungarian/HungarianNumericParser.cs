@@ -17,6 +17,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
     private NumericTokenPart _part;
     private NumericTokenShape _shape;
     private int _end;
+    private int _suffixStart;
 
     public bool IsActive => _part != NumericTokenPart.None || _numberParser.IsActive;
 
@@ -38,7 +39,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         {
             case NumericTokenPart.HourNumber when _shape == NumericTokenShape.TimeHourOnly:
                 _part = NumericTokenPart.None;
-                phrase = WithSuffix(ref index, "óra");
+                phrase = EndWithSuffix(ref index, "óra");
                 return true;
             case NumericTokenPart.HourNumber:
                 _part = NumericTokenPart.Hour;
@@ -55,7 +56,11 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
                 return true;
             case NumericTokenPart.MinuteNumber:
                 _part = NumericTokenPart.None;
-                phrase = WithSuffix(ref index, "perc");
+                phrase = EndWithSuffix(ref index, "perc");
+                return true;
+            case NumericTokenPart.BeforeRegularSuffix:
+                _part = NumericTokenPart.None;
+                phrase = EndWithSuffix(ref index, ReadOnlySpan<char>.Empty);
                 return true;
             default:
                 phrase = default;
@@ -63,17 +68,21 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         }
     }
 
-    private UtteranceSegment<T> WithSuffix(ref int index, ReadOnlySpan<char> main)
+    private UtteranceSegment<T> EndWithSuffix(ref int index, ReadOnlySpan<char> main)
     {
         var suffix = _text[index.._end];
         index = _end;
-        return suffix.IsEmpty
-            ? _tree.RootPhrase(main)
-            : _tree.RootPhrase(new TreeKey
-            {
-                First = main,
-                Second = suffix.TrimStart('-')
-            });
+        return _tree.RootPhrase(
+            suffix.IsEmpty
+                ? main
+                : main.IsEmpty
+                    ? suffix
+                    : new TreeKey
+                    {
+                        First = main,
+                        Second = suffix.TrimStart('-')
+                    }
+        );
     }
 
     public bool Begin(ref int index, int tokenEnd, out UtteranceSegment<T> phrase)
@@ -91,6 +100,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         (_part, phrase) = _shape switch
         {
             NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(ref index, length)),
+            NumericTokenShape.RegularSuffixed => (NumericTokenPart.BeforeRegularSuffix, BeginSuffixed(ref index)),
             NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, true)),
             NumericTokenShape.TimeHourMinute or NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
             _ => (NumericTokenPart.None, default)
@@ -109,6 +119,12 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         return phrase;
     }
 
+    private UtteranceSegment<T> BeginSuffixed(ref int index)
+    {
+        _suffixStart = index + _text[index..].IndexOf('-');
+        return BeginNumber(ref index, _suffixStart - index);
+    }
+
     private enum NumericTokenPart
     {
 
@@ -116,7 +132,8 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         HourNumber,
         Hour,
         Minute,
-        MinuteNumber
+        MinuteNumber,
+        BeforeRegularSuffix
 
     }
 
