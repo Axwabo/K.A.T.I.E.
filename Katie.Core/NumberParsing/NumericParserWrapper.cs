@@ -1,5 +1,6 @@
 ﻿using System;
 using Katie.Core.DataStructures;
+using Katie.Core.NumberParsing.Hungarian;
 
 namespace Katie.Core.NumberParsing;
 

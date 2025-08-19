@@ -1,7 +1,7 @@
 ﻿using System;
 using Katie.Core.DataStructures;
 
-namespace Katie.Core.NumberParsing;
+namespace Katie.Core.NumberParsing.Hungarian;
 
 public ref struct HungarianNumericParser<T> where T : PhraseBase
 {
