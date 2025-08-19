@@ -51,10 +51,10 @@ public sealed class PhraseTree<T> where T : PhraseBase
             node.Set(span[previousIndex..].Trim(), phrase);
     }
 
-    public bool TryGetRootNode(ReadOnlySpan<char> token, [NotNullWhen(true)] out PhraseTreeNode<T>? node)
+    public bool TryGetRootNode(TreeKey token, [NotNullWhen(true)] out PhraseTreeNode<T>? node)
         => _rootNode.TryGetDescendant(token, out node);
 
-    public bool TryGetRootValue(ReadOnlySpan<char> token, [NotNullWhen(true)] out T? value)
+    public bool TryGetRootValue(TreeKey token, [NotNullWhen(true)] out T? value)
     {
         if (_rootNode.TryGetDescendant(token, out var node))
         {

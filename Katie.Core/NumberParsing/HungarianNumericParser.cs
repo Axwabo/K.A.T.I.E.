@@ -72,8 +72,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
 
     private void BeginNumber(ref int index, int length, out UtteranceSegment<T> phrase)
     {
-        _numberParser = new HungarianNumberParser<T>(_text[index..(index + length)], _tree);
-        _numberParser.Next(out phrase, out var advanced);
+        _numberParser = new HungarianNumberParser<T>(_text[index..(index + length)], _tree, out phrase, out var advanced);
         index += advanced;
     }
 

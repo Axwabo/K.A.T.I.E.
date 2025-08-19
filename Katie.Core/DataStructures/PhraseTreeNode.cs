@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Katie.Core.Extensions;
 
 namespace Katie.Core.DataStructures;
 
@@ -22,10 +20,10 @@ public sealed class PhraseTreeNode<T> where T : PhraseBase
         Value = value;
     }
 
-    public PhraseTreeNode<T> Set(ReadOnlySpan<char> key, T? value)
-        => _descendants[key.LowercaseHashCode()] = new PhraseTreeNode<T>(key.ToString(), value);
+    public PhraseTreeNode<T> Set(TreeKey key, T? value)
+        => _descendants[key.GetHashCode()] = new PhraseTreeNode<T>(key.ToString(), value);
 
-    public bool TryGetDescendant(ReadOnlySpan<char> key, [NotNullWhen(true)] out PhraseTreeNode<T>? value)
-        => _descendants.TryGetValue(key.LowercaseHashCode(), out value);
+    public bool TryGetDescendant(TreeKey key, [NotNullWhen(true)] out PhraseTreeNode<T>? value)
+        => _descendants.TryGetValue(key.GetHashCode(), out value);
 
 }

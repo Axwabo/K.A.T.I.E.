@@ -15,7 +15,7 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
 
     public bool IsActive => _part != NumberPart.None;
 
-    public HungarianNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree)
+    public HungarianNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, out UtteranceSegment<T> phrase, out int advanced)
     {
         _text = text;
         _tree = tree;
@@ -25,6 +25,7 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
             2 => NumberPart.Tízes,
             _ => throw new ArgumentException($"Cannot parse number of {text.Length} digits")
         };
+        Next(out phrase, out advanced);
     }
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
