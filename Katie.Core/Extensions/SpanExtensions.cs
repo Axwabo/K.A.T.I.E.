@@ -25,4 +25,12 @@ public static class SpanExtensions
 
     public static ReadOnlySpan<char> TrimDelimeters(this ReadOnlySpan<char> span) => span.Trim(Delimiters);
 
+    public static bool IsDigit(this ReadOnlySpan<char> span)
+    {
+        foreach (var c in span)
+            if (!char.IsDigit(c))
+                return false;
+        return true;
+    }
+
 }

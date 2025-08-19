@@ -9,16 +9,18 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
 
     private readonly ReadOnlySpan<char> _text;
     private readonly PhraseTree<T> _tree;
+    private readonly bool _ordinal;
 
     private int _index;
     private NumberPart _part;
 
     public bool IsActive => _part != NumberPart.None;
 
-    public HungarianNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, out UtteranceSegment<T> phrase, out int advanced)
+    public HungarianNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal, out UtteranceSegment<T> phrase, out int advanced)
     {
         _text = text;
         _tree = tree;
+        _ordinal = ordinal;
         _part = text.Length switch
         {
             1 => NumberPart.Egyes,
@@ -35,7 +37,7 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
             case NumberPart.Tízes:
                 if (_text[^1] == '0')
                 {
-                    phrase = _tree.Digit(_text[_index], Map.Tíz);
+                    phrase = _tree.Digit(_text[_index], _ordinal ? Map.Tizedik : Map.Tíz);
                     advanced = 2;
                     _part = NumberPart.None;
                     return true;
@@ -46,7 +48,7 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
                 _part = NumberPart.Egyes;
                 return true;
             case NumberPart.Egyes:
-                phrase = _tree.Digit(_text[_index], Map.Egy);
+                phrase = _tree.Digit(_text[_index], _ordinal ? Map.Sorszám : Map.Egy);
                 advanced = 1;
                 _part = NumberPart.None;
                 return true;
@@ -99,6 +101,20 @@ file static class Map
         _ => ""
     };
 
+    public static string Tizedik(char digit) => digit switch
+    {
+        '1' => "tizedik",
+        '2' => "huszadik",
+        '3' => "harmincadik",
+        '4' => "negyvenedik",
+        '5' => "ötvenedik",
+        '6' => "hatvanadik",
+        '7' => "hetvenedik",
+        '8' => "nyolcvanadik",
+        '9' => "kilencedik",
+        _ => ""
+    };
+
     public static string Egy(char digit) => digit switch
     {
         '0' => "nulla",
@@ -111,6 +127,21 @@ file static class Map
         '7' => "hét",
         '8' => "nyolc",
         '9' => "kilenc",
+        _ => ""
+    };
+
+    public static string Sorszám(char digit) => digit switch
+    {
+        '0' => "nulladik",
+        '1' => "első",
+        '2' => "második",
+        '3' => "harmadik",
+        '4' => "negyedik",
+        '5' => "ötödik",
+        '6' => "hatodik",
+        '7' => "hetedik",
+        '8' => "nyolcadik",
+        '9' => "kilencedik",
         _ => ""
     };
 
