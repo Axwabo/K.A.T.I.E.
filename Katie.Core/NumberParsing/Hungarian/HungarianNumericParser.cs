@@ -39,6 +39,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         {
             case NumericTokenPart.HourNumber when _shape == NumericTokenShape.TimeHourOnly:
                 _part = NumericTokenPart.None;
+                index += 3;
                 phrase = EndWithSuffix(ref index, "óra");
                 return true;
             case NumericTokenPart.HourNumber:
