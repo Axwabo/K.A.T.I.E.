@@ -46,7 +46,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
                 phrase = _tree.RootPhrase("óra");
                 return true;
             case NumericTokenPart.Hour:
-                _part = NumericTokenPart.Hour;
+                _part = NumericTokenPart.Minute;
                 phrase = Pause;
                 index++;
                 return true;
