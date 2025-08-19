@@ -1,5 +1,6 @@
 ﻿using System;
 using Katie.Core.DataStructures;
+using Katie.Core.Extensions;
 
 namespace Katie.Core.NumberParsing.Hungarian;
 
@@ -36,7 +37,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
             case NumericTokenPart.HourNumber:
                 _previousPart = NumericTokenPart.Hour;
                 index++;
-                phrase = Phrase("óra");
+                phrase = _tree.RootPhrase("óra");
                 return true;
             case NumericTokenPart.Hour:
                 _previousPart = NumericTokenPart.MinuteNumber;
@@ -48,11 +49,11 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
                 index = _end;
                 if (suffix.IsEmpty)
                 {
-                    phrase = Phrase("perc");
+                    phrase = _tree.RootPhrase("perc");
                     return true;
                 }
 
-                phrase = Phrase(new TreeKey
+                phrase = _tree.RootPhrase(new TreeKey
                 {
                     First = "perc",
                     Second = suffix.TrimStart('-')
@@ -91,9 +92,6 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         };
         return true;
     }
-
-    private UtteranceSegment<T> Phrase(TreeKey key)
-        => _tree.TryGetRootValue(key, out var value) ? value : key.Length;
 
     private UtteranceSegment<T> BeginNumber(ref int index, int length, bool ordinal = false)
     {
