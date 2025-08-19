@@ -18,16 +18,19 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
 
     public HungarianNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal, out UtteranceSegment<T> phrase, out int advanced)
     {
-        _text = text;
+        if (text.IsEmpty)
+            throw new ArgumentException("Text cannot be empty", nameof(text));
+        _text = text.TrimStart('0');
         _tree = tree;
         _ordinal = ordinal;
-        _part = text.Length switch
+        _part = _text.Length switch
         {
             1 => NumberPart.Egyes,
             2 => NumberPart.Tízes,
-            _ => throw new ArgumentException($"Cannot parse number of {text.Length} digits")
+            _ => throw new ArgumentException($"Cannot parse a number of {_text.Length} digits")
         };
         Next(out phrase, out advanced);
+        advanced += text.Length - _text.Length;
     }
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
