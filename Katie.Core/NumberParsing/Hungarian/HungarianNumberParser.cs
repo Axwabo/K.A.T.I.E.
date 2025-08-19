@@ -11,7 +11,11 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
     public bool IsActive => _parser.IsActive;
 
     public HungarianNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal, out UtteranceSegment<T> phrase, out int advanced)
-        => _parser = new SequentialNumberParser<T>(text, tree, Map.Digits, ordinal, out phrase, out advanced);
+    {
+        var trimmed = text.TrimStart('0');
+        _parser = new SequentialNumberParser<T>(trimmed, tree, Map.Digits, ordinal, out phrase, out advanced);
+        advanced += text.Length - trimmed.Length;
+    }
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced) => _parser.Next(out phrase, out advanced);
 

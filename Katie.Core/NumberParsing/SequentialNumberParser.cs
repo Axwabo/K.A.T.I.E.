@@ -24,15 +24,14 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
     {
         if (text.IsEmpty)
             throw new ArgumentException("Text cannot be empty", nameof(text));
-        _text = text.TrimStart('0');
+        if (text.Length > 2)
+            throw new ArgumentException($"Cannot parse a number of {text.Length} digits", nameof(text));
+        _text = text;
         _tree = tree;
         _mappers = mappers;
         _isOrdinal = isOrdinal;
-        if (_text.Length > 2)
-            throw new ArgumentException($"Cannot parse a number of {_text.Length} digits", nameof(text));
         PositionalIndex = _text.Length - 1;
         Next(out phrase, out advanced);
-        advanced += text.Length - _text.Length;
     }
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
