@@ -60,7 +60,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
     {
         if (_index == -1)
             return false;
-        while (_index < _text.Length - 1)
+        while (_index < _text.Length)
         {
             if (!char.IsWhiteSpace(_text[_index]))
                 return true;
