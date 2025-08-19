@@ -11,10 +11,11 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
     private readonly PhraseTree<T> _tree;
     private readonly bool _ordinal;
 
-    private int _index;
-    private NumberPart _part;
+    private int _positionalIndex;
 
-    public bool IsActive => _part != NumberPart.None;
+    private char Digit => _text[_text.Length - _positionalIndex - 1];
+
+    public bool IsActive => _positionalIndex != -1 && !_text.IsEmpty;
 
     public HungarianNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal, out UtteranceSegment<T> phrase, out int advanced)
     {
@@ -23,37 +24,34 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
         _text = text.TrimStart('0');
         _tree = tree;
         _ordinal = ordinal;
-        _part = _text.Length switch
-        {
-            1 => NumberPart.Egyes,
-            2 => NumberPart.Tízes,
-            _ => throw new ArgumentException($"Cannot parse a number of {_text.Length} digits")
-        };
+        if (_text.Length > 2)
+            throw new ArgumentException($"Cannot parse a number of {_text.Length} digits", nameof(text));
+        _positionalIndex = _text.Length - 1;
         Next(out phrase, out advanced);
         advanced += text.Length - _text.Length;
     }
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
     {
-        switch (_part)
+        switch (_positionalIndex)
         {
-            case NumberPart.Tízes:
+            case 1:
                 if (_text[^1] == '0')
                 {
-                    phrase = _tree.Digit(_text[_index], _ordinal ? Map.Tizedik : Map.Tíz);
+                    phrase = _tree.Digit(_text[^2], _ordinal ? Map.TenOrdinal : Map.TenExact);
                     advanced = 2;
-                    _part = NumberPart.None;
+                    _positionalIndex = -1;
                     return true;
                 }
 
-                phrase = _tree.Digit(_text[_index++], Map.Tizen);
+                phrase = _tree.Digit(Digit, Map.Ten);
                 advanced = 1;
-                _part = NumberPart.Egyes;
+                _positionalIndex = 0;
                 return true;
-            case NumberPart.Egyes:
-                phrase = _tree.Digit(_text[_index], _ordinal ? Map.Sorszám : Map.Egy);
+            case 0:
+                phrase = _tree.Digit(Digit, _ordinal ? Map.Ordinal : Map.One);
                 advanced = 1;
-                _part = NumberPart.None;
+                _positionalIndex = -1;
                 return true;
             default:
                 phrase = default;
@@ -62,21 +60,12 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
         }
     }
 
-    private enum NumberPart
-    {
-
-        None,
-        Tízes,
-        Egyes
-
-    }
-
 }
 
 file static class Map
 {
 
-    public static string Tizen(char digit) => digit switch
+    public static string Ten(char digit) => digit switch
     {
         '1' => "tizen",
         '2' => "huszon",
@@ -90,7 +79,7 @@ file static class Map
         _ => ""
     };
 
-    public static string Tíz(char digit) => digit switch
+    public static string TenExact(char digit) => digit switch
     {
         '1' => "tíz",
         '2' => "húsz",
@@ -104,7 +93,7 @@ file static class Map
         _ => ""
     };
 
-    public static string Tizedik(char digit) => digit switch
+    public static string TenOrdinal(char digit) => digit switch
     {
         '1' => "tizedik",
         '2' => "huszadik",
@@ -118,7 +107,7 @@ file static class Map
         _ => ""
     };
 
-    public static string Egy(char digit) => digit switch
+    public static string One(char digit) => digit switch
     {
         '0' => "nulla",
         '1' => "egy",
@@ -133,7 +122,7 @@ file static class Map
         _ => ""
     };
 
-    public static string Sorszám(char digit) => digit switch
+    public static string Ordinal(char digit) => digit switch
     {
         '0' => "nulladik",
         '1' => "első",

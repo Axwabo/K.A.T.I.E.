@@ -13,8 +13,9 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
 
     private NumericTokenPart _previousPart;
     private NumericTokenShape _shape;
+    private int _end;
 
-    public bool IsActive => _previousPart != NumericTokenPart.None;
+    public bool IsActive => _previousPart != NumericTokenPart.None || _numberParser.IsActive;
 
     public HungarianNumericParser(ReadOnlySpan<char> text, PhraseTree<T> tree)
     {
@@ -43,15 +44,14 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
                 return true;
             case NumericTokenPart.MinuteNumber:
                 _previousPart = NumericTokenPart.None;
-                var suffix = _text[index..];
-                index++;
+                var suffix = _text[index.._end];
+                index = _end;
                 if (suffix.IsEmpty)
                 {
                     phrase = Phrase("perc");
                     return true;
                 }
 
-                index += suffix.Length;
                 phrase = Phrase(new TreeKey
                 {
                     First = "perc",
@@ -81,12 +81,13 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
             return false;
         }
 
+        _end = tokenEnd;
         (_previousPart, phrase) = _shape switch
         {
             NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(ref index, length)),
             NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, true)),
-            NumericTokenShape.Time => (NumericTokenPart.Hour, BeginNumber(ref index, 2)),
-            _ => (NumericTokenPart.None, length)
+            NumericTokenShape.Time => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
+            _ => (NumericTokenPart.None, default)
         };
         return true;
     }

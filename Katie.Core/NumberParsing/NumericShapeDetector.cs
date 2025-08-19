@@ -9,7 +9,7 @@ public static class NumericShapeDetector
     public static NumericTokenShape Identify(ReadOnlySpan<char> span, int length)
         => length > span.Length
             ? throw new ArgumentOutOfRangeException(nameof(length), "Length cannot be greater than the span length.")
-            : length >= 5 && span[..2].IsDigit() && span[3] == ':' && span[2..5].IsDigit()
+            : length >= 5 && span[..2].IsDigit() && span[2] == ':' && span[3..5].IsDigit()
                 ? NumericTokenShape.Time
                 : !span[..length].IsDigit()
                     ? NumericTokenShape.None
