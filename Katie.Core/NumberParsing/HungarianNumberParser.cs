@@ -1,5 +1,6 @@
 ﻿using System;
 using Katie.Core.DataStructures;
+using Katie.Core.Extensions;
 
 namespace Katie.Core.NumberParsing;
 
@@ -31,7 +32,7 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
         switch (_part)
         {
             case NumberPart.Tízes:
-                if (_text[^1] == 0)
+                if (_text[^1] == '0')
                 {
                     phrase = _tree.Digit(_text[_index], Map.Tíz);
                     advanced = 2;
@@ -111,13 +112,5 @@ file static class Map
         '9' => "kilenc",
         _ => ""
     };
-
-    public static UtteranceSegment<T> Digit<T>(this PhraseTree<T> tree, char digit, Func<char, string> mapper) where T : PhraseBase
-    {
-        var key = mapper(digit);
-        return string.IsNullOrEmpty(key) || !tree.TryGetRootValue(key, out var phrase)
-            ? 1
-            : phrase;
-    }
 
 }

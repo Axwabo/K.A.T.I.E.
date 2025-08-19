@@ -11,9 +11,9 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
 
     private HungarianNumberParser<T> _numberParser;
 
-    private NumericTokenPart _part;
+    private NumericTokenPart _previousPart;
 
-    public bool IsActive => _part != NumericTokenPart.None;
+    public bool IsActive => _previousPart != NumericTokenPart.None;
 
     public HungarianNumericParser(ReadOnlySpan<char> text, PhraseTree<T> tree)
     {
@@ -29,23 +29,21 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
             return true;
         }
 
-        switch (_part)
+        switch (_previousPart)
         {
             case NumericTokenPart.HourNumber:
+                _previousPart = NumericTokenPart.Hour;
                 index++;
-                phrase = _tree.TryGetRootValue("óra", out var hour) ? hour : 3;
-                _part = NumericTokenPart.Hour;
+                phrase = Phrase("óra");
                 return true;
             case NumericTokenPart.Hour:
-                _numberParser = new HungarianNumberParser<T>(_text[index..(index + 2)], _tree);
-                _numberParser.Next(out phrase, out var advancedHour);
-                _part = NumericTokenPart.MinuteNumber;
-                index += advancedHour;
+                _previousPart = NumericTokenPart.MinuteNumber;
+                BeginNumber(ref index, 2, out phrase);
                 return true;
             case NumericTokenPart.MinuteNumber:
+                _previousPart = NumericTokenPart.None;
                 index++;
-                phrase = _tree.TryGetRootValue("perc", out var minute) ? minute : 4;
-                _part = NumericTokenPart.None;
+                phrase = Phrase("perc");
                 return true;
             default:
                 phrase = default;
@@ -55,20 +53,28 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
 
     public bool Begin(ref int index, int tokenEnd, out UtteranceSegment<T> phrase)
     {
-        _part = NumericTokenPart.None;
+        _previousPart = NumericTokenPart.None;
         var length = tokenEnd - index;
         if (length == 5 && char.IsDigit(_text[index + 1]) && _text[index + 2] == ':')
         {
-            _part = NumericTokenPart.HourNumber;
-            _numberParser = new HungarianNumberParser<T>(_text[index..(index + 2)], _tree);
-            _numberParser.Next(out phrase, out var advanced);
-            index += advanced;
+            _previousPart = NumericTokenPart.HourNumber;
+            BeginNumber(ref index, 2, out phrase);
             return true;
         }
 
         index = tokenEnd;
         phrase = default;
         return false;
+    }
+
+    private UtteranceSegment<T> Phrase(ReadOnlySpan<char> token)
+        => _tree.TryGetRootValue(token, out var value) ? value : token.Length;
+
+    private void BeginNumber(ref int index, int length, out UtteranceSegment<T> phrase)
+    {
+        _numberParser = new HungarianNumberParser<T>(_text[index..(index + length)], _tree);
+        _numberParser.Next(out phrase, out var advanced);
+        index += advanced;
     }
 
     private enum NumericTokenPart
