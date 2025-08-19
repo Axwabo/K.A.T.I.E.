@@ -14,11 +14,11 @@ public ref struct PhraseParser<T> where T : PhraseBase
 
     private int _index;
 
-    public PhraseParser(ReadOnlySpan<char> text, PhraseTree<T> tree)
+    public PhraseParser(ReadOnlySpan<char> text, PhraseTree<T> tree, ReadOnlySpan<char> language)
     {
         _tree = tree;
         _text = text;
-        _numericParser = new NumericParserWrapper<T>(text, tree);
+        _numericParser = new NumericParserWrapper<T>(text, tree, language);
     }
 
     public bool Next(out UtteranceSegment<T> phrase)

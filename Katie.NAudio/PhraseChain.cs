@@ -18,10 +18,10 @@ public sealed class PhraseChain : ISampleProvider
 
     public static WaveFormat Format { get; } = WaveFormat.CreateIeeeFloatWaveFormat(SampleRate, 1);
 
-    public static PhraseChain? Parse(ReadOnlySpan<char> text, PhraseTree<SamplePhraseBase> tree)
+    public static PhraseChain? Parse(ReadOnlySpan<char> text, PhraseTree<SamplePhraseBase> tree, ReadOnlySpan<char> language)
     {
         var segments = new Queue<UtteranceSegment<SamplePhraseBase>>();
-        var parser = new PhraseParser<SamplePhraseBase>(text, tree);
+        var parser = new PhraseParser<SamplePhraseBase>(text, tree, language);
         while (parser.Next(out var phrase))
             if (phrase.Duration != TimeSpan.Zero)
                 segments.Enqueue(phrase);
