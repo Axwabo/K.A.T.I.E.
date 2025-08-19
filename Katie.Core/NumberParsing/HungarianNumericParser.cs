@@ -65,6 +65,12 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
 
     public bool Begin(ref int index, int tokenEnd, out UtteranceSegment<T> phrase)
     {
+        if (!char.IsDigit(_text[index]))
+        {
+            phrase = default;
+            return false;
+        }
+
         _previousPart = NumericTokenPart.None;
         var length = tokenEnd - index;
         if (length >= 5 && char.IsDigit(_text[index + 1]) && _text[index + 2] == ':')

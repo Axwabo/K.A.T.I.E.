@@ -10,7 +10,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
 
     private readonly PhraseTree<T> _tree;
     private readonly ReadOnlySpan<char> _text;
-    private HungarianNumericParser<T> _hungarianNumericParser;
+    private NumericParserWrapper<T> _numericParser;
 
     private int _index;
 
@@ -18,11 +18,12 @@ public ref struct PhraseParser<T> where T : PhraseBase
     {
         _tree = tree;
         _text = text;
+        _numericParser = new NumericParserWrapper<T>(text, tree);
     }
 
     public bool Next(out UtteranceSegment<T> phrase)
     {
-        if (_hungarianNumericParser.IsActive && _hungarianNumericParser.Next(ref _index, out phrase))
+        if (_numericParser.Next(ref _index, out phrase))
             return true;
 
         if (!SkipWhitespaces())
@@ -40,14 +41,8 @@ public ref struct PhraseParser<T> where T : PhraseBase
             return false;
         }
 
-        if (char.IsDigit(_text[_index]))
-        {
-            _hungarianNumericParser = new HungarianNumericParser<T>(_text, _tree);
-            if (_hungarianNumericParser.Begin(ref _index, primaryEnd, out phrase))
-                return true;
-        }
-
-        if (TryParsePhrase(primaryToken, out phrase))
+        if (_numericParser.Begin(ref _index, primaryEnd, out phrase)
+            || TryParsePhrase(primaryToken, out phrase))
             return true;
 
         if (primaryToken.Length > 0)
