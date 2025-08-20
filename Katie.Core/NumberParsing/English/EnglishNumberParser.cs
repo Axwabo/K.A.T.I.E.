@@ -36,9 +36,11 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
                 phrase = _tree.RootPhrase("oh");
                 return _parser.Next(out _, out advanced);
             case (1, '1'):
-                _parser.Next(out _, out _);
+                _parser.Next(out phrase, out advanced);
+                if (advanced == 2)
+                    return true;
+                advanced++;
                 phrase = _tree.RootPhrase(Map.TenTy(_parser.Digit));
-                advanced = 2;
                 _parser.Next(out _, out _);
                 return true;
             default:

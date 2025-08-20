@@ -47,7 +47,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
                 return true;
             case NumericTokenPart.Minute:
                 _part = NumericTokenPart.None;
-                phrase = BeginNumber(ref index, 2);
+                phrase = BeginNumber(ref index, 2, false);
                 return true;
             default:
                 phrase = default;
@@ -71,7 +71,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
             NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(ref index, length)),
             NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, ordinal: true)),
             NumericTokenShape.TimeHourMinute => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2, false)),
-            NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
+            NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2, false)),
             _ => (NumericTokenPart.None, default)
         };
         return _shape is not (NumericTokenShape.None or NumericTokenShape.RegularSuffixed);
