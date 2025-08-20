@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Katie.Core;
+﻿namespace Katie.Core;
 
 public abstract class PhraseBase
 {

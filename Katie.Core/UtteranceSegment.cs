@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Katie.Core;
+﻿namespace Katie.Core;
 
 public readonly record struct UtteranceSegment<T>(TimeSpan Duration, T? Phrase = null) where T : PhraseBase
 {

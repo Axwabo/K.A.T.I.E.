@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Katie.Core;
+﻿using Katie.Core;
 using Katie.Core.DataStructures;
 using Katie.NAudio.Phrases;
 using NAudio.Wave;

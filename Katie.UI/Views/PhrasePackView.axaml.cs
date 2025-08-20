@@ -1,6 +1,4 @@
-﻿using Avalonia.Controls;
-
-namespace Katie.UI.Views;
+﻿namespace Katie.UI.Views;
 
 public partial class PhrasePackView : UserControl
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Katie.Core.Extensions;
+﻿namespace Katie.Core.Extensions;
 
 public static class SpanExtensions
 {

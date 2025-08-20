@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Katie.NAudio.Phrases;
-using Katie.UI.ViewModels;
-
-namespace Katie.UI.PhraseProviders;
+﻿namespace Katie.UI.PhraseProviders;
 
 public interface IPhraseProvider
 {

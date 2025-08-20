@@ -1,6 +1,4 @@
-﻿using Katie.UI.Views;
-
-namespace Katie.UI.ViewModels;
+﻿namespace Katie.UI.ViewModels;
 
 public sealed class MainWindowViewModel
 {

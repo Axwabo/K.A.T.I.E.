@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Katie.Core.NumberParsing;
+﻿namespace Katie.Core.NumberParsing;
 
 using Mapper = Func<char, string>;
 

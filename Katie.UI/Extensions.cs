@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Avalonia.Threading;
-using Katie.NAudio.Extensions;
-using Katie.NAudio.Phrases;
+﻿using Katie.NAudio.Extensions;
 
 namespace Katie.UI;
 

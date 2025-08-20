@@ -1,5 +1,4 @@
-﻿using System;
-using Katie.Core.DataStructures;
+﻿using Katie.Core.DataStructures;
 using Katie.Core.Extensions;
 using Katie.Core.NumberParsing;
 

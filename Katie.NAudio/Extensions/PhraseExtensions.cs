@@ -1,5 +1,4 @@
-﻿using System;
-using Katie.NAudio.Phrases;
+﻿using Katie.NAudio.Phrases;
 
 namespace Katie.NAudio.Extensions;
 

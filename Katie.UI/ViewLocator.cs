@@ -1,7 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Controls.Templates;
-using Katie.UI.ViewModels;
-using Katie.UI.Views;
+﻿using Avalonia.Controls.Templates;
 
 namespace Katie.UI;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using Katie.Core.Extensions;
+﻿using Katie.Core.Extensions;
 
 namespace Katie.Core.DataStructures;
 

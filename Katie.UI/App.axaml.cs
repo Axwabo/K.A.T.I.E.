@@ -1,10 +1,7 @@
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using Katie.UI.ViewModels;
-using Katie.UI.Views;
 
 namespace Katie.UI;
 

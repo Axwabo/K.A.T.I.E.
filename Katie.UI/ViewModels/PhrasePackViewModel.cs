@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Threading;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
-using Katie.NAudio.Phrases;
 using Katie.UI.PhraseProviders;
 
 namespace Katie.UI.ViewModels;

@@ -1,5 +1,3 @@
-using Avalonia.Controls;
-
 namespace Katie.UI.Views;
 
 public partial class MainWindow : Window

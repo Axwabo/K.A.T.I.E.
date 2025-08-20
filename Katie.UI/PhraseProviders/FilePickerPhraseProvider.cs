@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using Avalonia.Platform.Storage;
-using Katie.NAudio.Phrases;
 
 namespace Katie.UI.PhraseProviders;
 

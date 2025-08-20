@@ -1,13 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Katie.Core.DataStructures;
 using Katie.NAudio;
-using Katie.NAudio.Phrases;
 using Katie.UI.PhraseProviders;
 using NAudio.Wave;
 
