@@ -1,4 +1,4 @@
-﻿namespace Katie.UI;
+﻿namespace Katie.UI.Extensions;
 
 public static class ActionExtensions
 {
