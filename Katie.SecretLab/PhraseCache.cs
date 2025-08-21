@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Katie.Core.DataStructures;
-using Katie.Core.Extensions;
 using Katie.NAudio.Phrases;
 using SecretLabNAudio.Core.Extensions;
 using SecretLabNAudio.Core.FileReading;
@@ -12,27 +11,35 @@ namespace Katie.SecretLab;
 public static class PhraseCache
 {
 
-    private static readonly Dictionary<int, PhraseTree<SamplePhraseBase>> Trees = [];
+    public static PhraseTree<SamplePhraseBase> Hungarian { get; private set; } = new([]);
+
+    public static PhraseTree<SamplePhraseBase> English { get; private set; } = new([]);
 
     public static void Initialize(DirectoryInfo phrasesRoot)
     {
-        var global = phrasesRoot.CreateSubdirectory("Global").EnumeratePhrases().ToList();
-        foreach (var directory in phrasesRoot.EnumerateDirectories())
-            if (directory.Name != "Global")
-                Trees[directory.Name.AsSpan().LowercaseHashCode()] = new PhraseTree<SamplePhraseBase>(global.Concat(directory.EnumeratePhrases()));
+        var global = phrasesRoot.EnumeratePhrases("Global").ToList();
+        Hungarian = new PhraseTree<SamplePhraseBase>(global.Concat(phrasesRoot.EnumeratePhrases("Hungarian")));
+        English = new PhraseTree<SamplePhraseBase>(global.Concat(phrasesRoot.EnumeratePhrases("English")));
     }
 
     public static bool TryGetTree(ReadOnlySpan<char> language, [NotNullWhen(true)] out PhraseTree<SamplePhraseBase>? tree)
-        => Trees.TryGetValue(language.LowercaseHashCode(), out tree);
-
-    private static IEnumerable<SamplePhraseBase> EnumeratePhrases(this DirectoryInfo directory)
     {
-        foreach (var file in Directory.EnumerateFiles(directory.FullName, "*.wav"))
+        tree = language.Equals("Hungarian", StringComparison.OrdinalIgnoreCase)
+            ? Hungarian
+            : language.Equals("English", StringComparison.OrdinalIgnoreCase)
+                ? English
+                : null;
+        return tree != null;
+    }
+
+    private static IEnumerable<SamplePhraseBase> EnumeratePhrases(this DirectoryInfo directory, string subdirectory)
+    {
+        foreach (var file in Directory.EnumerateFiles(directory.CreateSubdirectory(subdirectory).FullName, "*.wav"))
         {
+            var name = Path.GetFileNameWithoutExtension(file);
+            Logger.Debug($"Found {directory.Name} phrase: {name}");
             using var stream = CreateAudioReader.Stream(file);
             var samples = stream.ReadPlayerCompatibleSamples();
-            var name = Path.GetFileNameWithoutExtension(file);
-            Logger.Debug($"Added {directory.Name} phrase: {name}");
             yield return new RawSourcePhrase(samples, name);
         }
     }
