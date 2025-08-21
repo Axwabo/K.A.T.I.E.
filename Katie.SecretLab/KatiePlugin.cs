@@ -21,7 +21,8 @@ public sealed class KatiePlugin : Plugin
     public override void Enable()
     {
         _harmony.PatchAll();
-        PhraseCache.Initialize(this.GetConfigDirectory());
+        var config = this.GetConfigDirectory();
+        PhraseCache.Initialize(config.CreateSubdirectory("Phrases"));
         CustomHandlersManager.RegisterEventsHandler(_handlers);
     }
 

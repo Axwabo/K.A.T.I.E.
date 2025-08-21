@@ -14,14 +14,12 @@ public static class PhraseCache
 
     private static readonly Dictionary<int, PhraseTree<SamplePhraseBase>> Trees = [];
 
-    public static void Initialize(DirectoryInfo configDirectory)
+    public static void Initialize(DirectoryInfo phrasesRoot)
     {
-        var global = configDirectory.CreateSubdirectory("Global").EnumeratePhrases().ToList();
-        foreach (var directory in configDirectory.EnumerateDirectories())
-        {
+        var global = phrasesRoot.CreateSubdirectory("Global").EnumeratePhrases().ToList();
+        foreach (var directory in phrasesRoot.EnumerateDirectories())
             if (directory.Name != "Global")
                 Trees[directory.Name.AsSpan().LowercaseHashCode()] = new PhraseTree<SamplePhraseBase>(global.Concat(directory.EnumeratePhrases()));
-        }
     }
 
     public static bool TryGetTree(ReadOnlySpan<char> language, [NotNullWhen(true)] out PhraseTree<SamplePhraseBase>? tree)
