@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <PackageReference Include="NAudio.Core" />
-        <PackageReference Include="NLayer" />
-        <PackageReference Include="NLayer.NAudioSupport" />
-        <PackageReference Include="NVorbis" />
-        <PackageReference Include="NAudio.Vorbis" />
+        <PackageReference Include="NAudio.Core" PrivateAssets="all" />
+        <PackageReference Include="NLayer" PrivateAssets="all" />
+        <PackageReference Include="NLayer.NAudioSupport" PrivateAssets="all" />
+        <PackageReference Include="NVorbis" PrivateAssets="all" />
+        <PackageReference Include="NAudio.Vorbis" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>

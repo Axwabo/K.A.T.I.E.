@@ -28,11 +28,19 @@ internal sealed class AnnouncementManager : MonoBehaviour
 
     private void Awake() => Instance = this;
 
-    public void Play(string text)
+    public bool Play(string text)
     {
-        var chain = PhraseChain.Parse(text, PhraseCache.Tree, "Hungarian");
-        if (chain != null)
-            Player.SampleProvider = chain;
+        var span = text.AsSpan().Trim();
+        if (span[0] != '[')
+            return false;
+        var end = span.IndexOf(']');
+        if (end == -1)
+            return false;
+        var language = span[1..end];
+        if (!PhraseCache.TryGetTree(language, out var tree))
+            return false;
+        Player.SampleProvider = PhraseChain.Parse(span[(end + 1)..].Trim(), tree, language);
+        return true;
     }
 
 }

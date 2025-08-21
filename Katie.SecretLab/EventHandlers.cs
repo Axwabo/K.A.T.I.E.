@@ -10,8 +10,8 @@ internal sealed class EventHandlers : CustomEventsHandler
 
     public override void OnServerCassieAnnouncing(CassieAnnouncingEventArgs ev)
     {
-        ev.IsAllowed = false;
-        AnnouncementManager.Instance.Play(ev.Words);
+        if (AnnouncementManager.Instance.Play(ev.Words))
+            ev.IsAllowed = false;
     }
 
 }

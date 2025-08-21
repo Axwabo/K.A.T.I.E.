@@ -11,11 +11,17 @@ public static class SpanExtensions
         return indexInSlice == -1 ? -1 : indexInSlice + start;
     }
 
-    public static int LowercaseHashCode(this ReadOnlySpan<char> first, ReadOnlySpan<char> second)
+    public static int LowercaseHashCode(this ReadOnlySpan<char> span)
     {
         var code = 0;
-        foreach (var c in first)
+        foreach (var c in span)
             code = HashCode.Combine(code, char.ToLowerInvariant(c));
+        return code;
+    }
+
+    public static int LowercaseHashCode(this ReadOnlySpan<char> first, ReadOnlySpan<char> second)
+    {
+        var code = first.LowercaseHashCode();
         foreach (var c in second)
             code = HashCode.Combine(code, char.ToLowerInvariant(c));
         return code;
