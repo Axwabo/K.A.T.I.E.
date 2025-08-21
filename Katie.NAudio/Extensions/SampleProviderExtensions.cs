@@ -6,12 +6,12 @@ namespace Katie.NAudio.Extensions;
 public static class SampleProviderExtensions
 {
 
-    public static ISampleProvider EnsureFormat(this ISampleProvider provider, int sampleRate, int channels)
-        => (provider.WaveFormat.Channels, channels) switch
+    public static ISampleProvider EnsureFormat(this ISampleProvider provider, SimpleWaveFormat format)
+        => (provider.WaveFormat.Channels, format.Channels) switch
         {
-            (1, 2) => new MonoToStereoSampleProvider(provider.EnsureSampleRate(sampleRate)),
-            (2, 1) => new StereoToMonoSampleProvider(provider).EnsureSampleRate(sampleRate),
-            _ => provider.EnsureSampleRate(sampleRate)
+            (1, 2) => new MonoToStereoSampleProvider(provider.EnsureSampleRate(format.SampleRate)),
+            (2, 1) => new StereoToMonoSampleProvider(provider).EnsureSampleRate(format.SampleRate),
+            _ => provider.EnsureSampleRate(format.SampleRate)
         };
 
     public static ISampleProvider EnsureSampleRate(this ISampleProvider provider, int sampleRate)

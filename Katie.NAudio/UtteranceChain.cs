@@ -83,7 +83,7 @@ public sealed class UtteranceChain : ISampleProvider
         }
 
         result = segment is {Phrase: { } clip}
-            ? (clip.ToSampleProvider().EnsureFormat(WaveFormat.SampleRate, WaveFormat.Channels), clip.Text)
+            ? (clip.ToSampleProvider().EnsureFormat(WaveFormat), clip.Text)
             : (new DurationSilenceSampleProvider(WaveFormat, segment.Duration.TotalSeconds), "");
         return true;
     }
