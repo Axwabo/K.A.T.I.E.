@@ -6,4 +6,5 @@
     </Folder>
     <Project Path="Katie.Core/Katie.Core.csproj" />
     <Project Path="Katie.NAudio/Katie.NAudio.csproj" />
+    <Project Path="Katie.SecretLab/Katie.SecretLab.csproj" />
 </Solution>
