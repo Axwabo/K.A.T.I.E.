@@ -1,6 +1,9 @@
 ﻿using Katie.NAudio;
+using NAudio.Wave.SampleProviders;
 using SecretLabNAudio.Core;
+using SecretLabNAudio.Core.Extensions;
 using SecretLabNAudio.Core.Pools;
+using SecretLabNAudio.Core.Providers;
 using UnityEngine;
 
 namespace Katie.SecretLab;
@@ -24,9 +27,13 @@ internal sealed class AnnouncementManager : MonoBehaviour
         Instance.Player = player;
     }
 
+    private readonly SampleProviderQueue _queue = new(AudioPlayer.SupportedFormat);
+
     public AudioPlayer Player { get; private set; } = null!;
 
     private void Awake() => Instance = this;
+
+    private void Start() => Player.SampleProvider = _queue.Volume(2);
 
     public bool Play(string text)
     {
@@ -39,7 +46,9 @@ internal sealed class AnnouncementManager : MonoBehaviour
         var language = span[1..end];
         if (!PhraseCache.TryGetTree(language, out var tree))
             return false;
-        Player.SampleProvider = PhraseChain.Parse(span[(end + 1)..].Trim(), tree, language);
+        var chain = PhraseChain.Parse(span[(end + 1)..].Trim(), tree, language);
+        if (chain != null)
+            _queue.Enqueue(new OffsetSampleProvider(chain) {LeadOut = TimeSpan.FromSeconds(3)});
         return true;
     }
 
