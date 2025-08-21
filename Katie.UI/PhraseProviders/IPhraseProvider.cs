@@ -14,8 +14,8 @@ public interface IPhraseProvider
     );
 
     private static Task Add(string key, PhrasePackViewModel pack)
-        => InitialProviders.TryGetValue(key, out var hungarianProvider)
-            ? pack.AddPhrases(hungarianProvider)
+        => InitialProviders.TryGetValue(key, out var provider)
+            ? pack.AddPhrases(provider)
             : Task.CompletedTask;
 
 }
