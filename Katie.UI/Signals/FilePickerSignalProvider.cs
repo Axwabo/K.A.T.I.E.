@@ -1,8 +1,9 @@
-﻿using Avalonia.Platform.Storage;
+﻿using System.IO;
+using Avalonia.Platform.Storage;
 using Katie.UI.Extensions;
 using NAudio.Wave;
 
-namespace Katie.UI.SignalProviders;
+namespace Katie.UI.Signals;
 
 internal sealed class FilePickerSignalProvider : ISignalProvider
 {
@@ -25,13 +26,14 @@ internal sealed class FilePickerSignalProvider : ISignalProvider
 
     public FilePickerSignalProvider(IStorageProvider storageProvider) => _storageProvider = storageProvider;
 
-    public async IAsyncEnumerable<RawSourceSampleProvider> EnumerateSignalsAsync()
+    public async IAsyncEnumerable<Signal> EnumerateSignalsAsync()
     {
         foreach (var file in await _storageProvider.OpenFilePickerAsync(Options))
         {
             await using var fileStream = await file.OpenReadAsync();
             await using var reader = new WaveFileReader(fileStream);
-            yield return reader.ToSampleProvider().ReadSamples(reader.TotalTime);
+            var provider = await Task.Run(() => reader.ToSampleProvider().ReadSamples(reader.TotalTime));
+            yield return new Signal(provider, Path.GetFileNameWithoutExtension(file.Name), reader.TotalTime);
         }
     }
 
