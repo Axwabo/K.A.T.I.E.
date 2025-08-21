@@ -68,7 +68,7 @@ public sealed partial class MainViewModel : ViewModelBase
     {
         var index = ++_playIndex;
         // TODO: replace with a SoundFlow backend
-        var provider = PhraseChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree, language);
+        var provider = UtteranceChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree, language);
         if (provider == null)
             return;
         using var device = new WasapiOut();

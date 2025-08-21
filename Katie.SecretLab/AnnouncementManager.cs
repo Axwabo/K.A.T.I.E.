@@ -46,7 +46,7 @@ internal sealed class AnnouncementManager : MonoBehaviour
         var language = span[1..end];
         if (!PhraseCache.TryGetTree(language, out var tree))
             return false;
-        var chain = PhraseChain.Parse(span[(end + 1)..].Trim(), tree, language);
+        var chain = UtteranceChain.Parse(span[(end + 1)..].Trim(), tree, language);
         if (chain != null)
             _queue.Enqueue(new OffsetSampleProvider(chain) {LeadOut = TimeSpan.FromSeconds(3)});
         return true;

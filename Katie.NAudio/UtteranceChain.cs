@@ -8,10 +8,10 @@ namespace Katie.NAudio;
 
 using LabeledClip = (ISampleProvider Provider, string Text);
 
-public sealed class PhraseChain : ISampleProvider
+public sealed class UtteranceChain : ISampleProvider
 {
 
-    public static PhraseChain? Parse(ReadOnlySpan<char> text, PhraseTree<SamplePhraseBase> tree, ReadOnlySpan<char> language)
+    public static UtteranceChain? Parse(ReadOnlySpan<char> text, PhraseTree<SamplePhraseBase> tree, ReadOnlySpan<char> language)
     {
         var segments = new Queue<UtteranceSegment<SamplePhraseBase>>();
         var parser = new PhraseParser<SamplePhraseBase>(text, tree, language);
@@ -25,7 +25,7 @@ public sealed class PhraseChain : ISampleProvider
         }
 
         format ??= SimpleWaveFormat.Default;
-        return segments.Count == 0 ? null : new PhraseChain(segments, format.Value.ToIeeeFloat());
+        return segments.Count == 0 ? null : new UtteranceChain(segments, format.Value);
     }
 
     private readonly Queue<UtteranceSegment<SamplePhraseBase>> _remaining;
@@ -38,10 +38,10 @@ public sealed class PhraseChain : ISampleProvider
 
     public TimeSpan TotalTime { get; }
 
-    private PhraseChain(Queue<UtteranceSegment<SamplePhraseBase>> remaining, WaveFormat waveFormat)
+    private UtteranceChain(Queue<UtteranceSegment<SamplePhraseBase>> remaining, SimpleWaveFormat waveFormat)
     {
         _remaining = remaining;
-        WaveFormat = waveFormat;
+        WaveFormat = waveFormat.ToIeeeFloat();
         TotalTime = remaining.Aggregate(TimeSpan.Zero, (prev, curr) => prev + curr.Duration);
         TryDequeue(out var current);
         Current = current;
