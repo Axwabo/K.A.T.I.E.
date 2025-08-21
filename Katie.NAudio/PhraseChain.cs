@@ -1,5 +1,6 @@
 ﻿using Katie.Core;
 using Katie.Core.DataStructures;
+using Katie.NAudio.Extensions;
 using Katie.NAudio.Phrases;
 using NAudio.Wave;
 
@@ -10,19 +11,21 @@ using LabeledClip = (ISampleProvider Provider, string Text);
 public sealed class PhraseChain : ISampleProvider
 {
 
-    public const int SampleRate = 48000;
-    public const double SamplesToSeconds = 1d / SampleRate;
-
-    public static WaveFormat Format { get; } = WaveFormat.CreateIeeeFloatWaveFormat(SampleRate, 1);
-
     public static PhraseChain? Parse(ReadOnlySpan<char> text, PhraseTree<SamplePhraseBase> tree, ReadOnlySpan<char> language)
     {
         var segments = new Queue<UtteranceSegment<SamplePhraseBase>>();
         var parser = new PhraseParser<SamplePhraseBase>(text, tree, language);
+        SimpleWaveFormat? format = null;
         while (parser.Next(out var phrase))
-            if (phrase.Duration != TimeSpan.Zero)
-                segments.Enqueue(phrase);
-        return segments.Count == 0 ? null : new PhraseChain(segments);
+        {
+            if (phrase.Duration == TimeSpan.Zero)
+                continue;
+            format ??= phrase.Phrase?.WaveFormat;
+            segments.Enqueue(phrase);
+        }
+
+        format ??= SimpleWaveFormat.Default;
+        return segments.Count == 0 ? null : new PhraseChain(segments, format.Value.ToIeeeFloat());
     }
 
     private readonly Queue<UtteranceSegment<SamplePhraseBase>> _remaining;
@@ -35,15 +38,16 @@ public sealed class PhraseChain : ISampleProvider
 
     public TimeSpan TotalTime { get; }
 
-    private PhraseChain(Queue<UtteranceSegment<SamplePhraseBase>> remaining)
+    private PhraseChain(Queue<UtteranceSegment<SamplePhraseBase>> remaining, WaveFormat waveFormat)
     {
         _remaining = remaining;
+        WaveFormat = waveFormat;
         TotalTime = remaining.Aggregate(TimeSpan.Zero, (prev, curr) => prev + curr.Duration);
         TryDequeue(out var current);
         Current = current;
     }
 
-    public WaveFormat WaveFormat => Format;
+    public WaveFormat WaveFormat { get; }
 
     public int Read(float[] buffer, int offset, int count)
     {
@@ -54,7 +58,7 @@ public sealed class PhraseChain : ISampleProvider
         {
             var read = Current.Provider.Read(buffer, total, Math.Min(count, count - total));
             total += read;
-            CurrentTime += TimeSpan.FromSeconds(read * SamplesToSeconds);
+            CurrentTime += this.SamplesToTime(read);
             if (read > 0)
                 continue;
             if (TryDequeue(out var result))
@@ -79,8 +83,8 @@ public sealed class PhraseChain : ISampleProvider
         }
 
         result = segment is {Phrase: { } clip}
-            ? (clip.ToSampleProvider(), clip.Text)
-            : (new DurationSilenceSampleProvider(Format, segment.Duration.TotalSeconds), "");
+            ? (clip.ToSampleProvider().EnsureFormat(WaveFormat.SampleRate, WaveFormat.Channels), clip.Text)
+            : (new DurationSilenceSampleProvider(WaveFormat, segment.Duration.TotalSeconds), "");
         return true;
     }
 

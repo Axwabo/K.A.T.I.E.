@@ -1,6 +1,6 @@
 ﻿using NAudio.Wave;
 
-namespace Katie.NAudio;
+namespace Katie.UI;
 
 public sealed class RawSourceSampleProvider : ISampleProvider
 {

@@ -1,6 +1,8 @@
-﻿using NAudio.Wave;
+﻿using Katie.NAudio;
+using Katie.NAudio.Extensions;
+using NAudio.Wave;
 
-namespace Katie.NAudio.Phrases;
+namespace Katie.UI;
 
 public sealed class RawSourceSamplePhrase : SamplePhraseBase
 {
@@ -9,16 +11,16 @@ public sealed class RawSourceSamplePhrase : SamplePhraseBase
 
     public RawSourceSamplePhrase(RawSourceSampleProvider provider, string text)
     {
-        if (!provider.WaveFormat.Equals(PhraseChain.Format))
-            throw new ArgumentException("Wave format must match PhraseChain.Format");
         _provider = provider;
         Text = text;
-        Duration = TimeSpan.FromSeconds(provider.Length * PhraseChain.SamplesToSeconds);
+        Duration = provider.SamplesToTime(provider.Length);
     }
 
     public override string Text { get; }
 
     public override TimeSpan Duration { get; }
+
+    public override SimpleWaveFormat WaveFormat => _provider.WaveFormat;
 
     public override ISampleProvider ToSampleProvider() => _provider.Copy();
 

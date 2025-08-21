@@ -6,6 +6,8 @@ namespace Katie.NAudio.Phrases;
 public abstract class SamplePhraseBase : PhraseBase
 {
 
+    public abstract SimpleWaveFormat WaveFormat { get; }
+
     public abstract ISampleProvider ToSampleProvider();
 
 }

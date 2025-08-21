@@ -1,4 +1,5 @@
-﻿using Katie.NAudio.Phrases;
+﻿using Katie.NAudio;
+using Katie.NAudio.Phrases;
 using NAudio.Wave;
 using SecretLabNAudio.Core;
 using SecretLabNAudio.Core.Providers;
@@ -22,6 +23,8 @@ public sealed class RawSourcePhrase : SamplePhraseBase
     public override string Text { get; }
 
     public override TimeSpan Duration { get; }
+
+    public override SimpleWaveFormat WaveFormat => _provider.WaveFormat;
 
     public override ISampleProvider ToSampleProvider() => _provider.Copy();
 
