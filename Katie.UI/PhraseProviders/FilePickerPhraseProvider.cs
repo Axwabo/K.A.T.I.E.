@@ -27,7 +27,20 @@ internal sealed class FilePickerPhraseProvider : IPhraseProvider
     public async IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync()
     {
         foreach (var file in await _storageProvider.OpenFilePickerAsync(Options))
-            yield return new WaveStreamPhrase(await file.OpenReadAsync(), Path.GetFileNameWithoutExtension(file.Name));
+        {
+            var name = Path.GetFileNameWithoutExtension(file.Name);
+            if (!IPhraseProvider.IsBrowser)
+            {
+                yield return new WaveStreamPhrase(await file.OpenReadAsync(), name);
+                continue;
+            }
+
+            await using var stream = await file.OpenReadAsync();
+            var memory = new MemoryStream();
+            await stream.CopyToAsync(memory);
+            memory.Position = 0;
+            yield return new WaveStreamPhrase(memory, name);
+        }
     }
 
 }

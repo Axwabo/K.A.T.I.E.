@@ -5,6 +5,8 @@ public interface IPhraseProvider
 
     IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync();
 
+    public static bool IsBrowser { get; set; }
+
     public static Dictionary<string, IPhraseProvider> InitialProviders { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     public static Task LoadInitialPhrases(PhrasePackViewModel hungarian, PhrasePackViewModel english, PhrasePackViewModel global) => Task.WhenAll(

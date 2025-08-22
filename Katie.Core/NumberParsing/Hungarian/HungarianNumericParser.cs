@@ -59,7 +59,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
                 return true;
             case NumericTokenPart.BeforeRegularSuffix:
                 _part = NumericTokenPart.None;
-                phrase = EndWithSuffix(ref index, ReadOnlySpan<char>.Empty);
+                phrase = EndWithSuffix(ref index, default);
                 return true;
             default:
                 phrase = default;
