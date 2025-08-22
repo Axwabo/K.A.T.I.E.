@@ -13,9 +13,6 @@ const config = dotnetRuntime.getConfig();
 
 const exports = await dotnetRuntime.getAssemblyExports(config.mainAssemblyName);
 
-await dotnetRuntime.runMain(config.mainAssemblyName, [globalThis.location.href]);
+globalThis.readFromProvider = exports.Katie.UI.Browser.WebAudioFunctions.ReadFromProvider;
 
-/** @returns {MemoryView<number>} */
-export function readFromProvider() {
-    return exports.WebAudioFunctions.ReadFromProvider();
-}
+await dotnetRuntime.runMain(config.mainAssemblyName, [globalThis.location.href]);

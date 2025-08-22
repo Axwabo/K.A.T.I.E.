@@ -10,13 +10,21 @@ public sealed class WebAudioPlayer : IAudioPlayer
 
     public static WebAudioPlayer Instance { get; } = new();
 
-    public bool IsPlaying { get; private set; }
+    public bool IsPlaying { get; set; }
 
     public TimeSpan CurrentTime { get; private set; }
 
-    public async Task Play() => await WebAudioFunctions.Play();
+    public async Task Play()
+    {
+        await WebAudioFunctions.Play();
+        IsPlaying = true;
+    }
 
-    public Task Stop() => WebAudioFunctions.Stop();
+    public async Task Stop()
+    {
+        await WebAudioFunctions.Stop();
+        IsPlaying = false;
+    }
 
     public void Dispose()
     {

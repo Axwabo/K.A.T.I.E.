@@ -115,7 +115,7 @@ public sealed partial class MainViewModel : ViewModelBase
         Progress = 0;
 
         using var player = IAudioPlayer.Factory(signalProvider.EnsureFormat(provider.WaveFormat).FollowedBy(provider));
-        player.Play();
+        await player.Play();
         var totalTime = signalDuration + provider.TotalTime;
         while (true)
         {
@@ -130,7 +130,7 @@ public sealed partial class MainViewModel : ViewModelBase
             await Task.Delay(10);
         }
 
-        player.Stop();
+        await player.Stop();
     }
 
     private void SetSplit(UtteranceChain provider)

@@ -27,7 +27,11 @@ internal static partial class WebAudioFunctions
             return ArraySegment<double>.Empty;
         var read = WebAudioPlayer.Provider.Read(FloatBuffer, 0, FloatBuffer.Length);
         if (read == 0)
+        {
+            WebAudioPlayer.Instance.IsPlaying = false;
             return ArraySegment<double>.Empty;
+        }
+
         for (var i = 0; i < read; i++)
             DoubleBuffer[i] = FloatBuffer[i];
         return new ArraySegment<double>(DoubleBuffer, 0, read);
