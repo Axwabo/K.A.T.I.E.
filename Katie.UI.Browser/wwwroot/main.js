@@ -11,4 +11,11 @@ const dotnetRuntime = await dotnet
 
 const config = dotnetRuntime.getConfig();
 
+const exports = await dotnetRuntime.getAssemblyExports(config.mainAssemblyName);
+
 await dotnetRuntime.runMain(config.mainAssemblyName, [globalThis.location.href]);
+
+/** @returns {MemoryView<number>} */
+export function readFromProvider() {
+    return exports.WebAudioFunctions.ReadFromProvider();
+}
