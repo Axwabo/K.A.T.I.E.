@@ -9,7 +9,7 @@ using PlaybackState = SoundFlow.Enums.PlaybackState;
 
 namespace Katie.UI.Desktop;
 
-public sealed class SoundFlowAudioPlayer : IDisposable
+public sealed class SoundFlowAudioPlayer : IAudioPlayer
 {
 
     private readonly AudioEngine _engine;

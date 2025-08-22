@@ -22,6 +22,7 @@ internal static class Program
                 IPhraseProvider.InitialProviders[Path.GetFileName(directory)] = new DirectoryPhraseProvider(directory);
         if (Directory.Exists(Signals))
             ISignalProvider.InitialProvider = new DirectorySignalProvider(Signals);
+        IAudioPlayer.Factory = provider => new SoundFlowAudioPlayer(provider);
         BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);
     }
