@@ -21,11 +21,12 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
         _leadingZero = text[0] == '0';
     }
 
-    private EnglishNumberParser(PhraseTree<T> tree, SequentialNumberParser<T> parser)
+    private EnglishNumberParser(PhraseTree<T> tree, SequentialNumberParser<T> parser, int offset)
     {
         _tree = tree;
         _parser = parser;
         _leadingZero = false;
+        _index = offset;
     }
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
@@ -57,7 +58,7 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
     }
 
     public static EnglishNumberParser<T> CreateTrimmed(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal, out int advanced)
-        => new(tree, SequentialNumberParser<T>.CreateTrimmed(text, tree, Map.Digits, ordinal, out advanced));
+        => new(tree, SequentialNumberParser<T>.CreateTrimmed(text, tree, Map.Digits, ordinal, out advanced), advanced);
 
 }
 
