@@ -10,6 +10,7 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
     private readonly bool _leadingZero;
 
     private SequentialNumberParser<T> _parser;
+    private int _index;
 
     public bool IsActive => _parser.IsActive;
 
@@ -32,19 +33,27 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
         switch (_parser.PositionalIndex, _parser.Digit)
         {
             case (not 0, '0') when _leadingZero:
-                phrase = _tree.RootPhrase("oh");
-                return _parser.Next(out _, out advanced);
+                phrase = _tree.RootPhrase("oh", _index);
+                return Advance(out _, out advanced);
             case (1, '1'):
-                _parser.Next(out phrase, out advanced);
+                Advance(out phrase, out advanced);
                 if (advanced == 2)
                     return true;
                 advanced++;
-                phrase = _tree.RootPhrase(Map.TenTy(_parser.Digit));
-                _parser.Next(out _, out _);
+                _index++;
+                phrase = _tree.RootPhrase(Map.TenTy(_parser.Digit), _index);
+                Advance(out _, out _);
                 return true;
             default:
-                return _parser.Next(out phrase, out advanced);
+                return Advance(out phrase, out advanced);
         }
+    }
+
+    private bool Advance(out UtteranceSegment<T> phrase, out int advanced)
+    {
+        var success = _parser.Next(out phrase, out advanced);
+        _index += advanced;
+        return success;
     }
 
     public static EnglishNumberParser<T> CreateTrimmed(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal, out int advanced)

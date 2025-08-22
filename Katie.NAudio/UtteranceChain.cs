@@ -39,7 +39,7 @@ public sealed class UtteranceChain : ISampleProvider
     public TimeSpan TotalTime { get; }
 
     public IEnumerable<UtteranceSegment<PhraseBase>> Remaining
-        => _remaining.Select(e => new UtteranceSegment<PhraseBase>(e.Duration, e.Phrase));
+        => _remaining.Select(e => new UtteranceSegment<PhraseBase>(e.Duration, e.EndIndex, e.Phrase));
 
     private UtteranceChain(Queue<UtteranceSegment<SamplePhraseBase>> remaining, SimpleWaveFormat waveFormat)
     {

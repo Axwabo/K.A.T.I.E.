@@ -6,8 +6,6 @@ namespace Katie.Core.NumberParsing.English;
 public ref struct EnglishNumericParser<T> where T : PhraseBase
 {
 
-    private static readonly UtteranceSegment<T> Pause = 0.2;
-
     private readonly ReadOnlySpan<char> _text;
     private readonly PhraseTree<T> _tree;
 
@@ -28,6 +26,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
     {
         if (_numberParser.IsActive && _numberParser.Next(out phrase, out var advanced))
         {
+            phrase = phrase with {EndIndex = phrase.EndIndex + index};
             index += advanced;
             return true;
         }
@@ -36,12 +35,12 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
         {
             case NumericTokenPart.HourNumber when _shape == NumericTokenShape.TimeHourOnly:
                 _part = NumericTokenPart.None;
-                phrase = _tree.RootPhrase("o'clock");
+                phrase = _tree.RootPhrase("o'clock", index + 2);
                 index += 3;
                 return true;
             case NumericTokenPart.HourNumber:
                 _part = NumericTokenPart.Minute;
-                phrase = Pause;
+                phrase = (0.2, index);
                 index++;
                 return true;
             case NumericTokenPart.Minute:

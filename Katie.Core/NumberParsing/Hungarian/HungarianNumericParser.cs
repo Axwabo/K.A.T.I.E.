@@ -6,8 +6,6 @@ namespace Katie.Core.NumberParsing.Hungarian;
 public ref struct HungarianNumericParser<T> where T : PhraseBase
 {
 
-    private static readonly UtteranceSegment<T> Pause = 0.2;
-
     private readonly ReadOnlySpan<char> _text;
     private readonly PhraseTree<T> _tree;
 
@@ -30,6 +28,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
     {
         if (_numberParser.IsActive && _numberParser.Next(out phrase, out var advanced))
         {
+            phrase = phrase with {EndIndex = phrase.EndIndex + index};
             index += advanced;
             return true;
         }
@@ -38,16 +37,16 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         {
             case NumericTokenPart.HourNumber when _shape == NumericTokenShape.TimeHourOnly:
                 _part = NumericTokenPart.None;
-                index += 3;
                 phrase = EndWithSuffix(ref index, "óra");
+                index += 3;
                 return true;
             case NumericTokenPart.HourNumber:
                 _part = NumericTokenPart.Hour;
-                phrase = _tree.RootPhrase("óra");
+                phrase = _tree.RootPhrase("óra", index);
                 return true;
             case NumericTokenPart.Hour:
                 _part = NumericTokenPart.Minute;
-                phrase = Pause;
+                phrase = (0.2, index);
                 index++;
                 return true;
             case NumericTokenPart.Minute:
@@ -81,8 +80,8 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
                     {
                         First = main,
                         Second = suffix.TrimStart('-')
-                    }
-        );
+                    },
+            _end);
     }
 
     public bool Begin(ref int index, int tokenEnd, out UtteranceSegment<T> phrase)

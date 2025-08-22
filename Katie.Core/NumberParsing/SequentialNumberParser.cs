@@ -41,18 +41,18 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
             case 1:
                 if (_text[^1] == '0')
                 {
-                    phrase = _tree.Digit(_text[^2], _isOrdinal ? _mappers.TenOrdinal : _mappers.TenExact);
+                    phrase = _tree.Digit(_text[^2], _isOrdinal ? _mappers.TenOrdinal : _mappers.TenExact, _text.Length - 1);
                     advanced = 2;
                     PositionalIndex = -1;
                     return true;
                 }
 
-                phrase = _tree.Digit(Digit, _mappers.Ten);
+                phrase = _tree.Digit(Digit, _mappers.Ten, _text.Length - 2);
                 advanced = 1;
                 PositionalIndex = 0;
                 return true;
             case 0:
-                phrase = _tree.Digit(Digit, _isOrdinal ? _mappers.OneOrdinal : _mappers.OneExact);
+                phrase = _tree.Digit(Digit, _isOrdinal ? _mappers.OneOrdinal : _mappers.OneExact, _text.Length - 1);
                 advanced = 1;
                 PositionalIndex = -1;
                 return true;

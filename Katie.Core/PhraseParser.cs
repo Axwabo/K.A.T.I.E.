@@ -47,7 +47,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
         if (primaryToken.Length > 0)
         {
             Commit(primaryToken);
-            phrase = primaryToken.Length;
+            phrase = (primaryToken.Length, _index);
             return true;
         }
 
@@ -85,7 +85,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
         }
 
         Commit(1);
-        phrase = duration;
+        phrase = (duration, _index);
         return true;
     }
 
@@ -128,7 +128,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
 
         if (lastSuccessful != null)
         {
-            phrase = lastSuccessful.Value;
+            phrase = (lastSuccessful.Value, _index);
             return true;
         }
 
