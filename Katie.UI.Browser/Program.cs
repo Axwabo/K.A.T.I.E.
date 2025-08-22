@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices.JavaScript;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
 using Katie.UI.PhraseProviders;
@@ -8,10 +9,18 @@ namespace Katie.UI.Browser;
 internal static class Program
 {
 
-    private static Task Main(string[] args)
+    private static async Task Main()
     {
+        await JSHost.ImportAsync(WebAudioFunctions.Module, $"/{WebAudioFunctions.Module}.js");
+
         IPhraseProvider.IsBrowser = true;
-        return BuildAvaloniaApp()
+        IAudioPlayer.Factory = provider =>
+        {
+            WebAudioPlayer.Provider = provider;
+            return WebAudioPlayer.Instance;
+        };
+
+        await BuildAvaloniaApp()
             .WithInterFont()
             .StartBrowserAppAsync("out");
     }

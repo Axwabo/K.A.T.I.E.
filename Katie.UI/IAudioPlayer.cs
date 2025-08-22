@@ -9,9 +9,9 @@ public interface IAudioPlayer : IDisposable
 
     TimeSpan CurrentTime { get; }
 
-    void Play();
+    Task Play();
 
-    void Stop();
+    Task Stop();
 
     public static Func<ISampleProvider, IAudioPlayer>? Factory { get; set; }
 

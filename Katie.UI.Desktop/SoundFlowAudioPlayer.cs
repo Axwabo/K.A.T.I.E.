@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using System.Threading.Tasks;
+using NAudio.Wave;
 using SoundFlow.Abstracts;
 using SoundFlow.Abstracts.Devices;
 using SoundFlow.Backends.MiniAudio;
@@ -34,16 +35,18 @@ public sealed class SoundFlowAudioPlayer : IAudioPlayer
         _device.MasterMixer.AddComponent(_player);
     }
 
-    public void Play()
+    public Task Play()
     {
         _device.Start();
         _player.Play();
+        return Task.CompletedTask;
     }
 
-    public void Stop()
+    public Task Stop()
     {
         _player.Stop();
         _device.Stop();
+        return Task.CompletedTask;
     }
 
     public void Dispose()
