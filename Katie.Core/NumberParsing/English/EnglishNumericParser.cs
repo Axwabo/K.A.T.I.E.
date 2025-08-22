@@ -91,7 +91,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
         index += advanced;
         if (ordinal)
             index++;
-        return phrase;
+        return phrase with {EndIndex = phrase.EndIndex + index};
     }
 
     private enum NumericTokenPart

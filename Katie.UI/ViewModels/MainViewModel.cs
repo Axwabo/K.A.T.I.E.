@@ -101,7 +101,8 @@ public sealed partial class MainViewModel : ViewModelBase
     {
         var index = ++_playIndex;
         // TODO: replace with a SoundFlow backend
-        var provider = UtteranceChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree, language);
+        var originalText = Text;
+        var provider = UtteranceChain.Parse(originalText, language == "English" ? _englishTree : _hungarianTree, language);
         if (provider == null)
             return;
         using var device = new WasapiOut();
@@ -120,6 +121,16 @@ public sealed partial class MainViewModel : ViewModelBase
             {
                 CurrentPhrase = currentTime < signalDuration ? signalName : provider.Current.Text;
                 Progress = currentTime / totalTime;
+                var currentIndex = provider.Current.Index;
+                if (currentTime < signalDuration || currentIndex >= originalText.Length - 1)
+                    return;
+                Span<char> textSpan = stackalloc char[originalText.Length + 1];
+                var i = currentIndex == -1 ? ^1 : currentIndex;
+                originalText.AsSpan()[..i].CopyTo(textSpan);
+                textSpan[i] = '█';
+                if (currentIndex != -1)
+                    originalText.AsSpan()[currentIndex..].CopyTo(textSpan[(currentIndex + 1)..]);
+                Text = textSpan.ToString();
             });
             await Task.Delay(10);
         }

@@ -6,7 +6,7 @@ using NAudio.Wave;
 
 namespace Katie.NAudio;
 
-using LabeledClip = (ISampleProvider Provider, string Text);
+using LabeledClip = (ISampleProvider Provider, string Text, int Index);
 
 public sealed class UtteranceChain : ISampleProvider
 {
@@ -86,8 +86,8 @@ public sealed class UtteranceChain : ISampleProvider
         }
 
         result = segment is {Phrase: { } clip}
-            ? (clip.ToSampleProvider().EnsureFormat(WaveFormat), clip.Text)
-            : (new DurationSilenceSampleProvider(WaveFormat, segment.Duration.TotalSeconds), "");
+            ? (clip.ToSampleProvider().EnsureFormat(WaveFormat), clip.Text, segment.EndIndex)
+            : (new DurationSilenceSampleProvider(WaveFormat, segment.Duration.TotalSeconds), "", segment.EndIndex);
         return true;
     }
 

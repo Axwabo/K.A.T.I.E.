@@ -115,7 +115,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         index += advanced;
         if (ordinal)
             index++;
-        return phrase;
+        return phrase with {EndIndex = phrase.EndIndex + index};
     }
 
     private UtteranceSegment<T> BeginSuffixed(ref int index)
