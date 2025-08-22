@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <PackageReference Include="NAudio.Core" PrivateAssets="all" />
+        <PackageReference Include="NAudio.Core" />
         <PackageReference Include="NLayer" PrivateAssets="all" />
         <PackageReference Include="NLayer.NAudioSupport" PrivateAssets="all" />
         <PackageReference Include="NVorbis" PrivateAssets="all" />

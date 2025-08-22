@@ -109,25 +109,27 @@ public sealed partial class MainViewModel : ViewModelBase
         if (provider == null)
             return;
         SetSplit(provider);
-        using var device = new WasapiOut();
         var (signalProvider, signalName, signalDuration) = SelectedSignal;
         signalProvider.Position = 0;
-        device.Init(signalProvider.EnsureFormat(provider.WaveFormat).FollowedBy(provider), true);
-        device.Play();
-        var bytesPerSecond = (double) device.OutputWaveFormat.AverageBytesPerSecond;
+        Progress = 0;
+
+        using var player = new AudioPlayer(signalProvider.EnsureFormat(provider.WaveFormat).FollowedBy(provider));
+        player.Play();
         var totalTime = signalDuration + provider.TotalTime;
-        while (device.PlaybackState == PlaybackState.Playing)
+        while (true)
         {
-            if (index != _playIndex)
-                device.Stop();
-            var currentTime = TimeSpan.FromSeconds(device.GetPosition() / bytesPerSecond);
+            var currentTime = player.CurrentTime;
             Dispatcher.UIThread.Post(() =>
             {
                 CurrentPhrase = currentTime < signalDuration ? signalName : provider.Current.Segment.Phrase?.Text ?? "";
                 Progress = currentTime / totalTime;
             });
+            if (index != _playIndex || !player.IsPlaying)
+                break;
             await Task.Delay(10);
         }
+
+        player.Stop();
     }
 
     private void SetSplit(UtteranceChain provider)
