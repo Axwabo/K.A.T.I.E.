@@ -1,5 +1,7 @@
-﻿/** @type {number[]} */
-const buffer = new Array(128);
+﻿import { bufferSize, clear, read } from "./constants.js";
+
+/** @type {number[]} */
+const buffer = new Array(bufferSize);
 buffer.fill(0);
 
 class NAudioProcessor extends AudioWorkletProcessor {
@@ -7,6 +9,11 @@ class NAudioProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
         this.port.onmessage = ev => {
+            if (ev.data === clear) {
+                console.log(clear)
+                buffer.length = 0;
+                return;
+            }
             if (!(ev.data?.buffer instanceof Float64Array))
                 return;
             for (let i = 0; i < ev.data.length; i++)
@@ -15,7 +22,7 @@ class NAudioProcessor extends AudioWorkletProcessor {
     }
 
     process(inputs, outputs) {
-        this.port.postMessage("read");
+        this.port.postMessage(read);
         if (buffer.length === 0)
             return true;
         const channel = outputs[0][0];
