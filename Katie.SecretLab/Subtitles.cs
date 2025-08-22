@@ -11,23 +11,24 @@ public static class Subtitles
     private const string Split = "<split>";
     private const double SilenceDuration = 0.5;
 
-    public static void PlayCassie(UtteranceChain chain, ReadOnlySpan<char> text, ReadOnlySpan<char> signalName, TimeSpan signalDuration)
+    public static void PlaySilence(TimeSpan duration) => Play(new StringBuilder().AppendSilence(duration).ToString(), null);
+
+    public static void PlayCassie(UtteranceChain chain, ReadOnlySpan<char> text)
     {
-        var (announcement, subtitles) = MakeCassieAnnouncement(chain, text, signalName, signalDuration);
-        foreach (var controller in RespawnEffectsController.AllControllers)
-            controller.RpcCassieAnnouncement(announcement, false, false, true, subtitles);
+        var (announcement, subtitles) = MakeCassieAnnouncement(chain, text);
+        Play(announcement, subtitles);
     }
 
-    private static (string Announcement, string Subtitles) MakeCassieAnnouncement(UtteranceChain chain, ReadOnlySpan<char> text, ReadOnlySpan<char> signalName, TimeSpan signalDuration)
+    private static void Play(string announcement, string? subtitles)
+    {
+        foreach (var controller in RespawnEffectsController.AllControllers)
+            controller.RpcCassieAnnouncement(announcement, false, false, subtitles != null, subtitles);
+    }
+
+    private static (string Announcement, string Subtitles) MakeCassieAnnouncement(UtteranceChain chain, ReadOnlySpan<char> text)
     {
         var announcementBuilder = new StringBuilder();
         var subtitleBuilder = new StringBuilder(SubtitlePrefix);
-        if (!signalName.IsEmpty)
-        {
-            announcementBuilder.AppendSilence(signalDuration).Append(Split).Append(" pitch_1");
-            subtitleBuilder.Append('*').Append(signalName).Append(" szignál*").Append(Split).Append(SubtitlePrefix);
-        }
-
         var time = chain.Current.Segment.Duration;
         var start = 0;
         var wasFullStop = false;
@@ -36,7 +37,7 @@ public static class Subtitles
             time += segment.Duration;
             if (wasFullStop)
             {
-                announcementBuilder.AppendSilence(time).Append(Split).Append(" pitch_1");
+                announcementBuilder.AppendSilence(time).Append(Split);
                 var end = segment.EndIndex == -1 ? ^0 : segment.EndIndex + 1;
                 subtitleBuilder.Append(text[start..end].Trim());
                 subtitleBuilder.Append(Split).Append(SubtitlePrefix);
@@ -57,7 +58,9 @@ public static class Subtitles
         var seconds = time.TotalSeconds;
         for (; seconds > SilenceDuration; seconds -= SilenceDuration)
             builder.Append(" . ");
-        return builder.Append(" pitch_").Append(SilenceDuration / seconds).Append(" . ");
+        return seconds > 0
+            ? builder.Append(" pitch_").Append(SilenceDuration / seconds).Append(" . ")
+            : builder.Append(" pitch_1");
     }
 
 }

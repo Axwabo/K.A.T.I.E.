@@ -1,5 +1,4 @@
 ﻿using Katie.NAudio;
-using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using SecretLabNAudio.Core;
 using SecretLabNAudio.Core.Extensions;
@@ -18,6 +17,8 @@ internal sealed class AnnouncementManager : MonoBehaviour
         MaxDistance = 10000,
         Volume = 1
     };
+
+    private static readonly TimeSpan Delay = TimeSpan.FromSeconds(3);
 
     public static AnnouncementManager Instance { get; private set; } = null!;
 
@@ -49,11 +50,18 @@ internal sealed class AnnouncementManager : MonoBehaviour
         var chain = UtteranceChain.Parse(announcement, tree, language);
         if (chain == null)
             return true;
-        var withSignal = signal == null ? chain : signal.Copy(true).FollowedBy(chain);
-        if (_queue.Current == null)
-            Player.ClearBuffer();
-        _queue.Enqueue(new OffsetSampleProvider(withSignal) {LeadOut = TimeSpan.FromSeconds(3)});
-        Subtitles.PlayCassie(chain, announcement, signal?.ClipName, signal?.TotalTime ?? TimeSpan.Zero);
+        if (signal != null)
+        {
+            signal.Position = 0;
+            _queue.Enqueue(signal);
+            _queue.Enqueue(new OffsetSampleProvider(chain) {LeadOut = Delay});
+            Subtitles.PlaySilence(signal.TotalTime);
+        }
+        else
+            _queue.Enqueue(new OffsetSampleProvider(chain) {LeadOut = Delay});
+
+        Subtitles.PlayCassie(chain, announcement);
+        Subtitles.PlaySilence(Delay);
         return true;
     }
 
