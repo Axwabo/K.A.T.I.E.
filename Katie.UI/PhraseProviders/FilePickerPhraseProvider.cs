@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Avalonia.Platform.Storage;
+using Katie.UI.Extensions;
 
 namespace Katie.UI.PhraseProviders;
 
@@ -36,9 +37,7 @@ internal sealed class FilePickerPhraseProvider : IPhraseProvider
             }
 
             await using var stream = await file.OpenReadAsync();
-            var memory = new MemoryStream();
-            await stream.CopyToAsync(memory);
-            memory.Position = 0;
+            var memory = await stream.ToMemoryStream();
             yield return new WaveStreamPhrase(memory, name);
         }
     }

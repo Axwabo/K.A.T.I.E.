@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
+using Katie.UI.Extensions;
 using Katie.UI.PhraseProviders;
 
 namespace Katie.UI.Browser;
@@ -14,6 +15,7 @@ internal static class Program
         await JSHost.ImportAsync(WebAudioFunctions.Module, $"/{WebAudioFunctions.Module}.js");
 
         IPhraseProvider.IsBrowser = true;
+        SignalUtils.IsBrowser = true;
         IAudioPlayer.Factory = provider =>
         {
             WebAudioPlayer.Provider = provider;

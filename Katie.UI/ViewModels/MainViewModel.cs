@@ -13,7 +13,7 @@ namespace Katie.UI.ViewModels;
 public sealed partial class MainViewModel : ViewModelBase
 {
 
-    private static readonly Signal DefaultSignal = new(new RawSourceSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 1), [], 0), "None", TimeSpan.Zero);
+    private static readonly Signal DefaultSignal = new(null!, "None", TimeSpan.Zero);
 
     private int _playIndex;
 
@@ -50,10 +50,13 @@ public sealed partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private Signal _selectedSignal = DefaultSignal;
 
-    private readonly FilePickerSignalProvider? _signalProvider;
+    private readonly Control? _host;
+
+    private FilePickerSignalProvider? _signalProvider;
 
     public MainViewModel(Control? host)
     {
+        _host = host;
         English = new PhrasePackViewModel {Host = host, Language = "English"};
         Hungarian = new PhrasePackViewModel {Host = host, Language = "Hungarian"};
         Global = new PhrasePackViewModel {Host = host, Language = "Global"};
@@ -65,8 +68,6 @@ public sealed partial class MainViewModel : ViewModelBase
             return;
         LoadInitialPhrases().ConfigureAwait(false);
         LoadSignals(ISignalProvider.InitialProvider).ConfigureAwait(false);
-        if (TopLevel.GetTopLevel(host) is {StorageProvider: var storage})
-            _signalProvider = new FilePickerSignalProvider(storage);
     }
 
     public MainViewModel() : this(null)
@@ -98,7 +99,9 @@ public sealed partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public Task AddSignals() => LoadSignals(_signalProvider);
+    public Task AddSignals() => TopLevel.GetTopLevel(_host) is {StorageProvider: {CanOpen: true} storage}
+        ? LoadSignals(_signalProvider ??= new FilePickerSignalProvider(storage))
+        : Task.CompletedTask;
 
     [RelayCommand]
     public async Task Play(string language)
@@ -106,23 +109,31 @@ public sealed partial class MainViewModel : ViewModelBase
         if (IAudioPlayer.Factory == null)
             return;
         var index = ++_playIndex;
-        var provider = UtteranceChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree, language);
-        if (provider == null)
+        var chain = UtteranceChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree, language);
+        if (chain == null)
             return;
-        SetSplit(provider);
-        var (signalProvider, signalName, signalDuration) = SelectedSignal;
-        signalProvider.Position = 0;
+        SetSplit(chain);
         Progress = 0;
 
-        using var player = IAudioPlayer.Factory(signalProvider.EnsureFormat(provider.WaveFormat).FollowedBy(provider));
+        var (signalProvider, signalName, signalDuration) = SelectedSignal;
+        ISampleProvider master;
+        if (SelectedSignal == DefaultSignal)
+            master = chain;
+        else
+        {
+            signalProvider.Position = 0;
+            master = signalProvider.ToSampleProvider().EnsureFormat(chain.WaveFormat).FollowedBy(chain);
+        }
+
+        using var player = IAudioPlayer.Factory(master);
         await player.Play();
-        var totalTime = signalDuration + provider.TotalTime;
+        var totalTime = signalDuration + chain.TotalTime;
         while (true)
         {
             var currentTime = player.CurrentTime;
             Dispatcher.UIThread.Post(() =>
             {
-                CurrentPhrase = currentTime < signalDuration ? signalName : provider.Current.Segment.Phrase?.Text ?? "";
+                CurrentPhrase = currentTime < signalDuration ? signalName : chain.Current.Segment.Phrase?.Text ?? "";
                 Progress = currentTime / totalTime;
             });
             if (index != _playIndex || !player.IsPlaying)

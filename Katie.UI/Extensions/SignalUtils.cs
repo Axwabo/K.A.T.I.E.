@@ -7,11 +7,13 @@ namespace Katie.UI.Extensions;
 public static class SignalUtils
 {
 
+    public static bool IsBrowser { get; set; }
+
     public static async Task<Signal> ReadSignalAsync(Stream stream, string path)
     {
-        await using var reader = new WaveFileReader(stream);
-        var provider = await Task.Run(() => reader.ToSampleProvider().ReadSamples(reader.TotalTime));
-        return new Signal(provider, Path.GetFileNameWithoutExtension(path), reader.TotalTime);
+        var memory = await stream.ToMemoryStream();
+        var reader = new WaveFileReader(memory);
+        return new Signal(reader, Path.GetFileNameWithoutExtension(path), reader.TotalTime);
     }
 
 }
