@@ -37,7 +37,7 @@ public static class PhraseCache
         foreach (var file in Directory.EnumerateFiles(directory.CreateSubdirectory(subdirectory).FullName, "*.wav"))
         {
             var name = Path.GetFileNameWithoutExtension(file);
-            Logger.Debug($"Found {directory.Name} phrase: {name}");
+            Logger.Debug($"Found {subdirectory} phrase: {name}");
             using var stream = CreateAudioReader.Stream(file);
             var samples = stream.ReadPlayerCompatibleSamples();
             yield return new RawSourcePhrase(samples, name);
