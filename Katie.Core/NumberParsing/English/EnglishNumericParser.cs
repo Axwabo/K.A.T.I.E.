@@ -26,7 +26,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
     {
         if (_numberParser.IsActive && _numberParser.Next(out phrase, out var advanced))
         {
-            phrase = phrase with {EndIndex = phrase.EndIndex + index};
+            phrase = phrase.WithOffset(index);
             index += advanced;
             return true;
         }
@@ -91,7 +91,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
         index += advanced;
         if (ordinal)
             index++;
-        return phrase with {EndIndex = phrase.EndIndex + index};
+        return phrase.WithOffset(index);
     }
 
     private enum NumericTokenPart

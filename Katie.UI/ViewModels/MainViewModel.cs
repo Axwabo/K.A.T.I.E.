@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text;
 using CommunityToolkit.Mvvm.Input;
 using Katie.Core.DataStructures;
 using Katie.NAudio;
@@ -24,6 +25,9 @@ public sealed partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _text = "";
+
+    [ObservableProperty]
+    private string _split = "Parsed text will show up here";
 
     [ObservableProperty]
     private string _currentPhrase = "";
@@ -101,10 +105,10 @@ public sealed partial class MainViewModel : ViewModelBase
     {
         var index = ++_playIndex;
         // TODO: replace with a SoundFlow backend
-        var originalText = Text;
-        var provider = UtteranceChain.Parse(originalText, language == "English" ? _englishTree : _hungarianTree, language);
+        var provider = UtteranceChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree, language);
         if (provider == null)
             return;
+        SetSplit(provider);
         using var device = new WasapiOut();
         var (signalProvider, signalName, signalDuration) = SelectedSignal;
         signalProvider.Position = 0;
@@ -119,21 +123,29 @@ public sealed partial class MainViewModel : ViewModelBase
             var currentTime = TimeSpan.FromSeconds(device.GetPosition() / bytesPerSecond);
             Dispatcher.UIThread.Post(() =>
             {
-                CurrentPhrase = currentTime < signalDuration ? signalName : provider.Current.Text;
+                CurrentPhrase = currentTime < signalDuration ? signalName : provider.Current.Segment.Phrase?.Text ?? "";
                 Progress = currentTime / totalTime;
-                var currentIndex = provider.Current.Index;
-                if (currentTime < signalDuration || currentIndex >= originalText.Length - 1)
-                    return;
-                Span<char> textSpan = stackalloc char[originalText.Length + 1];
-                var i = currentIndex == -1 ? ^1 : currentIndex;
-                originalText.AsSpan()[..i].CopyTo(textSpan);
-                textSpan[i] = '█';
-                if (currentIndex != -1)
-                    originalText.AsSpan()[currentIndex..].CopyTo(textSpan[(currentIndex + 1)..]);
-                Text = textSpan.ToString();
             });
             await Task.Delay(10);
         }
+    }
+
+    private void SetSplit(UtteranceChain provider)
+    {
+        var span = Text.AsSpan();
+        var builder = new StringBuilder(span.Length + 20);
+        var previous = provider.Current.Segment.EndIndex;
+        builder.Append(span[..previous]);
+        builder.Append('█');
+        foreach (var segment in provider.Remaining)
+        {
+            var current = segment.EndIndex == -1 ? span.Length : segment.EndIndex;
+            builder.Append(span[previous..current]);
+            builder.Append('█');
+            previous = current;
+        }
+
+        Split = builder.ToString();
     }
 
     [RelayCommand]

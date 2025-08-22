@@ -6,7 +6,7 @@ using NAudio.Wave;
 
 namespace Katie.NAudio;
 
-using LabeledClip = (ISampleProvider Provider, string Text, int Index);
+using PhraseClip = (ISampleProvider Provider, UtteranceSegment<SamplePhraseBase> Segment);
 
 public sealed class UtteranceChain : ISampleProvider
 {
@@ -28,22 +28,19 @@ public sealed class UtteranceChain : ISampleProvider
         return segments.Count == 0 ? null : new UtteranceChain(segments, format.Value);
     }
 
-    private readonly Queue<UtteranceSegment<SamplePhraseBase>> _remaining;
+    public Queue<UtteranceSegment<SamplePhraseBase>> Remaining { get; }
 
     private bool _ended;
 
-    public LabeledClip Current { get; private set; }
+    public PhraseClip Current { get; private set; }
 
     public TimeSpan CurrentTime { get; private set; }
 
     public TimeSpan TotalTime { get; }
 
-    public IEnumerable<UtteranceSegment<PhraseBase>> Remaining
-        => _remaining.Select(e => new UtteranceSegment<PhraseBase>(e.Duration, e.EndIndex, e.Phrase));
-
     private UtteranceChain(Queue<UtteranceSegment<SamplePhraseBase>> remaining, SimpleWaveFormat waveFormat)
     {
-        _remaining = remaining;
+        Remaining = remaining;
         WaveFormat = waveFormat.ToIeeeFloat();
         TotalTime = remaining.Aggregate(TimeSpan.Zero, (prev, curr) => prev + curr.Duration);
         TryDequeue(out var current);
@@ -77,17 +74,17 @@ public sealed class UtteranceChain : ISampleProvider
         return total;
     }
 
-    private bool TryDequeue(out LabeledClip result)
+    private bool TryDequeue(out PhraseClip result)
     {
-        if (!_remaining.TryDequeue(out var segment))
+        if (!Remaining.TryDequeue(out var segment))
         {
             result = default;
             return false;
         }
 
         result = segment is {Phrase: { } clip}
-            ? (clip.ToSampleProvider().EnsureFormat(WaveFormat), clip.Text, segment.EndIndex)
-            : (new DurationSilenceSampleProvider(WaveFormat, segment.Duration.TotalSeconds), "", segment.EndIndex);
+            ? (clip.ToSampleProvider().EnsureFormat(WaveFormat), segment)
+            : (new DurationSilenceSampleProvider(WaveFormat, segment.Duration.TotalSeconds), segment);
         return true;
     }
 
