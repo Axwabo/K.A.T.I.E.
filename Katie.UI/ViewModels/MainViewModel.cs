@@ -103,8 +103,9 @@ public sealed partial class MainViewModel : ViewModelBase
     [RelayCommand]
     public async Task Play(string language)
     {
+        if (IAudioPlayer.Factory == null)
+            return;
         var index = ++_playIndex;
-        // TODO: replace with a SoundFlow backend
         var provider = UtteranceChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree, language);
         if (provider == null)
             return;
@@ -113,7 +114,7 @@ public sealed partial class MainViewModel : ViewModelBase
         signalProvider.Position = 0;
         Progress = 0;
 
-        using var player = new AudioPlayer(signalProvider.EnsureFormat(provider.WaveFormat).FollowedBy(provider));
+        using var player = IAudioPlayer.Factory(signalProvider.EnsureFormat(provider.WaveFormat).FollowedBy(provider));
         player.Play();
         var totalTime = signalDuration + provider.TotalTime;
         while (true)

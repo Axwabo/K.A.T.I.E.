@@ -7,9 +7,9 @@ using SoundFlow.Enums;
 using SoundFlow.Structs;
 using PlaybackState = SoundFlow.Enums.PlaybackState;
 
-namespace Katie.UI;
+namespace Katie.UI.Desktop;
 
-public sealed class AudioPlayer : IDisposable
+public sealed class SoundFlowAudioPlayer : IDisposable
 {
 
     private readonly AudioEngine _engine;
@@ -20,7 +20,7 @@ public sealed class AudioPlayer : IDisposable
 
     public TimeSpan CurrentTime => TimeSpan.FromSeconds(_player.Time);
 
-    public AudioPlayer(ISampleProvider provider)
+    public SoundFlowAudioPlayer(ISampleProvider provider)
     {
         var format = new AudioFormat
         {

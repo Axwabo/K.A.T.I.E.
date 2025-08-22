@@ -2,7 +2,7 @@
 using SoundFlow.Enums;
 using SoundFlow.Interfaces;
 
-namespace Katie.UI;
+namespace Katie.UI.Desktop;
 
 public sealed class NAudioDataProvider : ISoundDataProvider
 {
