@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Katie.Core.DataStructures;
+using Katie.Core.Extensions;
 using Katie.NAudio.Phrases;
 using SecretLabNAudio.Core.Extensions;
 using SecretLabNAudio.Core.FileReading;
+using SecretLabNAudio.Core.Providers;
 using Logger = LabApi.Features.Console.Logger;
 
 namespace Katie.SecretLab;
@@ -15,11 +17,32 @@ public static class PhraseCache
 
     public static PhraseTree<SamplePhraseBase> English { get; private set; } = new([]);
 
-    public static void Initialize(DirectoryInfo phrasesRoot)
+    private static readonly Dictionary<int, RawSourceSampleProvider> Signals = [];
+
+    public static void Initialize(DirectoryInfo root)
     {
-        var global = phrasesRoot.EnumeratePhrases("Global").ToList();
-        Hungarian = new PhraseTree<SamplePhraseBase>(global.Concat(phrasesRoot.EnumeratePhrases("Hungarian")));
-        English = new PhraseTree<SamplePhraseBase>(global.Concat(phrasesRoot.EnumeratePhrases("English")));
+        InitializeSignals(root.CreateSubdirectory("Signals"));
+        InitializePhrases(root.CreateSubdirectory("Phrases"));
+    }
+
+    private static void InitializeSignals(DirectoryInfo directory)
+    {
+        foreach (var file in directory.EnumerateFiles("*.wav"))
+        {
+            var name = Path.GetFileNameWithoutExtension(file.FullName);
+            Logger.Debug($"Found signal: {name}");
+            using var stream = CreateAudioReader.Stream(file.FullName);
+            var provider = stream.ReadPlayerCompatibleSamples();
+            provider.ClipName = name;
+            Signals[name.AsSpan().LowercaseHashCode()] = provider;
+        }
+    }
+
+    private static void InitializePhrases(DirectoryInfo phrases)
+    {
+        var global = phrases.EnumeratePhrases("Global").ToList();
+        Hungarian = new PhraseTree<SamplePhraseBase>(global.Concat(phrases.EnumeratePhrases("Hungarian")));
+        English = new PhraseTree<SamplePhraseBase>(global.Concat(phrases.EnumeratePhrases("English")));
     }
 
     public static bool TryGetTree(ReadOnlySpan<char> language, [NotNullWhen(true)] out PhraseTree<SamplePhraseBase>? tree)
@@ -31,6 +54,9 @@ public static class PhraseCache
                 : null;
         return tree != null;
     }
+
+    public static bool TryGetSignal(ReadOnlySpan<char> name, [NotNullWhen(true)] out RawSourceSampleProvider? provider)
+        => Signals.TryGetValue(name.LowercaseHashCode(), out provider);
 
     private static IEnumerable<SamplePhraseBase> EnumeratePhrases(this DirectoryInfo directory, string subdirectory)
     {

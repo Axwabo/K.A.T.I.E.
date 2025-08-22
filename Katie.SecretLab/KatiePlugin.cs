@@ -22,7 +22,7 @@ public sealed class KatiePlugin : Plugin
     {
         _harmony.PatchAll();
         var config = this.GetConfigDirectory();
-        PhraseCache.Initialize(config.CreateSubdirectory("Phrases"));
+        PhraseCache.Initialize(config);
         CustomHandlersManager.RegisterEventsHandler(_handlers);
     }
 
