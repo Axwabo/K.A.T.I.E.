@@ -20,13 +20,13 @@ internal sealed class FilePickerSignalProvider : ISignalProvider
         ]
     };
 
-    private readonly IStorageProvider _storageProvider;
+    private readonly StorageWrapper _storage;
 
-    public FilePickerSignalProvider(IStorageProvider storageProvider) => _storageProvider = storageProvider;
+    public FilePickerSignalProvider(StorageWrapper storage) => _storage = storage;
 
     public async IAsyncEnumerable<Signal> EnumerateSignalsAsync()
     {
-        foreach (var file in await _storageProvider.OpenFilePickerAsync(Options))
+        foreach (var file in await _storage.OpenFilePickerAsync(Options))
         {
             await using var fileStream = await file.OpenReadAsync();
             yield return await SignalUtils.ReadSignalAsync(fileStream, file.Name);

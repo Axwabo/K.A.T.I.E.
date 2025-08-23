@@ -18,9 +18,8 @@ internal static class Program
     }
 
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .WithInterFont()
-            .With(CreateServiceCollection());
+        => AppBuilder.Configure(() => new App {Services = CreateServiceCollection()})
+            .WithInterFont();
 
     private static IServiceCollection CreateServiceCollection() => new ServiceCollection()
         .AddSingleton<IAudioPlayerFactory, WebAudioFactory>();

@@ -29,10 +29,9 @@ internal static class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+        => AppBuilder.Configure(() => new App {Services = CreateServiceCollection()})
             .UsePlatformDetect()
             .WithInterFont()
-            .With(CreateServiceCollection())
             .LogToTrace();
 
     private static IServiceCollection CreateServiceCollection() => new ServiceCollection()

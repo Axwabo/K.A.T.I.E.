@@ -8,9 +8,7 @@ namespace Katie.UI.ViewModels;
 public sealed partial class PhrasePackViewModel : ViewModelBase
 {
 
-    private FilePickerPhraseProvider? _fileProvider;
-
-    public Control? Host { get; init; }
+    public required IPhraseProvider? PhraseProvider { get; init; }
 
     public required string Language { get; set; }
 
@@ -21,11 +19,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
     public event Action? PhrasesChanged;
 
     [RelayCommand]
-    private async Task AddPhrases()
-    {
-        if (TopLevel.GetTopLevel(Host) is {StorageProvider: {CanOpen: true} storage})
-            await AddPhrases(_fileProvider ??= new FilePickerPhraseProvider(storage));
-    }
+    private Task AddPhrases() => PhraseProvider == null ? Task.CompletedTask : AddPhrases(PhraseProvider);
 
     public async Task AddPhrases(IPhraseProvider provider)
     {

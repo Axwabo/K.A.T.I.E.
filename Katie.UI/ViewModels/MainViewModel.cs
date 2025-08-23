@@ -7,6 +7,7 @@ using Katie.NAudio.Extensions;
 using Katie.UI.Audio;
 using Katie.UI.PhraseProviders;
 using Katie.UI.Signals;
+using Microsoft.Extensions.DependencyInjection;
 using NAudio.Wave;
 
 namespace Katie.UI.ViewModels;
@@ -51,16 +52,21 @@ public sealed partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private Signal _selectedSignal = DefaultSignal;
 
-    private readonly Control? _host;
+    private readonly ISignalProvider? _signalProvider;
 
-    private FilePickerSignalProvider? _signalProvider;
-
-    public MainViewModel(Control? host)
+    public MainViewModel(
+        IAudioPlayerFactory? audioPlayerFactory,
+        [FromKeyedServices(nameof(FilePickerSignalProvider))]
+        ISignalProvider? signalProvider,
+        [FromKeyedServices(nameof(FilePickerPhraseProvider))]
+        IPhraseProvider? phraseProvider
+    )
     {
-        _host = host;
-        English = new PhrasePackViewModel {Host = host, Language = "English"};
-        Hungarian = new PhrasePackViewModel {Host = host, Language = "Hungarian"};
-        Global = new PhrasePackViewModel {Host = host, Language = "Global"};
+        _factory = audioPlayerFactory;
+        _signalProvider = signalProvider;
+        English = new PhrasePackViewModel {PhraseProvider = phraseProvider, Language = "English"};
+        Hungarian = new PhrasePackViewModel {PhraseProvider = phraseProvider, Language = "Hungarian"};
+        Global = new PhrasePackViewModel {PhraseProvider = phraseProvider, Language = "Global"};
         Hungarian.PhrasesChanged += RebuildHungarian;
         English.PhrasesChanged += RebuildEnglish;
         Global.PhrasesChanged += RebuildHungarian;
@@ -71,9 +77,9 @@ public sealed partial class MainViewModel : ViewModelBase
         LoadSignals(ISignalProvider.InitialProvider).ConfigureAwait(false);
     }
 
-    private IAudioPlayerFactory? _factory;
+    private readonly IAudioPlayerFactory? _factory;
 
-    public MainViewModel() : this(null)
+    public MainViewModel() : this(null, null, null)
     {
     }
 
@@ -102,9 +108,7 @@ public sealed partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public Task AddSignals() => TopLevel.GetTopLevel(_host) is {StorageProvider: {CanOpen: true} storage}
-        ? LoadSignals(_signalProvider ??= new FilePickerSignalProvider(storage))
-        : Task.CompletedTask;
+    public Task AddSignals() => LoadSignals(_signalProvider);
 
     [RelayCommand]
     public async Task Play(string language)
