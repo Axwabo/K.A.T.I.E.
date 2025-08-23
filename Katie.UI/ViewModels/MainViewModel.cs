@@ -52,21 +52,21 @@ public sealed partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private Signal _selectedSignal = DefaultSignal;
 
-    private readonly ISignalProvider? _signalProvider;
+    private readonly ISignalProvider? _signalPicker;
 
     public MainViewModel(
         IAudioPlayerFactory? audioPlayerFactory,
         [FromKeyedServices(nameof(FilePickerSignalProvider))]
-        ISignalProvider? signalProvider,
+        ISignalProvider? signalPicker = null,
         [FromKeyedServices(nameof(FilePickerPhraseProvider))]
-        IPhraseProvider? phraseProvider
+        IPhraseProvider? phrasePicker = null
     )
     {
         _factory = audioPlayerFactory;
-        _signalProvider = signalProvider;
-        English = new PhrasePackViewModel {PhraseProvider = phraseProvider, Language = "English"};
-        Hungarian = new PhrasePackViewModel {PhraseProvider = phraseProvider, Language = "Hungarian"};
-        Global = new PhrasePackViewModel {PhraseProvider = phraseProvider, Language = "Global"};
+        _signalPicker = signalPicker;
+        English = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "English"};
+        Hungarian = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Hungarian"};
+        Global = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Global"};
         Hungarian.PhrasesChanged += RebuildHungarian;
         English.PhrasesChanged += RebuildEnglish;
         Global.PhrasesChanged += RebuildHungarian;
@@ -79,7 +79,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private readonly IAudioPlayerFactory? _factory;
 
-    public MainViewModel() : this(null, null, null)
+    public MainViewModel() : this(null)
     {
     }
 
@@ -108,7 +108,7 @@ public sealed partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public Task AddSignals() => LoadSignals(_signalProvider);
+    public Task AddSignals() => LoadSignals(_signalPicker);
 
     [RelayCommand]
     public async Task Play(string language)

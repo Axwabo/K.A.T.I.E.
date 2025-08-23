@@ -35,6 +35,7 @@ internal static class Program
             .LogToTrace();
 
     private static IServiceCollection CreateServiceCollection() => new ServiceCollection()
-        .AddSingleton<IAudioPlayerFactory, SoundFlowFactory>();
+        .AddSingleton<IAudioPlayerFactory, SoundFlowFactory>()
+        .AddSingleton<IFileToPhraseConverter, FileStreamToPhraseConverter>();
 
 }

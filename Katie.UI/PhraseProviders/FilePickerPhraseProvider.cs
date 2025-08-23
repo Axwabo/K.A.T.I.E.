@@ -1,6 +1,4 @@
-﻿using System.IO;
-using Avalonia.Platform.Storage;
-using Katie.UI.Extensions;
+﻿using Avalonia.Platform.Storage;
 
 namespace Katie.UI.PhraseProviders;
 
@@ -21,25 +19,21 @@ internal sealed class FilePickerPhraseProvider : IPhraseProvider
         ]
     };
 
-    private readonly IStorageProvider _storageProvider;
+    private readonly StorageWrapper _storage;
 
-    public FilePickerPhraseProvider(IStorageProvider storageProvider) => _storageProvider = storageProvider;
+    private readonly IFileToPhraseConverter _converter;
+
+    public FilePickerPhraseProvider(StorageWrapper storage, IFileToPhraseConverter converter)
+    {
+        _storage = storage;
+        _converter = converter;
+    }
 
     public async IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync()
     {
-        foreach (var file in await _storageProvider.OpenFilePickerAsync(Options))
-        {
-            var name = Path.GetFileNameWithoutExtension(file.Name);
-            if (!IPhraseProvider.IsBrowser)
-            {
-                yield return new WaveStreamPhrase(await file.OpenReadAsync(), name);
-                continue;
-            }
-
-            await using var stream = await file.OpenReadAsync();
-            var memory = await stream.ToMemoryStream();
-            yield return new WaveStreamPhrase(memory, name);
-        }
+        // TODO: list getting to interface
+        foreach (var file in await _storage.OpenFilePickerAsync(Options))
+            yield return await _converter.ToPhraseAsync(file);
     }
 
 }

@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Katie.UI.PhraseProviders;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Katie.UI;
@@ -16,7 +17,8 @@ public sealed class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         Services.AddViewModels()
-            .AddSingleton<StorageWrapper>();
+            .AddSingleton<StorageWrapper>()
+            .AddKeyedSingleton<IPhraseProvider, FilePickerPhraseProvider>(nameof(FilePickerPhraseProvider));
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
