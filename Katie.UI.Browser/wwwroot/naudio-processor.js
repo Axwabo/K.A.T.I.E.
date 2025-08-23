@@ -10,7 +10,6 @@ class NAudioProcessor extends AudioWorkletProcessor {
         super();
         this.port.onmessage = ev => {
             if (ev.data === clear) {
-                console.log(clear)
                 buffer.length = 0;
                 return;
             }
