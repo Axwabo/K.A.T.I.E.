@@ -18,10 +18,10 @@ public static class PhraseExtensions
                 continue;
             }
 
+            if (saver != null)
+                await saver.CacheAsync(streamPhrase);
             var samplePhrase = await Task.Run(() => streamPhrase.ToSamplePhrase());
             streamPhrase.Dispose();
-            if (saver != null)
-                await saver.CacheAsync(samplePhrase);
             yield return samplePhrase;
         }
     }

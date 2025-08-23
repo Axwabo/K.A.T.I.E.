@@ -15,6 +15,7 @@ export async function play() {
         naudio.port.onmessage = (ev => {
             if (ev.data !== read)
                 return;
+            /** @type {MemoryView} */
             const view = readFromProvider();
             view.copyTo(buffer, 0);
             naudio.port.postMessage({buffer, length: view.length});

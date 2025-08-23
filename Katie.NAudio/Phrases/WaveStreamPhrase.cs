@@ -3,7 +3,7 @@ using NAudio.Wave;
 
 namespace Katie.NAudio.Phrases;
 
-public sealed class WaveStreamPhrase : SamplePhraseBase, IDisposable
+public class WaveStreamPhrase : SamplePhraseBase, IDisposable
 {
 
     private readonly Stream _source;

@@ -15,7 +15,7 @@ public sealed class MemoryPhraseConverter : IFileToPhraseConverter
         var name = Path.GetFileNameWithoutExtension(file.Name);
         await using var stream = await file.OpenReadAsync();
         var memory = await stream.ToMemoryStream();
-        return new WaveStreamPhrase(memory, name);
+        return new MemoryStreamPhrase(memory, name);
     }
 
 }
