@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Katie.UI.PhraseProviders;
+using Katie.UI.Signals;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Katie.UI;
@@ -18,7 +19,8 @@ public sealed class App : Application
     {
         Services.AddViewModels()
             .AddSingleton<StorageWrapper>()
-            .AddKeyedSingleton<IPhraseProvider, FilePickerPhraseProvider>(nameof(FilePickerPhraseProvider));
+            .AddKeyedSingleton<IPhraseProvider, FilePickerPhraseProvider>(nameof(FilePickerPhraseProvider))
+            .AddKeyedSingleton<ISignalProvider, FilePickerSignalProvider>(nameof(FilePickerSignalProvider));
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
