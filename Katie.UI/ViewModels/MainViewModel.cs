@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Katie.Core.DataStructures;
 using Katie.NAudio;
 using Katie.NAudio.Extensions;
+using Katie.UI.Audio;
 using Katie.UI.PhraseProviders;
 using Katie.UI.Signals;
 using NAudio.Wave;
@@ -70,6 +71,8 @@ public sealed partial class MainViewModel : ViewModelBase
         LoadSignals(ISignalProvider.InitialProvider).ConfigureAwait(false);
     }
 
+    private IAudioPlayerFactory? _factory;
+
     public MainViewModel() : this(null)
     {
     }
@@ -106,7 +109,7 @@ public sealed partial class MainViewModel : ViewModelBase
     [RelayCommand]
     public async Task Play(string language)
     {
-        if (IAudioPlayer.Factory == null)
+        if (_factory == null)
             return;
         var index = ++_playIndex;
         var chain = UtteranceChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree, language);
@@ -125,7 +128,7 @@ public sealed partial class MainViewModel : ViewModelBase
             master = signalProvider.ToSampleProvider().EnsureFormat(chain.WaveFormat).FollowedBy(chain);
         }
 
-        using var player = IAudioPlayer.Factory(master);
+        using var player = _factory.CreatePlayer(master);
         await player.Play();
         var totalTime = signalDuration + chain.TotalTime;
         while (true)

@@ -1,6 +1,4 @@
-﻿using NAudio.Wave;
-
-namespace Katie.UI;
+﻿namespace Katie.UI.Audio;
 
 public interface IAudioPlayer : IDisposable
 {
@@ -12,7 +10,5 @@ public interface IAudioPlayer : IDisposable
     Task Play();
 
     Task Stop();
-
-    public static Func<ISampleProvider, IAudioPlayer>? Factory { get; set; }
 
 }

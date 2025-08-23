@@ -1,7 +1,9 @@
 ﻿using System.IO;
 using Avalonia;
+using Katie.UI.Audio;
 using Katie.UI.PhraseProviders;
 using Katie.UI.Signals;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Katie.UI.Desktop;
 
@@ -22,9 +24,7 @@ internal static class Program
                 IPhraseProvider.InitialProviders[Path.GetFileName(directory)] = new DirectoryPhraseProvider(directory);
         if (Directory.Exists(Signals))
             ISignalProvider.InitialProvider = new DirectorySignalProvider(Signals);
-        IAudioPlayer.Factory = provider => new SoundFlowAudioPlayer(provider);
-        BuildAvaloniaApp()
-            .StartWithClassicDesktopLifetime(args);
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
@@ -32,6 +32,10 @@ internal static class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
+            .With(CreateServiceCollection())
             .LogToTrace();
+
+    private static IServiceCollection CreateServiceCollection() => new ServiceCollection()
+        .AddSingleton<IAudioPlayerFactory, SoundFlowFactory>();
 
 }
