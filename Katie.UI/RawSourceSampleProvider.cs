@@ -32,4 +32,6 @@ public sealed class RawSourceSampleProvider : ISampleProvider
 
     public RawSourceSampleProvider Copy() => new(WaveFormat, _source, Length);
 
+    public ArraySegment<float> ToArraySegment() => new(_source, 0, Length);
+
 }

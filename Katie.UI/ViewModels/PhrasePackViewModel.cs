@@ -34,15 +34,20 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
             PhrasesChanged?.InvokeOnUIThread();
     }
 
-    public Task Cache() => Task.Run(() =>
+    public void ReplacePhrases(IReadOnlyCollection<SamplePhraseBase> phrases)
     {
-        var phrases = List.ToSamplePhrases();
-        Dispatcher.UIThread.Post(() =>
-        {
-            for (var i = 0; i < List.Count; i++)
-                List[i] = phrases[i];
-            PhrasesChanged?.Invoke();
-        });
-    });
+        List.Clear();
+        foreach (var phrase in phrases)
+            List.Add(phrase);
+        PhrasesChanged?.Invoke();
+    }
+
+    public async Task Cache(IPhraseCacheSaver? saver)
+    {
+        var list = new List<SamplePhraseBase>(List.Count);
+        await foreach (var phrase in List.ToSamplePhrases(saver))
+            list.Add(phrase);
+        Dispatcher.UIThread.Post(() => ReplacePhrases(list));
+    }
 
 }

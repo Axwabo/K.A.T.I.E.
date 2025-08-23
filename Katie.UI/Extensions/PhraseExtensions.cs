@@ -1,4 +1,6 @@
-﻿namespace Katie.UI.Extensions;
+﻿using Katie.UI.PhraseProviders;
+
+namespace Katie.UI.Extensions;
 
 public static class PhraseExtensions
 {
@@ -6,23 +8,22 @@ public static class PhraseExtensions
     public static RawSourceSamplePhrase ToSamplePhrase(this WaveStreamPhrase phrase)
         => new(phrase.ToSampleProvider().ReadSamples(phrase.Duration), phrase.Text);
 
-    public static List<SamplePhraseBase> ToSamplePhrases(this IReadOnlyCollection<SamplePhraseBase> phrases)
+    public static async IAsyncEnumerable<SamplePhraseBase> ToSamplePhrases(this IReadOnlyCollection<SamplePhraseBase> phrases, IPhraseCacheSaver? saver)
     {
-        var list = new List<SamplePhraseBase>(phrases.Count);
         foreach (var phrase in phrases)
         {
             if (phrase is not WaveStreamPhrase streamPhrase)
             {
-                list.Add(phrase);
+                yield return phrase;
                 continue;
             }
 
-            var samplePhrase = streamPhrase.ToSamplePhrase();
+            var samplePhrase = await Task.Run(() => streamPhrase.ToSamplePhrase());
             streamPhrase.Dispose();
-            list.Add(samplePhrase);
+            if (saver != null)
+                await saver.CacheAsync(samplePhrase);
+            yield return samplePhrase;
         }
-
-        return list;
     }
 
 }

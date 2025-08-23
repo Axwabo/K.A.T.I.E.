@@ -54,10 +54,13 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private readonly ISignalProvider? _signalPicker;
 
+    private readonly IPhraseCacheSaver? _cacheSaver;
+
     public MainViewModel(
         IAudioPlayerFactory? audioPlayerFactory,
         IEnumerable<IPhraseProvider> initialPhrases,
         ISignalProvider? initialSignals = null,
+        IPhraseCacheSaver? cacheSaver = null,
         [FromKeyedServices(nameof(FilePickerSignalProvider))]
         ISignalProvider? signalPicker = null,
         [FromKeyedServices(nameof(FilePickerPhraseProvider))]
@@ -66,6 +69,7 @@ public sealed partial class MainViewModel : ViewModelBase
     {
         _factory = audioPlayerFactory;
         _signalPicker = signalPicker;
+        _cacheSaver = cacheSaver;
         English = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "English"};
         Hungarian = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Hungarian"};
         Global = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Global"};
@@ -187,9 +191,9 @@ public sealed partial class MainViewModel : ViewModelBase
 
     [RelayCommand]
     public Task Cache() => Task.WhenAll(
-        Hungarian.Cache(),
-        English.Cache(),
-        Global.Cache()
+        Hungarian.Cache(_cacheSaver),
+        English.Cache(_cacheSaver),
+        Global.Cache(_cacheSaver)
     );
 
 }
