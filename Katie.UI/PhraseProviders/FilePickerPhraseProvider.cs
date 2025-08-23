@@ -29,11 +29,8 @@ internal sealed class FilePickerPhraseProvider : IPhraseProvider
         _converter = converter;
     }
 
-    public string Language => "";
-
     public async IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync()
     {
-        // TODO: list getting to interface
         foreach (var file in await _storage.OpenFilePickerAsync(Options))
             yield return await _converter.ToPhraseAsync(file);
     }

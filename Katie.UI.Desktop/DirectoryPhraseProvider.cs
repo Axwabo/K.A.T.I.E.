@@ -2,27 +2,36 @@
 using System.Threading.Tasks;
 using Katie.NAudio.Phrases;
 using Katie.UI.PhraseProviders;
+using Katie.UI.ViewModels;
 
 namespace Katie.UI.Desktop;
 
-public sealed class DirectoryPhraseProvider : IPhraseProvider
+public sealed class DirectoryPhraseProvider : IInitialPhraseProvider
 {
 
-    private readonly string _directory;
+    public required string Root { get; init; }
 
-    public DirectoryPhraseProvider(string directory)
+    private static List<WaveStreamPhrase> GetPhrasesAsync(string directory)
     {
-        _directory = directory;
-        Language = Path.GetFileName(directory);
+        var list = new List<WaveStreamPhrase>(20);
+        foreach (var file in Directory.EnumerateFiles(directory, "*.wav"))
+            list.Add(new WaveStreamPhrase(File.OpenRead(file), Path.GetFileNameWithoutExtension(file)));
+        return list;
     }
 
-    public string Language { get; }
-
-    public async IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync()
+    public Task LoadPhrasesAsync(PhrasePackViewModel hungarian, PhrasePackViewModel english, PhrasePackViewModel global)
     {
-        foreach (var file in Directory.EnumerateFiles(_directory, "*.wav"))
-            yield return new WaveStreamPhrase(File.OpenRead(file), Path.GetFileNameWithoutExtension(file));
-        await Task.CompletedTask;
+        LoadDirectoryAsync(hungarian, "Hungarian");
+        LoadDirectoryAsync(english, "English");
+        LoadDirectoryAsync(global, "Global");
+        return Task.CompletedTask;
+    }
+
+    private void LoadDirectoryAsync(PhrasePackViewModel model, string language)
+    {
+        var directory = Path.Combine(Root, language);
+        if (Directory.Exists(directory))
+            model.ReplacePhrases(GetPhrasesAsync(directory));
     }
 
 }

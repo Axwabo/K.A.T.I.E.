@@ -58,7 +58,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public MainViewModel(
         IAudioPlayerFactory? audioPlayerFactory,
-        IEnumerable<IPhraseProvider> initialPhrases,
+        IInitialPhraseProvider? initialPhrases = null,
         ISignalProvider? initialSignals = null,
         IPhraseCacheSaver? cacheSaver = null,
         [FromKeyedServices(nameof(FilePickerSignalProvider))]
@@ -85,7 +85,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private readonly IAudioPlayerFactory? _factory;
 
-    public MainViewModel() : this(null, [])
+    public MainViewModel() : this(null)
     {
     }
 
@@ -93,21 +93,15 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private void RebuildEnglish() => _englishTree = new PhraseTree<SamplePhraseBase>(Global.List.Concat(English.List));
 
-    private async Task LoadInitialPhrases(IEnumerable<IPhraseProvider> initialPhrases)
+    private async Task LoadInitialPhrases(IInitialPhraseProvider? initialPhrases)
     {
-        // var tasks = new List<Task>();
-        foreach (var provider in initialPhrases)
+        if (initialPhrases == null)
         {
-            var target = provider.Language.Equals("Hungarian", StringComparison.OrdinalIgnoreCase)
-                ? Hungarian
-                : provider.Language.Equals("English", StringComparison.OrdinalIgnoreCase)
-                    ? English
-                    : Global;
-            await target.AddPhrases(provider);
+            InitialsLoaded = true;
+            return;
         }
 
-        // TODO: don't do this in the browser 
-        // await Task.WhenAll(tasks);
+        await initialPhrases.LoadPhrasesAsync(Hungarian, English, Global);
         Dispatcher.UIThread.Post(() => InitialsLoaded = true);
     }
 
