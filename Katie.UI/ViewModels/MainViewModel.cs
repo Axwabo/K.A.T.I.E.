@@ -58,7 +58,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public MainViewModel(
         IAudioPlayerFactory? audioPlayerFactory,
-        IInitialPhraseProvider? initialPhrases = null,
+        IInitialPhraseLoader? initialPhrases = null,
         ISignalProvider? initialSignals = null,
         IPhraseCacheSaver? cacheSaver = null,
         [FromKeyedServices(nameof(FilePickerSignalProvider))]
@@ -93,7 +93,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private void RebuildEnglish() => _englishTree = new PhraseTree<SamplePhraseBase>(Global.List.Concat(English.List));
 
-    private async Task LoadInitialPhrases(IInitialPhraseProvider? initialPhrases)
+    private async Task LoadInitialPhrases(IInitialPhraseLoader? initialPhrases)
     {
         if (initialPhrases == null)
         {

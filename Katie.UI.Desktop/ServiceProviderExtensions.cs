@@ -14,7 +14,7 @@ public static class ServiceProviderExtensions
     public static IServiceCollection AddInitialProviders(this IServiceCollection builder)
     {
         if (Directory.Exists(Samples))
-            builder.AddSingleton<IInitialPhraseProvider>(new DirectoryPhraseProvider {Root = Samples});
+            builder.AddSingleton<IInitialPhraseLoader>(new DirectoryPhraseLoader {Root = Samples});
         if (Directory.Exists(Signals))
             builder.AddSingleton<ISignalProvider>(new DirectorySignalProvider(Signals));
         return builder;

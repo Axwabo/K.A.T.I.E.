@@ -1,22 +1,23 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using Katie.NAudio.Phrases;
 using Katie.UI.Extensions;
 using Katie.UI.PhraseProviders;
-using Katie.UI.ViewModels;
 using NAudio.Wave;
 
 namespace Katie.UI.Browser;
 
-public sealed class CacheStoragePhraseProvider : IInitialPhraseProvider
+public sealed class CacheStoragePhraseProvider : IPhraseProvider
 {
 
-    private static async Task<IReadOnlyCollection<RawSourceSamplePhrase>> EnumeratePhrasesAsync(string language)
+    public required string Language { get; init; }
+
+    public async IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync()
     {
         try
         {
-            await CacheFunctions.PrepareCache(language);
+            await CacheFunctions.PrepareCache(Language);
             var keys = CacheFunctions.GetKeys();
-            var list = new List<RawSourceSamplePhrase>(keys.Length);
             foreach (var key in keys.Order())
             {
                 var bytes = CacheFunctions.Load(key);
@@ -27,22 +28,13 @@ public sealed class CacheStoragePhraseProvider : IInitialPhraseProvider
                     var provider = reader.ToSampleProvider();
                     return provider.ReadSamples(reader.TotalTime);
                 });
-                list.Add(new RawSourceSamplePhrase(raw, key));
+                yield return new RawSourceSamplePhrase(raw, key);
             }
-
-            return list;
         }
         finally
         {
             CacheFunctions.ClearMemory();
         }
-    }
-
-    public async Task LoadPhrasesAsync(PhrasePackViewModel hungarian, PhrasePackViewModel english, PhrasePackViewModel global)
-    {
-        hungarian.ReplacePhrases(await EnumeratePhrasesAsync("Hungarian"));
-        english.ReplacePhrases(await EnumeratePhrasesAsync("English"));
-        global.ReplacePhrases(await EnumeratePhrasesAsync("Global"));
     }
 
 }

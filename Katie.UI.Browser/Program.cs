@@ -27,6 +27,6 @@ internal static class Program
         .AddSingleton<IAudioPlayerFactory, WebAudioFactory>()
         .AddSingleton<IFileToPhraseConverter, MemoryPhraseConverter>()
         .AddSingleton<IPhraseCacheSaver, PhraseCacheStorageSaver>()
-        .AddSingleton<IInitialPhraseProvider, CacheStoragePhraseProvider>();
+        .AddSingleton<IInitialPhraseLoader, CacheStoragePhraseLoader>();
 
 }

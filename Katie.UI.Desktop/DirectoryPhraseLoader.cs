@@ -6,7 +6,7 @@ using Katie.UI.ViewModels;
 
 namespace Katie.UI.Desktop;
 
-public sealed class DirectoryPhraseProvider : IInitialPhraseProvider
+public sealed class DirectoryPhraseLoader : IInitialPhraseLoader
 {
 
     public required string Root { get; init; }
