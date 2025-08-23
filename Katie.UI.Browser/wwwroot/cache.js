@@ -3,27 +3,39 @@
 /** @type {RequestInit} */
 const init = {headers: {"Content-Type": "audio/wav"}};
 
+/** @type {Map<string, Uint8Array>} */
+const prepared = new Map();
+
 /**
+ * @param language {string}
  * @param name {string}
  * @param data {MemoryView}
  */
-export function save(name, data) {
-    return cache.put(name, new Response(data.slice(), init));
+export function save(language, name, data) {
+    return cache.put(language + "/" + name, new Response(data.slice(), init));
 }
 
-export async function load(name) {
-    const match = await cache.match(name);
-    return match == null ? null : await match.bytes();
-}
-
-/**
- * @param callback {(name: string, data: Uint8Array) => void}
- */
-export async function list(callback) {
+/** @param language {string} */
+export async function prepare(language) {
     const keys = await cache.keys();
     for (const key of keys) {
+        const url = new URL(key.url);
+        if (!url.pathname.startsWith(language, 1))
+            continue;
         const match = await cache.match(key);
         const bytes = await match.bytes();
-        callback(key.url, bytes);
+        prepared.set(decodeURI(url.pathname.substring(2 + language.length)), bytes);
     }
+}
+
+export function keys() {
+    return Array.from(prepared.keys());
+}
+
+export function load(name) {
+    return prepared.get(name);
+}
+
+export function clearMemory() {
+    prepared.clear();
 }

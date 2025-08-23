@@ -45,7 +45,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
     public async Task Cache(IPhraseCacheSaver? saver)
     {
         var list = new List<SamplePhraseBase>(List.Count);
-        await foreach (var phrase in List.ToSamplePhrases(saver))
+        await foreach (var phrase in List.ToSamplePhrases(Language, saver))
             list.Add(phrase);
         Dispatcher.UIThread.Post(() => ReplacePhrases(list));
     }

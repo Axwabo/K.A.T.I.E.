@@ -8,7 +8,7 @@ public static class PhraseExtensions
     public static RawSourceSamplePhrase ToSamplePhrase(this WaveStreamPhrase phrase)
         => new(phrase.ToSampleProvider().ReadSamples(phrase.Duration), phrase.Text);
 
-    public static async IAsyncEnumerable<SamplePhraseBase> ToSamplePhrases(this IReadOnlyCollection<SamplePhraseBase> phrases, IPhraseCacheSaver? saver)
+    public static async IAsyncEnumerable<SamplePhraseBase> ToSamplePhrases(this IReadOnlyCollection<SamplePhraseBase> phrases, string language, IPhraseCacheSaver? saver)
     {
         foreach (var phrase in phrases)
         {
@@ -19,7 +19,7 @@ public static class PhraseExtensions
             }
 
             if (saver != null)
-                await saver.CacheAsync(streamPhrase);
+                await saver.CacheAsync(streamPhrase, language);
             var samplePhrase = await Task.Run(() => streamPhrase.ToSamplePhrase());
             streamPhrase.Dispose();
             yield return samplePhrase;

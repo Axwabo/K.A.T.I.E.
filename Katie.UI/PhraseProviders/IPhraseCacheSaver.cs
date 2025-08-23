@@ -3,6 +3,6 @@
 public interface IPhraseCacheSaver
 {
 
-    Task CacheAsync(WaveStreamPhrase phrase);
+    Task CacheAsync(WaveStreamPhrase phrase, string language);
 
 }

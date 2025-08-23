@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using Katie.NAudio.Phrases;
 using Katie.UI.Extensions;
 using Katie.UI.PhraseProviders;
@@ -9,17 +10,30 @@ namespace Katie.UI.Browser;
 public sealed class CacheStoragePhraseProvider : IPhraseProvider
 {
 
-    public string Language => "Global";
+    public required string Language { get; init; }
 
     public async IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync()
     {
-        foreach (var (name, bytes) in await CacheFunctions.LoadMemoryStream())
+        try
         {
-            using var stream = new MemoryStream(bytes);
-            await using var reader = new WaveFileReader(stream);
-            var provider = reader.ToSampleProvider();
-            var raw = provider.ReadSamples(reader.TotalTime);
-            yield return new RawSourceSamplePhrase(raw, name);
+            await CacheFunctions.PrepareCache(Language);
+            var keys = CacheFunctions.GetKeys();
+            foreach (var key in keys.Order())
+            {
+                var bytes = CacheFunctions.Load(key);
+                var raw = await Task.Run(() =>
+                {
+                    using var stream = new MemoryStream(bytes);
+                    using var reader = new WaveFileReader(stream);
+                    var provider = reader.ToSampleProvider();
+                    return provider.ReadSamples(reader.TotalTime);
+                });
+                yield return new RawSourceSamplePhrase(raw, key);
+            }
+        }
+        finally
+        {
+            CacheFunctions.ClearMemory();
         }
     }
 

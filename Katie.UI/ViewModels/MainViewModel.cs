@@ -95,7 +95,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private async Task LoadInitialPhrases(IEnumerable<IPhraseProvider> initialPhrases)
     {
-        var tasks = new List<Task>();
+        // var tasks = new List<Task>();
         foreach (var provider in initialPhrases)
         {
             var target = provider.Language.Equals("Hungarian", StringComparison.OrdinalIgnoreCase)
@@ -103,10 +103,11 @@ public sealed partial class MainViewModel : ViewModelBase
                 : provider.Language.Equals("English", StringComparison.OrdinalIgnoreCase)
                     ? English
                     : Global;
-            tasks.Add(target.AddPhrases(provider));
+            await target.AddPhrases(provider);
         }
 
-        await Task.WhenAll(tasks);
+        // TODO: don't do this in the browser 
+        // await Task.WhenAll(tasks);
         Dispatcher.UIThread.Post(() => InitialsLoaded = true);
     }
 

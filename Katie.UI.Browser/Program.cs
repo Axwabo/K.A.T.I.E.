@@ -27,6 +27,8 @@ internal static class Program
         .AddSingleton<IAudioPlayerFactory, WebAudioFactory>()
         .AddSingleton<IFileToPhraseConverter, MemoryPhraseConverter>()
         .AddSingleton<IPhraseCacheSaver, PhraseCacheStorageSaver>()
-        .AddSingleton<IPhraseProvider, CacheStoragePhraseProvider>();
+        .AddSingleton<IPhraseProvider>(new CacheStoragePhraseProvider {Language = "Hungarian"})
+        .AddSingleton<IPhraseProvider>(new CacheStoragePhraseProvider {Language = "English"})
+        .AddSingleton<IPhraseProvider>(new CacheStoragePhraseProvider {Language = "Global"});
 
 }
