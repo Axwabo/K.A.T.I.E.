@@ -14,6 +14,7 @@ internal static class Program
     private static async Task Main()
     {
         await JSHost.ImportAsync(WebAudioFunctions.Module, $"/{WebAudioFunctions.Module}.js");
+        await JSHost.ImportAsync(CacheFunctions.Module, $"/{CacheFunctions.Module}.js");
 
         await BuildAvaloniaApp().StartBrowserAppAsync("out");
     }
@@ -24,6 +25,7 @@ internal static class Program
 
     private static IServiceCollection CreateServiceCollection() => new ServiceCollection()
         .AddSingleton<IAudioPlayerFactory, WebAudioFactory>()
-        .AddSingleton<IFileToPhraseConverter, MemoryPhraseConverter>();
+        .AddSingleton<IFileToPhraseConverter, MemoryPhraseConverter>()
+        .AddSingleton<IPhraseCacheSaver, PhraseCacheStorageSaver>();
 
 }
