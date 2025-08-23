@@ -10,7 +10,13 @@ public sealed class DirectoryPhraseProvider : IPhraseProvider
 
     private readonly string _directory;
 
-    public DirectoryPhraseProvider(string directory) => _directory = directory;
+    public DirectoryPhraseProvider(string directory)
+    {
+        _directory = directory;
+        Language = Path.GetFileName(directory);
+    }
+
+    public string Language { get; }
 
     public async IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync()
     {

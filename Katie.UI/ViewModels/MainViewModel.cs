@@ -56,6 +56,8 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public MainViewModel(
         IAudioPlayerFactory? audioPlayerFactory,
+        IEnumerable<IPhraseProvider> initialPhrases,
+        ISignalProvider? initialSignals = null,
         [FromKeyedServices(nameof(FilePickerSignalProvider))]
         ISignalProvider? signalPicker = null,
         [FromKeyedServices(nameof(FilePickerPhraseProvider))]
@@ -73,13 +75,13 @@ public sealed partial class MainViewModel : ViewModelBase
         Global.PhrasesChanged += RebuildEnglish;
         if (Design.IsDesignMode)
             return;
-        LoadInitialPhrases().ConfigureAwait(false);
-        LoadSignals(ISignalProvider.InitialProvider).ConfigureAwait(false);
+        LoadInitialPhrases(initialPhrases).ConfigureAwait(false);
+        LoadSignals(initialSignals).ConfigureAwait(false);
     }
 
     private readonly IAudioPlayerFactory? _factory;
 
-    public MainViewModel() : this(null)
+    public MainViewModel() : this(null, [])
     {
     }
 
@@ -87,9 +89,20 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private void RebuildEnglish() => _englishTree = new PhraseTree<SamplePhraseBase>(Global.List.Concat(English.List));
 
-    private async Task LoadInitialPhrases()
+    private async Task LoadInitialPhrases(IEnumerable<IPhraseProvider> initialPhrases)
     {
-        await IPhraseProvider.LoadInitialPhrases(Hungarian, English, Global);
+        var tasks = new List<Task>();
+        foreach (var provider in initialPhrases)
+        {
+            var target = provider.Language.Equals("Hungarian", StringComparison.OrdinalIgnoreCase)
+                ? Hungarian
+                : provider.Language.Equals("English", StringComparison.OrdinalIgnoreCase)
+                    ? English
+                    : Global;
+            tasks.Add(target.AddPhrases(provider));
+        }
+
+        await Task.WhenAll(tasks);
         Dispatcher.UIThread.Post(() => InitialsLoaded = true);
     }
 

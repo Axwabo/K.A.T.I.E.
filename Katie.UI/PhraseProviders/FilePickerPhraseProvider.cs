@@ -29,6 +29,8 @@ internal sealed class FilePickerPhraseProvider : IPhraseProvider
         _converter = converter;
     }
 
+    public string Language => "";
+
     public async IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync()
     {
         // TODO: list getting to interface
