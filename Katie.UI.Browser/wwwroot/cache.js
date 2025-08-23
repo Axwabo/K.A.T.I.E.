@@ -16,7 +16,14 @@ export async function load(name) {
     return match == null ? null : await match.bytes();
 }
 
-export async function list() {
+/**
+ * @param callback {(name: string, data: Uint8Array) => void}
+ */
+export async function list(callback) {
     const keys = await cache.keys();
-    return keys.map(e => e.url);
+    for (const key of keys) {
+        const match = await cache.match(key);
+        const bytes = await match.bytes();
+        callback(key.url, bytes);
+    }
 }

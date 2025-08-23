@@ -26,6 +26,7 @@ internal static class Program
     private static IServiceCollection CreateServiceCollection() => new ServiceCollection()
         .AddSingleton<IAudioPlayerFactory, WebAudioFactory>()
         .AddSingleton<IFileToPhraseConverter, MemoryPhraseConverter>()
-        .AddSingleton<IPhraseCacheSaver, PhraseCacheStorageSaver>();
+        .AddSingleton<IPhraseCacheSaver, PhraseCacheStorageSaver>()
+        .AddSingleton<IPhraseProvider, CacheStoragePhraseProvider>();
 
 }
