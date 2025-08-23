@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Katie.UI"
+             xmlns:controls="clr-namespace:Katie.UI.Controls"
              x:Class="Katie.UI.App"
              RequestedThemeVariant="Dark">
     <Application.DataTemplates>
@@ -10,4 +11,23 @@
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>
+
+    <Application.Resources>
+        <ControlTheme x:Key="{x:Type controls:RadioButtonList}" TargetType="controls:RadioButtonList">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                        <ItemsPresenter
+                            Name="PART_ItemsPresenter"
+                            ItemsPanel="{TemplateBinding ItemsPanel}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+    </Application.Resources>
 </Application>
