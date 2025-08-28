@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Text;
+﻿using System.Text;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using Katie.Core.DataStructures;
@@ -7,7 +6,6 @@ using Katie.NAudio;
 using Katie.NAudio.Extensions;
 using Katie.UI.Audio;
 using Katie.UI.PhraseProviders;
-using Katie.UI.Signals;
 using Microsoft.Extensions.DependencyInjection;
 using NAudio.Wave;
 
@@ -15,8 +13,6 @@ namespace Katie.UI.ViewModels;
 
 public sealed partial class MainViewModel : ViewModelBase
 {
-
-    private static readonly Signal DefaultSignal = new(null!, "None", TimeSpan.Zero);
 
     private int _playIndex;
 
@@ -51,26 +47,19 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public PhrasePackViewModel Global { get; }
 
-    public ObservableCollection<Signal> Signals { get; } = [DefaultSignal];
-
-    [ObservableProperty]
-    private Signal _selectedSignal = DefaultSignal;
-
-    private readonly ISignalProvider? _signalPicker;
+    public SignalsViewModel Signals { get; }
 
     public MainViewModel(
+        SignalsViewModel signals,
         IAudioPlayerFactory? audioPlayerFactory,
         IInitialPhraseLoader? initialPhrases = null,
-        ISignalProvider? initialSignals = null,
         IPhraseCacheManager? cacheSaver = null,
-        [FromKeyedServices(nameof(FilePickerSignalProvider))]
-        ISignalProvider? signalPicker = null,
         [FromKeyedServices(nameof(FilePickerPhraseProvider))]
         IPhraseProvider? phrasePicker = null
     )
     {
         _factory = audioPlayerFactory;
-        _signalPicker = signalPicker;
+        Signals = signals;
         English = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "English", Cache = cacheSaver};
         Hungarian = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Hungarian", Cache = cacheSaver};
         Global = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Global", Cache = cacheSaver};
@@ -78,15 +67,13 @@ public sealed partial class MainViewModel : ViewModelBase
         English.PhrasesChanged += RebuildEnglish;
         Global.PhrasesChanged += RebuildHungarian;
         Global.PhrasesChanged += RebuildEnglish;
-        if (Design.IsDesignMode)
-            return;
-        LoadInitialPhrases(initialPhrases).ConfigureAwait(false);
-        LoadSignals(initialSignals).ConfigureAwait(false);
+        if (!Design.IsDesignMode)
+            LoadInitialPhrases(initialPhrases).ConfigureAwait(false);
     }
 
     private readonly IAudioPlayerFactory? _factory;
 
-    public MainViewModel() : this(null)
+    public MainViewModel() : this(new SignalsViewModel(), null)
     {
     }
 
@@ -105,23 +92,6 @@ public sealed partial class MainViewModel : ViewModelBase
         await initialPhrases.LoadPhrasesAsync(Hungarian, English, Global);
         Dispatcher.UIThread.Post(() => InitialsLoaded = true);
     }
-
-    private async Task LoadSignals(ISignalProvider? signalProvider)
-    {
-        if (signalProvider == null)
-            return;
-        var signals = new List<Signal>();
-        await foreach (var provider in signalProvider.EnumerateSignalsAsync())
-            signals.Add(provider);
-        Dispatcher.UIThread.Post(() =>
-        {
-            foreach (var signal in signals)
-                Signals.Add(signal);
-        });
-    }
-
-    [RelayCommand]
-    public Task AddSignals() => LoadSignals(_signalPicker);
 
     [RelayCommand]
     public async Task Play(string language)
@@ -147,9 +117,9 @@ public sealed partial class MainViewModel : ViewModelBase
         SetSplit(chain);
         Progress = 0;
 
-        var (signalProvider, signalName, signalDuration) = SelectedSignal;
+        var (signalProvider, signalName, signalDuration) = Signals.Selected;
         ISampleProvider master;
-        if (SelectedSignal == DefaultSignal)
+        if (Signals.Selected == SignalsViewModel.DefaultSignal)
             master = chain;
         else
         {

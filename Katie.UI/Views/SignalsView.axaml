@@ -1,0 +1,21 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Katie.UI.ViewModels"
+             xmlns:controls="clr-namespace:Katie.UI.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Katie.UI.Views.SignalsView"
+             x:DataType="viewModels:SignalsViewModel">
+    <StackPanel>
+        <Label Classes="title">Signal:</Label>
+        <controls:RadioButtonList ItemsSource="{Binding List}" SelectedValue="{Binding Selected}" GroupName="Signal">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Label Content="{Binding Name}" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </controls:RadioButtonList>
+        <Button Command="{Binding AddSignalsCommand}">Add Signals</Button>
+    </StackPanel>
+</UserControl>

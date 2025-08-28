@@ -11,7 +11,7 @@
         <viewModels:PhrasePackViewModel Language="Hungarian" />
     </Design.DataContext>
     <Grid RowDefinitions="Auto,Auto,*">
-        <Label Content="{Binding Language}" FontWeight="Bold" FontSize="20" />
+        <Label Classes="title" Content="{Binding Language}" />
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Button Command="{Binding AddPhrasesCommand}">Add</Button>
             <Button Command="{Binding ClearCommand}">Clear</Button>

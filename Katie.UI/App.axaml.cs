@@ -30,6 +30,7 @@ public sealed class App : Application
             var window = new MainWindow();
             Services.AddSingleton(new HostControl(window));
             Services.AddSingleton<MainWindowViewModel>();
+            Services.AddSingleton<SignalsViewModel>();
 
             var provider = Services.BuildServiceProvider();
 

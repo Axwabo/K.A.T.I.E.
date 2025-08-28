@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Katie.UI.ViewModels"
-             xmlns:controls="clr-namespace:Katie.UI.Controls"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
              x:Class="Katie.UI.Views.MainView"
              x:DataType="vm:MainViewModel">
@@ -18,18 +17,7 @@
             <UserControl Grid.Column="1" Content="{Binding English}" />
             <UserControl Grid.Column="2" Content="{Binding Global}" />
             <Rectangle Grid.Column="3" Width="1" Margin="5,0,5,5" Fill="Gray" />
-            <StackPanel Grid.Column="4">
-                <Button Command="{Binding CacheCommand}">Cache Phrases</Button>
-                <Button Command="{Binding AddSignalsCommand}">Add Signals</Button>
-                <Label>Signal:</Label>
-                <controls:RadioButtonList ItemsSource="{Binding Signals}" SelectedValue="{Binding SelectedSignal}" GroupName="Signal">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Label Content="{Binding Name}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </controls:RadioButtonList>
-            </StackPanel>
+            <UserControl Grid.Column="4" Content="{Binding Signals}" />
         </Grid>
         <ProgressBar Grid.Row="0" IsVisible="{Binding !InitialsLoaded}" IsIndeterminate="{Binding !InitialsLoaded}"
                      Foreground="DodgerBlue" ShowProgressText="True" ProgressTextFormat="Loading phrases..." MaxWidth="250" />

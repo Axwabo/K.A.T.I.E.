@@ -10,6 +10,10 @@
 
     <Application.Styles>
         <FluentTheme />
+        <Style Selector="Label.title">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="20" />
+        </Style>
     </Application.Styles>
 
     <Application.Resources>
