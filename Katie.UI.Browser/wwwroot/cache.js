@@ -15,6 +15,14 @@ export function save(language, name, data) {
     return cache.put(language + "/" + name, new Response(data.slice(), init));
 }
 
+/**
+ * @param language {string}
+ * @param name {string}
+ */
+export function remove(language, name) {
+    return cache.delete(language + "/" + name);
+}
+
 /** @param language {string} */
 export async function prepare(language) {
     const keys = await cache.keys();

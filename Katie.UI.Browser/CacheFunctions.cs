@@ -11,6 +11,9 @@ internal static partial class CacheFunctions
     [JSImport("save", Module)]
     public static partial Task Save(string language, string name, [JSMarshalAs<JSType.MemoryView>] ArraySegment<byte> data);
 
+    [JSImport("remove", Module)]
+    public static partial Task Remove(string language, string name);
+
     [JSImport("prepare", Module)]
     public static partial Task PrepareCache(string language);
 

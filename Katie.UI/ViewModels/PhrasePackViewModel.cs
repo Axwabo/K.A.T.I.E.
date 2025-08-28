@@ -10,6 +10,8 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
 
     public required IPhraseProvider? PhraseProvider { get; init; }
 
+    public IPhraseCacheManager? Cache { get; init; }
+
     public required string Language { get; set; }
 
     public string Content => $"Add {Language} phrases";
@@ -42,12 +44,28 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
         PhrasesChanged?.Invoke();
     }
 
-    public async Task Cache(IPhraseCacheSaver? saver)
+    public async Task CacheAll()
     {
         var list = new List<SamplePhraseBase>(List.Count);
-        await foreach (var phrase in List.ToSamplePhrases(Language, saver))
+        await foreach (var phrase in List.ToSamplePhrases(Language, Cache))
             list.Add(phrase);
         Dispatcher.UIThread.Post(() => ReplacePhrases(list));
+    }
+
+    [RelayCommand]
+    private async Task RemovePhrase(SamplePhraseBase phrase)
+    {
+        if (phrase is not WaveStreamPhrase wave)
+        {
+            List.Remove(phrase);
+            return;
+        }
+
+        if (Cache != null)
+            await Cache.DeleteAsync(wave, Language);
+        wave.Dispose();
+        List.Remove(wave);
+        PhrasesChanged?.InvokeOnUIThread();
     }
 
 }

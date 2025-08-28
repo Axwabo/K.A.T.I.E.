@@ -58,13 +58,11 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private readonly ISignalProvider? _signalPicker;
 
-    private readonly IPhraseCacheSaver? _cacheSaver;
-
     public MainViewModel(
         IAudioPlayerFactory? audioPlayerFactory,
         IInitialPhraseLoader? initialPhrases = null,
         ISignalProvider? initialSignals = null,
-        IPhraseCacheSaver? cacheSaver = null,
+        IPhraseCacheManager? cacheSaver = null,
         [FromKeyedServices(nameof(FilePickerSignalProvider))]
         ISignalProvider? signalPicker = null,
         [FromKeyedServices(nameof(FilePickerPhraseProvider))]
@@ -73,10 +71,9 @@ public sealed partial class MainViewModel : ViewModelBase
     {
         _factory = audioPlayerFactory;
         _signalPicker = signalPicker;
-        _cacheSaver = cacheSaver;
-        English = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "English"};
-        Hungarian = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Hungarian"};
-        Global = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Global"};
+        English = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "English", Cache = cacheSaver};
+        Hungarian = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Hungarian", Cache = cacheSaver};
+        Global = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Global", Cache = cacheSaver};
         Hungarian.PhrasesChanged += RebuildHungarian;
         English.PhrasesChanged += RebuildEnglish;
         Global.PhrasesChanged += RebuildHungarian;
@@ -202,9 +199,9 @@ public sealed partial class MainViewModel : ViewModelBase
 
     [RelayCommand]
     public Task Cache() => Task.WhenAll(
-        Hungarian.Cache(_cacheSaver),
-        English.Cache(_cacheSaver),
-        Global.Cache(_cacheSaver)
+        Hungarian.CacheAll(),
+        English.CacheAll(),
+        Global.CacheAll()
     );
 
 }
