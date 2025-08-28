@@ -26,7 +26,6 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
     {
         if (_numberParser.IsActive && _numberParser.Next(out phrase, out var advanced))
         {
-            phrase = phrase.WithOffset(index);
             index += advanced;
             return true;
         }
@@ -35,12 +34,12 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
         {
             case NumericTokenPart.HourNumber when _shape == NumericTokenShape.TimeHourOnly:
                 _part = NumericTokenPart.None;
-                phrase = _tree.RootPhrase("o'clock", index + 2);
+                phrase = _tree.RootPhrase("o'clock");
                 index += 3;
                 return true;
             case NumericTokenPart.HourNumber:
                 _part = NumericTokenPart.Minute;
-                phrase = (0.2, index);
+                phrase = 0.2;
                 index++;
                 return true;
             case NumericTokenPart.Minute:
@@ -91,7 +90,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
         index += advanced;
         if (ordinal)
             index++;
-        return phrase.WithOffset(index);
+        return phrase;
     }
 
     private enum NumericTokenPart

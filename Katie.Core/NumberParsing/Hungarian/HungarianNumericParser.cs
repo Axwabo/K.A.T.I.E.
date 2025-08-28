@@ -42,11 +42,11 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
                 return true;
             case NumericTokenPart.HourNumber:
                 _part = NumericTokenPart.Hour;
-                phrase = _tree.RootPhrase("óra", index);
+                phrase = _tree.RootPhrase("óra");
                 return true;
             case NumericTokenPart.Hour:
                 _part = NumericTokenPart.Minute;
-                phrase = (0.2, index);
+                phrase = 0.2;
                 index++;
                 return true;
             case NumericTokenPart.Minute:
@@ -80,8 +80,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
                     {
                         First = main,
                         Second = suffix.TrimStart('-')
-                    },
-            _end);
+                    });
     }
 
     public bool Begin(ref int index, int tokenEnd, out UtteranceSegment<T> phrase)

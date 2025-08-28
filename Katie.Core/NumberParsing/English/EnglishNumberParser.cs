@@ -34,7 +34,7 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
         switch (_parser.PositionalIndex, _parser.Digit)
         {
             case (not 0, '0') when _leadingZero:
-                phrase = _tree.RootPhrase("oh", _index);
+                phrase = _tree.RootPhrase("oh");
                 return Advance(out _, out advanced);
             case (1, '1'):
                 Advance(out phrase, out advanced);
@@ -42,7 +42,7 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
                     return true;
                 advanced++;
                 _index++;
-                phrase = _tree.RootPhrase(Map.TenTy(_parser.Digit), _index);
+                phrase = _tree.RootPhrase(Map.TenTy(_parser.Digit));
                 Advance(out _, out _);
                 return true;
             default:

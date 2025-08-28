@@ -22,6 +22,14 @@ public ref struct PhraseParser<T> where T : PhraseBase
 
     public bool Next(out UtteranceSegment<T> phrase)
     {
+        if (!Step(out phrase))
+            return false;
+        phrase = phrase with {EndIndex = _index};
+        return true;
+    }
+
+    private bool Step(out UtteranceSegment<T> phrase)
+    {
         if (_numericParser.Next(ref _index, out phrase))
             return true;
 
@@ -47,7 +55,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
         if (primaryToken.Length > 0)
         {
             Commit(primaryToken);
-            phrase = (primaryToken.Length, _index);
+            phrase = primaryToken.Length;
             return true;
         }
 
@@ -85,7 +93,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
         }
 
         Commit(1);
-        phrase = (duration, _index);
+        phrase = duration;
         return true;
     }
 
@@ -128,7 +136,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
 
         if (lastSuccessful != null)
         {
-            phrase = (lastSuccessful.Value, _index);
+            phrase = lastSuccessful.Value;
             return true;
         }
 
