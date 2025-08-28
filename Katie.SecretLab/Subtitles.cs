@@ -50,7 +50,10 @@ public static class Subtitles
                 wasFullStop = true;
         }
 
-        return (announcementBuilder.ToString(), subtitleBuilder.ToString());
+        return (
+            announcementBuilder.RemoveEnd(Split.Length).ToString(),
+            subtitleBuilder.RemoveEnd(Split.Length + SubtitlePrefix.Length).ToString()
+        );
     }
 
     private static StringBuilder AppendSilence(this StringBuilder builder, TimeSpan time)
@@ -59,8 +62,11 @@ public static class Subtitles
         for (; seconds > SilenceDuration; seconds -= SilenceDuration)
             builder.Append(" . ");
         return seconds > 0
-            ? builder.Append(" pitch_").Append(SilenceDuration / seconds).Append(" . ")
+            ? builder.Append(" pitch_").Append(SilenceDuration / seconds).Append(" . pitch_1 ")
             : builder.Append(" pitch_1");
     }
+
+    private static StringBuilder RemoveEnd(this StringBuilder builder, int characters)
+        => builder.Remove(builder.Length - characters, characters);
 
 }
