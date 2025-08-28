@@ -1,4 +1,5 @@
 ﻿using Katie.NAudio;
+using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using SecretLabNAudio.Core;
 using SecretLabNAudio.Core.Extensions;
@@ -31,11 +32,25 @@ internal sealed class AnnouncementManager : MonoBehaviour
 
     private readonly SampleProviderQueue _queue = new(AudioPlayer.SupportedFormat);
 
+    private readonly Dictionary<ISampleProvider, (string Announcement, string Subtitles)> _announcements = [];
+
+    private ISampleProvider? _previousProvider;
+
     public AudioPlayer Player { get; private set; } = null!;
 
     private void Awake() => Instance = this;
 
     private void Start() => Player.SampleProvider = _queue.Volume(2);
+
+    private void Update()
+    {
+        var current = _queue.Current;
+        if (current == _previousProvider)
+            return;
+        _previousProvider = current;
+        if (current != null && _announcements.Remove(current, out var tuple))
+            Subtitles.Play(tuple.Announcement, tuple.Subtitles);
+    }
 
     public bool Play(string text)
     {
@@ -50,18 +65,11 @@ internal sealed class AnnouncementManager : MonoBehaviour
         var chain = UtteranceChain.Parse(announcement, tree, language);
         if (chain == null)
             return true;
+        var offset = new OffsetSampleProvider(chain) {LeadOut = Delay};
         if (signal != null)
-        {
-            signal.Position = 0;
-            _queue.Enqueue(signal);
-            _queue.Enqueue(new OffsetSampleProvider(chain) {LeadOut = Delay});
-            Subtitles.PlaySilence(signal.TotalTime);
-        }
-        else
-            _queue.Enqueue(new OffsetSampleProvider(chain) {LeadOut = Delay});
-
-        Subtitles.PlayCassie(chain, announcement);
-        Subtitles.PlaySilence(Delay);
+            _queue.Enqueue(signal.Copy(true));
+        _queue.Enqueue(offset);
+        _announcements[offset] = Subtitles.MakeCassieAnnouncement(chain, announcement);
         return true;
     }
 

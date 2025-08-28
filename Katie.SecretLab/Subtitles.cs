@@ -11,27 +11,20 @@ public static class Subtitles
     private const string Split = "<split>";
     private const double SilenceDuration = 0.5;
 
-    public static void PlaySilence(TimeSpan duration) => Play(new StringBuilder().AppendSilence(duration).ToString(), null);
-
-    public static void PlayCassie(UtteranceChain chain, ReadOnlySpan<char> text)
-    {
-        var (announcement, subtitles) = MakeCassieAnnouncement(chain, text);
-        Play(announcement, subtitles);
-    }
-
-    private static void Play(string announcement, string? subtitles)
+    public static void Play(string announcement, string subtitles)
     {
         foreach (var controller in RespawnEffectsController.AllControllers)
-            controller.RpcCassieAnnouncement(announcement, false, false, subtitles != null, subtitles);
+            controller.RpcCassieAnnouncement(announcement, false, false, true, subtitles);
     }
 
-    private static (string Announcement, string Subtitles) MakeCassieAnnouncement(UtteranceChain chain, ReadOnlySpan<char> text)
+    public static (string Announcement, string Subtitles) MakeCassieAnnouncement(UtteranceChain chain, ReadOnlySpan<char> text)
     {
         var announcementBuilder = new StringBuilder();
         var subtitleBuilder = new StringBuilder(SubtitlePrefix);
         var time = chain.Current.Segment.Duration;
         var start = 0;
         var wasFullStop = false;
+        var anySplits = false;
         foreach (var segment in chain.Remaining)
         {
             time += segment.Duration;
@@ -44,6 +37,7 @@ public static class Subtitles
                 start = end.GetOffset(text.Length);
                 time = TimeSpan.Zero;
                 wasFullStop = false;
+                anySplits = true;
             }
 
             if (segment.EndIndex == -1 || text[segment.EndIndex] == '.')
@@ -51,8 +45,8 @@ public static class Subtitles
         }
 
         return (
-            announcementBuilder.RemoveEnd(Split.Length).ToString(),
-            subtitleBuilder.RemoveEnd(Split.Length + SubtitlePrefix.Length).ToString()
+            announcementBuilder.RemoveEnd(Split.Length, anySplits).ToString(),
+            subtitleBuilder.RemoveEnd(Split.Length + SubtitlePrefix.Length, anySplits).ToString()
         );
     }
 
@@ -66,7 +60,7 @@ public static class Subtitles
             : builder.Append(" pitch_1");
     }
 
-    private static StringBuilder RemoveEnd(this StringBuilder builder, int characters)
-        => builder.Remove(builder.Length - characters, characters);
+    private static StringBuilder RemoveEnd(this StringBuilder builder, int characters, bool condition)
+        => condition ? builder.Remove(builder.Length - characters, characters) : builder;
 
 }
