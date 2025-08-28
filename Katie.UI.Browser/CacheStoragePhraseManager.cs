@@ -9,9 +9,9 @@ public sealed class CacheStoragePhraseManager : IPhraseCacheManager
 
     public Task CacheAsync(WaveStreamPhrase phrase, string language)
         => phrase is MemoryStreamPhrase memory
-            ? CacheFunctions.Save(language, phrase.Text, memory.Data)
+            ? PhraseCacheFunctions.Save(language, phrase.Text, memory.Data)
             : Task.CompletedTask;
 
-    public Task DeleteAsync(WaveStreamPhrase phrase, string language) => CacheFunctions.Remove(language, phrase.Text);
+    public Task ClearAsync() => PhraseCacheFunctions.DeleteAll();
 
 }

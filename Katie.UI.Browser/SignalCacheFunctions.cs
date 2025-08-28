@@ -3,19 +3,16 @@ using System.Threading.Tasks;
 
 namespace Katie.UI.Browser;
 
-internal static partial class CacheFunctions
+internal static partial class SignalCacheFunctions
 {
 
-    public const string Module = "cache";
+    public const string Module = "signalCache";
 
     [JSImport("save", Module)]
-    public static partial Task Save(string language, string name, [JSMarshalAs<JSType.MemoryView>] ArraySegment<byte> data);
-
-    [JSImport("remove", Module)]
-    public static partial Task Remove(string language, string name);
+    public static partial Task Save(string name, [JSMarshalAs<JSType.MemoryView>] ArraySegment<byte> data);
 
     [JSImport("prepare", Module)]
-    public static partial Task PrepareCache(string language);
+    public static partial Task PrepareCache();
 
     [JSImport("keys", Module)]
     public static partial string[] GetKeys();
@@ -25,5 +22,8 @@ internal static partial class CacheFunctions
 
     [JSImport("clearMemory", Module)]
     public static partial void ClearMemory();
+
+    [JSImport("clear", Module)]
+    public static partial Task DeleteAll();
 
 }

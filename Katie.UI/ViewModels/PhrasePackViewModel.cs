@@ -14,8 +14,6 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
 
     public required string Language { get; set; }
 
-    public string Content => $"Add {Language} phrases";
-
     public ObservableCollection<SamplePhraseBase> List { get; } = [];
 
     public event Action? PhrasesChanged;
@@ -53,7 +51,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task RemovePhrase(SamplePhraseBase phrase)
+    private void RemovePhrase(SamplePhraseBase phrase)
     {
         if (phrase is not WaveStreamPhrase wave)
         {
@@ -61,11 +59,19 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
             return;
         }
 
-        if (Cache != null)
-            await Cache.DeleteAsync(wave, Language);
         wave.Dispose();
         List.Remove(wave);
-        PhrasesChanged?.InvokeOnUIThread();
+        PhrasesChanged?.Invoke();
+    }
+
+    [RelayCommand]
+    private void Clear()
+    {
+        foreach (var phrase in List)
+            if (phrase is WaveStreamPhrase stream)
+                stream.Dispose();
+        List.Clear();
+        PhrasesChanged?.Invoke();
     }
 
 }

@@ -7,6 +7,6 @@ public partial class PhrasePackView : UserControl
 
     public PhrasePackView() => InitializeComponent();
 
-    public IAsyncRelayCommand? RemovePhrase => (DataContext as PhrasePackViewModel)?.RemovePhraseCommand;
+    public IRelayCommand? RemovePhrase => (DataContext as PhrasePackViewModel)?.RemovePhraseCommand;
 
 }

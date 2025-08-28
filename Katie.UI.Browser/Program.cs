@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Browser;
 using Katie.UI.Audio;
 using Katie.UI.PhraseProviders;
+using Katie.UI.Signals;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Katie.UI.Browser;
@@ -14,7 +15,8 @@ internal static class Program
     private static async Task Main()
     {
         await JSHost.ImportAsync(WebAudioFunctions.Module, $"/{WebAudioFunctions.Module}.js");
-        await JSHost.ImportAsync(CacheFunctions.Module, $"/{CacheFunctions.Module}.js");
+        await JSHost.ImportAsync(PhraseCacheFunctions.Module, $"/{PhraseCacheFunctions.Module}.js");
+        await JSHost.ImportAsync(SignalCacheFunctions.Module, $"/{SignalCacheFunctions.Module}.js");
 
         await BuildAvaloniaApp().StartBrowserAppAsync("out");
     }
@@ -27,6 +29,7 @@ internal static class Program
         .AddSingleton<IAudioPlayerFactory, WebAudioFactory>()
         .AddSingleton<IFileToPhraseConverter, MemoryPhraseConverter>()
         .AddSingleton<IPhraseCacheManager, CacheStoragePhraseManager>()
-        .AddSingleton<IInitialPhraseLoader, CacheStoragePhraseLoader>();
+        .AddSingleton<IInitialPhraseLoader, CacheStoragePhraseLoader>()
+        .AddSingleton<ISignalProvider, CacheStorageSignalLoader>();
 
 }

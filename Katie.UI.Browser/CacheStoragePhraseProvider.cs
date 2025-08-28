@@ -16,11 +16,11 @@ public sealed class CacheStoragePhraseProvider : IPhraseProvider
     {
         try
         {
-            await CacheFunctions.PrepareCache(Language);
-            var keys = CacheFunctions.GetKeys();
+            await PhraseCacheFunctions.PrepareCache(Language);
+            var keys = PhraseCacheFunctions.GetKeys();
             foreach (var key in keys.Order())
             {
-                var bytes = CacheFunctions.Load(key);
+                var bytes = PhraseCacheFunctions.Load(key);
                 var raw = await Task.Run(() =>
                 {
                     using var stream = new MemoryStream(bytes);
@@ -33,7 +33,7 @@ public sealed class CacheStoragePhraseProvider : IPhraseProvider
         }
         finally
         {
-            CacheFunctions.ClearMemory();
+            PhraseCacheFunctions.ClearMemory();
         }
     }
 

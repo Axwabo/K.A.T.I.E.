@@ -10,9 +10,13 @@
     <Design.DataContext>
         <viewModels:PhrasePackViewModel Language="Hungarian" />
     </Design.DataContext>
-    <Grid RowDefinitions="Auto,*">
-        <Button Content="{Binding Content}" Command="{Binding AddPhrasesCommand}" />
-        <ScrollViewer Grid.Row="1">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <Label Content="{Binding Language}" FontWeight="Bold" FontSize="20" />
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Button Command="{Binding AddPhrasesCommand}">Add</Button>
+            <Button Command="{Binding ClearCommand}">Clear</Button>
+        </StackPanel>
+        <ScrollViewer Grid.Row="2">
             <ItemsControl ItemsSource="{Binding List}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
