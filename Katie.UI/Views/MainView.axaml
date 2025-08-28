@@ -34,7 +34,7 @@
         <ProgressBar Grid.Row="0" IsVisible="{Binding !InitialsLoaded}" IsIndeterminate="{Binding !InitialsLoaded}"
                      Foreground="DodgerBlue" ShowProgressText="True" ProgressTextFormat="Loading phrases..." MaxWidth="250" />
         <TextBox Grid.Row="1" Text="{Binding Text}" Watermark="Enter the text to announce" TextWrapping="Wrap" />
-        <TextBlock Grid.Row="2" Text="{Binding Split}" TextWrapping="Wrap" />
+        <TextBlock Grid.Row="2" Text="{Binding Split}" TextWrapping="Wrap" Foreground="{Binding Brush}" />
         <StackPanel Grid.Row="3" Margin="0,5" Orientation="Horizontal" IsEnabled="{Binding InitialsLoaded}">
             <Button Command="{Binding PlayCommand}" CommandParameter="Hungarian">Play Hungarian</Button>
             <Button Command="{Binding PlayCommand}" CommandParameter="English">Play English</Button>

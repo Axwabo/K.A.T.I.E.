@@ -28,7 +28,6 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
     {
         if (_numberParser.IsActive && _numberParser.Next(out phrase, out var advanced))
         {
-            phrase = phrase with {EndIndex = phrase.EndIndex + index};
             index += advanced;
             return true;
         }
@@ -37,8 +36,8 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         {
             case NumericTokenPart.HourNumber when _shape == NumericTokenShape.TimeHourOnly:
                 _part = NumericTokenPart.None;
-                phrase = EndWithSuffix(ref index, "óra");
                 index += 3;
+                phrase = EndWithSuffix(ref index, "óra");
                 return true;
             case NumericTokenPart.HourNumber:
                 _part = NumericTokenPart.Hour;
@@ -114,7 +113,7 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         index += advanced;
         if (ordinal)
             index++;
-        return phrase with {EndIndex = phrase.EndIndex + index};
+        return phrase;
     }
 
     private UtteranceSegment<T> BeginSuffixed(ref int index)

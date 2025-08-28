@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using Katie.Core.DataStructures;
 using Katie.NAudio;
@@ -30,6 +31,9 @@ public sealed partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _split = "Parsed text will show up here";
+
+    [ObservableProperty]
+    private IImmutableBrush _brush = Brushes.White;
 
     [ObservableProperty]
     private string _currentPhrase = "";
@@ -128,7 +132,19 @@ public sealed partial class MainViewModel : ViewModelBase
         if (_factory == null)
             return;
         var index = ++_playIndex;
-        var chain = UtteranceChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree, language);
+        UtteranceChain? chain;
+        try
+        {
+            chain = UtteranceChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree, language);
+        }
+        catch (Exception e)
+        {
+            Split = e.Message;
+            Brush = Brushes.Red;
+            return;
+        }
+
+        Brush = Brushes.White;
         if (chain == null)
             return;
         SetSplit(chain);
