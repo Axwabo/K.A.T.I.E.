@@ -167,7 +167,7 @@ public sealed partial class MainViewModel : ViewModelBase
     {
         var span = Text.AsSpan();
         var builder = new StringBuilder(span.Length + 20);
-        var previous = provider.Current.Segment.EndIndex;
+        var previous = Math.Max(0, provider.Current.Segment.EndIndex);
         builder.Append(span[..previous]);
         builder.Append('█');
         foreach (var segment in provider.Remaining)
