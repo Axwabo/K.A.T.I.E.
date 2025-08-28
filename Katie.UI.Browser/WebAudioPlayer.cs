@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Katie.UI.Audio;
+using Katie.UI.Browser.JSInterop;
 using NAudio.Wave;
 
 namespace Katie.UI.Browser;

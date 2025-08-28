@@ -2,7 +2,7 @@
 using Katie.UI.PhraseProviders;
 using Katie.UI.ViewModels;
 
-namespace Katie.UI.Browser;
+namespace Katie.UI.Browser.Caching;
 
 public sealed class CacheStoragePhraseLoader : IInitialPhraseLoader
 {

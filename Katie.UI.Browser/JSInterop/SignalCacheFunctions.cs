@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices.JavaScript;
 using System.Threading.Tasks;
 
-namespace Katie.UI.Browser;
+namespace Katie.UI.Browser.JSInterop;
 
 internal static partial class SignalCacheFunctions
 {

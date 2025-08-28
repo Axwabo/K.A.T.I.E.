@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
 using Katie.UI.Audio;
+using Katie.UI.Browser.Caching;
+using Katie.UI.Browser.JSInterop;
 using Katie.UI.PhraseProviders;
 using Katie.UI.Signals;
 using Microsoft.Extensions.DependencyInjection;

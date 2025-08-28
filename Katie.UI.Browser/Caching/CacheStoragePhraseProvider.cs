@@ -1,11 +1,12 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using Katie.NAudio.Phrases;
+using Katie.UI.Browser.JSInterop;
 using Katie.UI.Extensions;
 using Katie.UI.PhraseProviders;
 using NAudio.Wave;
 
-namespace Katie.UI.Browser;
+namespace Katie.UI.Browser.Caching;
 
 public sealed class CacheStoragePhraseProvider : IPhraseProvider
 {

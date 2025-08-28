@@ -1,8 +1,9 @@
 ﻿using System.IO;
+using Katie.UI.Browser.JSInterop;
 using Katie.UI.Signals;
 using NAudio.Wave;
 
-namespace Katie.UI.Browser;
+namespace Katie.UI.Browser.Caching;
 
 public sealed class CacheStorageSignalLoader : ISignalProvider
 {

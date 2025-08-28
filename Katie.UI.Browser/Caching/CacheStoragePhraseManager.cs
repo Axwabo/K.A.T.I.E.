@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Katie.NAudio.Phrases;
+using Katie.UI.Browser.JSInterop;
 using Katie.UI.PhraseProviders;
 
-namespace Katie.UI.Browser;
+namespace Katie.UI.Browser.Caching;
 
 public sealed class CacheStoragePhraseManager : IPhraseCacheManager
 {
