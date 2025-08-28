@@ -35,7 +35,7 @@ public static class Subtitles
                 subtitleBuilder.Append(text[start..end].Trim());
                 subtitleBuilder.Append(Split).Append(SubtitlePrefix);
                 start = end.GetOffset(text.Length);
-                time = TimeSpan.Zero;
+                time = segment.Duration;
                 wasFullStop = false;
                 anySplits = true;
             }
