@@ -36,6 +36,8 @@ internal sealed class AnnouncementManager : MonoBehaviour
 
     private ISampleProvider? _previousProvider;
 
+    private float _pauseTime;
+
     public AudioPlayer Player { get; private set; } = null!;
 
     private void Awake() => Instance = this;
@@ -44,9 +46,15 @@ internal sealed class AnnouncementManager : MonoBehaviour
 
     private void Update()
     {
-        Player.IsPaused = NineTailedFoxAnnouncer.singleton.queue is [{collection: not Subtitles.Collection}, ..];
-        if (Player.IsPaused)
+        if (NineTailedFoxAnnouncer.singleton.queue is [{collection: not Subtitles.Collection}, ..])
+            _pauseTime = 5;
+        if ((_pauseTime -= Time.deltaTime) >= 0)
+        {
+            Player.IsPaused = true;
             return;
+        }
+
+        Player.IsPaused = false;
         var current = _queue.Current;
         if (current == _previousProvider)
             return;
