@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using CentralAuth;
 using Katie.NAudio;
 using Mirror;
 using Respawning;
@@ -37,7 +38,7 @@ public static class Subtitles
                 componentIndex = controller.ComponentIndex,
                 functionHash = CassieRpcHash,
                 payload = writer.ToArraySegment()
-            }.SendToAuthenticated();
+            }.SendToHubsConditionally(hub => hub.Mode == ClientInstanceMode.ReadyClient);
     }
 
     public static void Delay(float seconds)
