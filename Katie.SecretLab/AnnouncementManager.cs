@@ -45,6 +45,8 @@ internal sealed class AnnouncementManager : MonoBehaviour
     private void Update()
     {
         Player.IsPaused = NineTailedFoxAnnouncer.singleton.queue is [{collection: not Subtitles.Collection}, ..];
+        if (Player.IsPaused)
+            return;
         var current = _queue.Current;
         if (current == _previousProvider)
             return;

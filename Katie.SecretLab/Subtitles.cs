@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using Katie.NAudio;
+using Mirror;
 using Respawning;
+using Utils.Networking;
 
 namespace Katie.SecretLab;
 
@@ -13,18 +15,33 @@ public static class Subtitles
 
     public const string Collection = "K.A.T.I.E.";
 
+    private const ushort CassieRpcHash = unchecked((ushort) -31296712);
+
     public static void Play(string announcement, string subtitles)
     {
         var queue = NineTailedFoxAnnouncer.singleton.queue;
         var start = queue.Count;
-        foreach (var controller in RespawnEffectsController.AllControllers)
-            controller.RpcCassieAnnouncement(announcement, false, false, true, subtitles);
+        NineTailedFoxAnnouncer.singleton.AddPhraseToQueue(announcement, false, false, false, true, subtitles);
         for (var i = start; i < queue.Count; i++)
             queue[i].collection = Collection;
+        using var writer = NetworkWriterPool.Get();
+        writer.WriteString(announcement);
+        writer.WriteBool(false); // makeHold
+        writer.WriteBool(false); // makeNoise
+        writer.WriteBool(true); // customAnnouncement
+        writer.WriteString(subtitles);
+        foreach (var controller in RespawnEffectsController.AllControllers)
+            new RpcMessage
+            {
+                netId = controller.netId,
+                componentIndex = controller.ComponentIndex,
+                functionHash = CassieRpcHash,
+                payload = writer.ToArraySegment()
+            }.SendToAuthenticated();
     }
 
     public static void Delay(float seconds)
-        => NineTailedFoxAnnouncer.singleton.queue.Add(new NineTailedFoxAnnouncer.VoiceLine {length = seconds, collection = Collection});
+        => NineTailedFoxAnnouncer.singleton.queue.Add(new NineTailedFoxAnnouncer.VoiceLine {apiName = ".", length = seconds, collection = Collection});
 
     public static (string Announcement, string Subtitles) MakeCassieAnnouncement(UtteranceChain chain, ReadOnlySpan<char> text)
     {
