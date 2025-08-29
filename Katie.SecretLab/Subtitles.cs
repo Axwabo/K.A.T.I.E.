@@ -7,15 +7,24 @@ namespace Katie.SecretLab;
 public static class Subtitles
 {
 
-    public const string SubtitlePrefix = "<pos=-1px><mark=#000000ff> <color=#88f>Κ．Α．Τ．Ι．Ε．։  </color></mark> ";
+    private const string SubtitlePrefix = "<pos=-1px><mark=#000000ff> <color=#88f>Κ．Α．Τ．Ι．Ε．։  </color></mark> ";
     private const string Split = "<split>";
     private const double SilenceDuration = 0.5;
 
+    public const string Collection = "K.A.T.I.E.";
+
     public static void Play(string announcement, string subtitles)
     {
+        var queue = NineTailedFoxAnnouncer.singleton.queue;
+        var start = queue.Count;
         foreach (var controller in RespawnEffectsController.AllControllers)
             controller.RpcCassieAnnouncement(announcement, false, false, true, subtitles);
+        for (var i = start; i < queue.Count; i++)
+            queue[i].collection = Collection;
     }
+
+    public static void Delay(float seconds)
+        => NineTailedFoxAnnouncer.singleton.queue.Add(new NineTailedFoxAnnouncer.VoiceLine {length = seconds, collection = Collection});
 
     public static (string Announcement, string Subtitles) MakeCassieAnnouncement(UtteranceChain chain, ReadOnlySpan<char> text)
     {

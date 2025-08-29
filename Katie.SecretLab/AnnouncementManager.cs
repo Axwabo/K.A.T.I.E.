@@ -44,12 +44,15 @@ internal sealed class AnnouncementManager : MonoBehaviour
 
     private void Update()
     {
+        Player.IsPaused = NineTailedFoxAnnouncer.singleton.queue is [{collection: not Subtitles.Collection}, ..];
         var current = _queue.Current;
         if (current == _previousProvider)
             return;
         _previousProvider = current;
-        if (current != null && _announcements.Remove(current, out var tuple))
-            Subtitles.Play(tuple.Announcement, tuple.Subtitles);
+        if (current == null || !_announcements.Remove(current, out var tuple))
+            return;
+        Subtitles.Play(tuple.Announcement, tuple.Subtitles);
+        Subtitles.Delay(3);
     }
 
     public bool Play(string text)
