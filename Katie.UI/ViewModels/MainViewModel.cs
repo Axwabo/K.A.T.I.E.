@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.ComponentModel;
+using System.Text;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using Katie.Core.DataStructures;
@@ -17,10 +18,12 @@ public sealed partial class MainViewModel : ViewModelBase
     private int _playIndex;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Opacity))]
-    private bool _initialsLoaded;
+    [NotifyPropertyChangedFor(nameof(HasBlockingOperation), nameof(Opacity))]
+    private string? _blockingOperation = "Loading phrases...";
 
-    public double Opacity => InitialsLoaded ? 1 : 0.5;
+    public bool HasBlockingOperation => BlockingOperation != null;
+
+    public double Opacity => HasBlockingOperation ? 0.5 : 1;
 
     [ObservableProperty]
     private string _text = "";
@@ -49,6 +52,8 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public SignalsViewModel Signals { get; }
 
+    private readonly IAudioPlayerFactory? _factory;
+
     public MainViewModel(
         SignalsViewModel signals,
         IAudioPlayerFactory? audioPlayerFactory,
@@ -67,11 +72,12 @@ public sealed partial class MainViewModel : ViewModelBase
         English.PhrasesChanged += RebuildEnglish;
         Global.PhrasesChanged += RebuildHungarian;
         Global.PhrasesChanged += RebuildEnglish;
+        Hungarian.PropertyChanged += SetBlockingOperation;
+        English.PropertyChanged += SetBlockingOperation;
+        Global.PropertyChanged += SetBlockingOperation;
         if (!Design.IsDesignMode)
             LoadInitialPhrases(initialPhrases).ConfigureAwait(false);
     }
-
-    private readonly IAudioPlayerFactory? _factory;
 
     public MainViewModel() : this(new SignalsViewModel(), null)
     {
@@ -81,16 +87,22 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private void RebuildEnglish() => _englishTree = new PhraseTree<SamplePhraseBase>(Global.List.Concat(English.List));
 
+    private void SetBlockingOperation(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(PhrasePackViewModel.BlockingOperation))
+            BlockingOperation = Hungarian.BlockingOperation ?? English.BlockingOperation ?? Global.BlockingOperation;
+    }
+
     private async Task LoadInitialPhrases(IInitialPhraseLoader? initialPhrases)
     {
         if (initialPhrases == null)
         {
-            InitialsLoaded = true;
+            BlockingOperation = null;
             return;
         }
 
         await initialPhrases.LoadPhrasesAsync(Hungarian, English, Global);
-        Dispatcher.UIThread.Post(() => InitialsLoaded = true);
+        Dispatcher.UIThread.Post(() => BlockingOperation = null);
     }
 
     [RelayCommand]

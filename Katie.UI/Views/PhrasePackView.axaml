@@ -15,12 +15,13 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Button Command="{Binding AddPhrasesCommand}">Add</Button>
             <Button Command="{Binding ClearCommand}">Clear</Button>
+            <Button Command="{Binding CacheAllCommand}">Cache</Button>
         </StackPanel>
         <ScrollViewer Grid.Row="2">
             <ItemsControl ItemsSource="{Binding List}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,5,0">
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,5,0" Background="{Binding Converter={StaticResource PhraseToBrush}}">
                             <Label Content="{Binding Text}" ToolTip.Tip="{Binding Text}" />
                             <Button Grid.Column="1" ToolTip.Tip="Delete" Command="{Binding #Root.RemovePhrase}" CommandParameter="{Binding}">X</Button>
                         </Grid>

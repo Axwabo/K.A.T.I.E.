@@ -18,11 +18,15 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
 
     public event Action? PhrasesChanged;
 
+    [ObservableProperty]
+    private string? _blockingOperation;
+
     [RelayCommand]
     private Task AddPhrases() => PhraseProvider == null ? Task.CompletedTask : AddPhrases(PhraseProvider);
 
     public async Task AddPhrases(IPhraseProvider provider)
     {
+        BlockingOperation = "Adding phrases...";
         var any = false;
         await foreach (var phrase in provider.EnumeratePhrasesAsync())
         {
@@ -30,8 +34,12 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
             any = true;
         }
 
-        if (any)
-            PhrasesChanged?.InvokeOnUIThread();
+        Dispatcher.UIThread.Post(() =>
+        {
+            BlockingOperation = null;
+            if (any)
+                PhrasesChanged?.Invoke();
+        });
     }
 
     public void ReplacePhrases(IReadOnlyCollection<SamplePhraseBase> phrases)
@@ -42,12 +50,22 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
         PhrasesChanged?.Invoke();
     }
 
+    [RelayCommand]
     public async Task CacheAll()
     {
-        var list = new List<SamplePhraseBase>(List.Count);
-        await foreach (var phrase in List.ToSamplePhrases(Language, Cache))
-            list.Add(phrase);
-        Dispatcher.UIThread.Post(() => ReplacePhrases(list));
+        BlockingOperation = "Caching phrases...";
+        var any = false;
+        await foreach (var task in Task.WhenEach(List.ToSamplePhrases(Language, Cache)))
+        {
+            any = true;
+            var (index, phrase) = task.Result;
+            Dispatcher.UIThread.Post(() => List[index] = phrase);
+        }
+
+        if (any)
+            Dispatcher.UIThread.Post(() => BlockingOperation = null);
+        else
+            BlockingOperation = null; // avoid one frame delay
     }
 
     [RelayCommand]

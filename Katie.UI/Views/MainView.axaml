@@ -12,18 +12,18 @@
         <vm:MainViewModel />
     </Design.DataContext>
     <Grid RowDefinitions="*,60,Auto,Auto,Auto" Margin="5">
-        <Grid Grid.Row="0" ColumnDefinitions="*,*,*,Auto,Auto" IsEnabled="{Binding InitialsLoaded}" Opacity="{Binding Opacity}">
+        <Grid Grid.Row="0" ColumnDefinitions="*,*,*,Auto,Auto" IsEnabled="{Binding !HasBlockingOperation}" Opacity="{Binding Opacity}">
             <UserControl Content="{Binding Hungarian}" />
             <UserControl Grid.Column="1" Content="{Binding English}" />
             <UserControl Grid.Column="2" Content="{Binding Global}" />
             <Rectangle Grid.Column="3" Width="1" Margin="5,0,5,5" Fill="Gray" />
             <UserControl Grid.Column="4" Content="{Binding Signals}" />
         </Grid>
-        <ProgressBar Grid.Row="0" IsVisible="{Binding !InitialsLoaded}" IsIndeterminate="{Binding !InitialsLoaded}"
-                     Foreground="DodgerBlue" ShowProgressText="True" ProgressTextFormat="Loading phrases..." MaxWidth="250" />
+        <ProgressBar Grid.Row="0" IsVisible="{Binding HasBlockingOperation}" IsIndeterminate="{Binding HasBlockingOperation}"
+                     Foreground="DodgerBlue" ShowProgressText="True" ProgressTextFormat="{Binding BlockingOperation}" MaxWidth="250" />
         <TextBox Grid.Row="1" Text="{Binding Text}" Watermark="Enter the text to announce" TextWrapping="Wrap" />
         <TextBlock Grid.Row="2" Text="{Binding Split}" TextWrapping="Wrap" Foreground="{Binding Brush}" />
-        <StackPanel Grid.Row="3" Margin="0,5" Orientation="Horizontal" IsEnabled="{Binding InitialsLoaded}">
+        <StackPanel Grid.Row="3" Margin="0,5" Orientation="Horizontal" IsEnabled="{Binding !HasBlockingOperation}">
             <Button Command="{Binding PlayCommand}" CommandParameter="Hungarian">Play Hungarian</Button>
             <Button Command="{Binding PlayCommand}" CommandParameter="English">Play English</Button>
             <Button Command="{Binding StopCommand}">Stop</Button>
