@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Text;
+using System.Threading;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using Katie.Core.DataStructures;
@@ -54,6 +55,11 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private readonly IAudioPlayerFactory? _factory;
 
+    private CancellationTokenSource? _cts = new();
+
+    [ObservableProperty]
+    private bool _canCancel;
+
     public MainViewModel(
         SignalsViewModel signals,
         IAudioPlayerFactory? audioPlayerFactory,
@@ -72,9 +78,6 @@ public sealed partial class MainViewModel : ViewModelBase
         English.PhrasesChanged += RebuildEnglish;
         Global.PhrasesChanged += RebuildHungarian;
         Global.PhrasesChanged += RebuildEnglish;
-        Hungarian.PropertyChanged += SetBlockingOperation;
-        English.PropertyChanged += SetBlockingOperation;
-        Global.PropertyChanged += SetBlockingOperation;
         if (!Design.IsDesignMode)
             LoadInitialPhrases(initialPhrases).ConfigureAwait(false);
     }
@@ -89,19 +92,50 @@ public sealed partial class MainViewModel : ViewModelBase
 
     private void SetBlockingOperation(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(PhrasePackViewModel.BlockingOperation))
-            BlockingOperation = Hungarian.BlockingOperation ?? English.BlockingOperation ?? Global.BlockingOperation;
+        if (e.PropertyName is not nameof(PhrasePackViewModel.BlockingOperation))
+            return;
+        var hadOperation = HasBlockingOperation;
+        BlockingOperation = Hungarian.BlockingOperation ?? English.BlockingOperation ?? Global.BlockingOperation;
+        if (hadOperation || !HasBlockingOperation)
+            return;
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        EnableCancellation();
+    }
+
+    private void EnableCancellation()
+    {
+        CanCancel = true;
+        Hungarian.Cancellation = English.Cancellation = Global.Cancellation = _cts?.Token ?? CancellationToken.None;
+    }
+
+    private void SubscribeToOperations()
+    {
+        Hungarian.PropertyChanged += SetBlockingOperation;
+        English.PropertyChanged += SetBlockingOperation;
+        Global.PropertyChanged += SetBlockingOperation;
+    }
+
+    [RelayCommand]
+    private void Cancel()
+    {
+        CanCancel = false;
+        _cts?.Cancel();
     }
 
     private async Task LoadInitialPhrases(IInitialPhraseLoader? initialPhrases)
     {
+        EnableCancellation();
         if (initialPhrases == null)
         {
+            SubscribeToOperations();
             BlockingOperation = null;
             return;
         }
 
         await initialPhrases.LoadPhrasesAsync(Hungarian, English, Global);
+        SubscribeToOperations();
         Dispatcher.UIThread.Post(() => BlockingOperation = null);
     }
 

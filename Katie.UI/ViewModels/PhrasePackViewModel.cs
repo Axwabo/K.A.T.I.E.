@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Threading;
 using CommunityToolkit.Mvvm.Input;
 using Katie.UI.Extensions;
 using Katie.UI.PhraseProviders;
@@ -16,6 +17,8 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
 
     public ObservableCollection<SamplePhraseBase> List { get; } = [];
 
+    public CancellationToken Cancellation { get; set; }
+
     public event Action? PhrasesChanged;
 
     [ObservableProperty]
@@ -27,19 +30,22 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
     public async Task AddPhrases(IPhraseProvider provider)
     {
         BlockingOperation = "Adding phrases...";
-        var any = false;
-        await foreach (var phrase in provider.EnumeratePhrasesAsync())
+        try
         {
-            List.Add(phrase);
-            any = true;
-        }
+            var any = false;
+            await foreach (var phrase in provider.EnumeratePhrasesAsync().WithCancellation(Cancellation))
+            {
+                List.Add(phrase);
+                any = true;
+            }
 
-        Dispatcher.UIThread.Post(() =>
-        {
-            BlockingOperation = null;
             if (any)
-                PhrasesChanged?.Invoke();
-        });
+                PhrasesChanged?.InvokeOnUIThread();
+        }
+        finally
+        {
+            Dispatcher.UIThread.Post(() => BlockingOperation = null);
+        }
     }
 
     public void ReplacePhrases(IReadOnlyCollection<SamplePhraseBase> phrases)
@@ -55,7 +61,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
     {
         BlockingOperation = "Caching phrases...";
         var any = false;
-        await foreach (var task in Task.WhenEach(List.ToSamplePhrases(Language, Cache)))
+        await foreach (var task in Task.WhenEach(List.ToSamplePhrases(Language, Cache)).WithCancellation(Cancellation))
         {
             any = true;
             var (index, phrase) = task.Result;

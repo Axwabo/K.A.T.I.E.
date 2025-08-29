@@ -19,8 +19,11 @@
             <Rectangle Grid.Column="3" Width="1" Margin="5,0,5,5" Fill="Gray" />
             <UserControl Grid.Column="4" Content="{Binding Signals}" />
         </Grid>
-        <ProgressBar Grid.Row="0" IsVisible="{Binding HasBlockingOperation}" IsIndeterminate="{Binding HasBlockingOperation}"
-                     Foreground="DodgerBlue" ShowProgressText="True" ProgressTextFormat="{Binding BlockingOperation}" MaxWidth="250" />
+        <StackPanel Grid.Row="0" VerticalAlignment="Center" IsVisible="{Binding HasBlockingOperation}">
+            <ProgressBar IsIndeterminate="{Binding HasBlockingOperation}"
+                         Foreground="DodgerBlue" ShowProgressText="True" ProgressTextFormat="{Binding BlockingOperation}" MaxWidth="250" />
+            <Button HorizontalAlignment="Center" Command="{Binding CancelCommand}" IsEnabled="{Binding CanCancel}" Margin="0,5,0,0">Cancel</Button>
+        </StackPanel>
         <TextBox Grid.Row="1" Text="{Binding Text}" Watermark="Enter the text to announce" TextWrapping="Wrap" />
         <TextBlock Grid.Row="2" Text="{Binding Split}" TextWrapping="Wrap" Foreground="{Binding Brush}" />
         <StackPanel Grid.Row="3" Margin="0,5" Orientation="Horizontal" IsEnabled="{Binding !HasBlockingOperation}">
