@@ -13,6 +13,6 @@ const config = dotnetRuntime.getConfig();
 
 const exports = await dotnetRuntime.getAssemblyExports(config.mainAssemblyName);
 
-globalThis.readFromProvider = exports.Katie.UI.Browser.WebAudioFunctions.ReadFromProvider;
+globalThis.readFromProvider = exports.Katie.UI.Browser.JSInterop.WebAudioFunctions.ReadFromProvider;
 
 await dotnetRuntime.runMain(config.mainAssemblyName, [globalThis.location.href]);
