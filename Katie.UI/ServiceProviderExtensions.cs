@@ -6,6 +6,7 @@ internal static class ServiceProviderExtensions
 {
 
     public static IServiceCollection AddViewModels(this IServiceCollection collection)
-        => collection.AddSingleton<MainViewModel>();
+        => collection.AddSingleton<MainViewModel>()
+            .AddSingleton<SignalsViewModel>();
 
 }
