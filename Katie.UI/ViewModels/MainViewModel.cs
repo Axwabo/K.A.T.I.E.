@@ -20,7 +20,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasBlockingOperation), nameof(Opacity))]
-    private string? _blockingOperation = "Loading phrases...";
+    private string? _blockingOperation = null; //"Loading phrases...";
 
     public bool HasBlockingOperation => BlockingOperation != null;
 

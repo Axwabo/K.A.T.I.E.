@@ -8,7 +8,7 @@
              x:Class="Katie.UI.Views.SignalsView"
              x:DataType="viewModels:SignalsViewModel">
     <StackPanel>
-        <Label Classes="title">Signal:</Label>
+        <Label Classes="title">Signal</Label>
         <controls:RadioButtonList ItemsSource="{Binding List}" SelectedValue="{Binding Selected}" GroupName="Signal">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
