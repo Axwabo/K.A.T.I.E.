@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Katie.UI.ViewModels"
-             xmlns:controls="clr-namespace:Katie.UI.Controls"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
              x:Class="Katie.UI.Views.MainView"
              x:DataType="vm:MainViewModel">
@@ -12,12 +11,12 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
-    <Grid RowDefinitions="*,Auto,Auto" Margin="5">
-        <Grid Grid.Row="0" ColumnDefinitions="*,*,*,Auto,Auto" IsEnabled="{Binding !HasBlockingOperation}" Opacity="{Binding Opacity}" ColumnSpacing="5">
+    <Grid RowDefinitions="*,60,Auto,Auto,Auto" Margin="5">
+        <Grid Grid.Row="0" ColumnDefinitions="*,*,*,Auto,Auto" IsEnabled="{Binding !HasBlockingOperation}" Opacity="{Binding Opacity}">
             <UserControl Content="{Binding Hungarian}" />
             <UserControl Grid.Column="1" Content="{Binding English}" />
             <UserControl Grid.Column="2" Content="{Binding Global}" />
-            <Rectangle Grid.Column="3" Width="1" Fill="Gray" />
+            <Rectangle Grid.Column="3" Width="1" Margin="5,0,5,5" Fill="Gray" />
             <UserControl Grid.Column="4" Content="{Binding Signals}" />
         </Grid>
         <StackPanel Grid.Row="0" VerticalAlignment="Center" IsVisible="{Binding HasBlockingOperation}">
@@ -25,21 +24,14 @@
                          Foreground="DodgerBlue" ShowProgressText="True" ProgressTextFormat="{Binding BlockingOperation}" MaxWidth="250" />
             <Button HorizontalAlignment="Center" Command="{Binding CancelCommand}" IsEnabled="{Binding CanCancel}" Margin="0,5,0,0">Cancel</Button>
         </StackPanel>
-        <Grid Grid.Row="1" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="5">
-            <TextBox Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Text="{Binding Text}" Watermark="Enter the text to announce" TextWrapping="Wrap" />
-            <Button Grid.Row="0" Grid.Column="0" IsEnabled="{Binding !HasBlockingOperation}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Command="{Binding PlayCommand}" CommandParameter="Hungarian">Play Hungarian</Button>
-            <Button Grid.Row="1" Grid.Column="0" IsEnabled="{Binding !HasBlockingOperation}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Command="{Binding PlayCommand}" CommandParameter="English">Play English</Button>
-            <Button Grid.Row="2" Grid.Column="0" IsEnabled="{Binding !HasBlockingOperation}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Command="{Binding StopCommand}">Stop</Button>
-            <DockPanel Grid.Row="2" Grid.Column="1">
-                <Label DockPanel.Dock="Top" Content="{Binding CurrentPhrase}" VerticalAlignment="Center" />
-                <ProgressBar DockPanel.Dock="Bottom" Height="3" Maximum="1" Value="{Binding Progress}" Foreground="Red" />
-            </DockPanel>
-
-        </Grid>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center">
-            <controls:LabelRadioButton IsChecked="True" BorderThickness="0,0,0,2" CornerRadius="0" FontWeight="Bold">Play</controls:LabelRadioButton>
-            <controls:LabelRadioButton BorderThickness="0,0,0,2" CornerRadius="0" FontWeight="Bold">Queue</controls:LabelRadioButton>
-            <controls:LabelRadioButton BorderThickness="0,0,0,2" CornerRadius="0" FontWeight="Bold">Export</controls:LabelRadioButton>
+        <TextBox Grid.Row="1" Text="{Binding Text}" Watermark="Enter the text to announce" TextWrapping="Wrap" />
+        <TextBlock Grid.Row="2" Text="{Binding Split}" TextWrapping="Wrap" Foreground="{Binding Brush}" />
+        <StackPanel Grid.Row="3" Margin="0,5" Orientation="Horizontal" IsEnabled="{Binding !HasBlockingOperation}">
+            <Button Command="{Binding PlayCommand}" CommandParameter="Hungarian">Play Hungarian</Button>
+            <Button Command="{Binding PlayCommand}" CommandParameter="English">Play English</Button>
+            <Button Command="{Binding StopCommand}">Stop</Button>
+            <Label Content="{Binding CurrentPhrase}" VerticalAlignment="Center" />
         </StackPanel>
+        <ProgressBar Grid.Row="4" Height="3" Maximum="1" Value="{Binding Progress}" Foreground="Red" />
     </Grid>
 </UserControl>
