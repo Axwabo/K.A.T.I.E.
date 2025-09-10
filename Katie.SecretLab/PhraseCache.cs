@@ -13,9 +13,9 @@ namespace Katie.SecretLab;
 public static class PhraseCache
 {
 
-    public static PhraseTree<SamplePhraseBase> Hungarian { get; private set; } = new([]);
+    public static PhraseTree<WavePhraseBase> Hungarian { get; private set; } = new([]);
 
-    public static PhraseTree<SamplePhraseBase> English { get; private set; } = new([]);
+    public static PhraseTree<WavePhraseBase> English { get; private set; } = new([]);
 
     private static readonly Dictionary<int, RawSourceSampleProvider> Signals = [];
 
@@ -41,11 +41,11 @@ public static class PhraseCache
     private static void InitializePhrases(DirectoryInfo phrases)
     {
         var global = phrases.EnumeratePhrases("Global").ToList();
-        Hungarian = new PhraseTree<SamplePhraseBase>(global.Concat(phrases.EnumeratePhrases("Hungarian")));
-        English = new PhraseTree<SamplePhraseBase>(global.Concat(phrases.EnumeratePhrases("English")));
+        Hungarian = new PhraseTree<WavePhraseBase>(global.Concat(phrases.EnumeratePhrases("Hungarian")));
+        English = new PhraseTree<WavePhraseBase>(global.Concat(phrases.EnumeratePhrases("English")));
     }
 
-    public static bool TryGetTree(ReadOnlySpan<char> language, [NotNullWhen(true)] out PhraseTree<SamplePhraseBase>? tree)
+    public static bool TryGetTree(ReadOnlySpan<char> language, [NotNullWhen(true)] out PhraseTree<WavePhraseBase>? tree)
     {
         tree = language.Equals("Hungarian", StringComparison.OrdinalIgnoreCase)
             ? Hungarian
@@ -58,7 +58,7 @@ public static class PhraseCache
     public static bool TryGetSignal(ReadOnlySpan<char> name, [NotNullWhen(true)] out RawSourceSampleProvider? provider)
         => Signals.TryGetValue(name.LowercaseHashCode(), out provider);
 
-    private static IEnumerable<SamplePhraseBase> EnumeratePhrases(this DirectoryInfo directory, string subdirectory)
+    private static IEnumerable<WavePhraseBase> EnumeratePhrases(this DirectoryInfo directory, string subdirectory)
     {
         foreach (var file in Directory.EnumerateFiles(directory.CreateSubdirectory(subdirectory).FullName, "*.wav"))
         {

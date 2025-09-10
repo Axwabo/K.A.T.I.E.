@@ -3,6 +3,6 @@
 public interface IPhraseProvider
 {
 
-    IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync();
+    IAsyncEnumerable<WavePhraseBase> EnumeratePhrasesAsync();
 
 }

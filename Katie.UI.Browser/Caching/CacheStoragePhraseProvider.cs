@@ -13,7 +13,7 @@ public sealed class CacheStoragePhraseProvider : IPhraseProvider
 
     public required string Language { get; init; }
 
-    public async IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync()
+    public async IAsyncEnumerable<WavePhraseBase> EnumeratePhrasesAsync()
     {
         try
         {

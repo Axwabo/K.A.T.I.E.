@@ -15,7 +15,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
 
     public required string Language { get; set; }
 
-    public ObservableCollection<SamplePhraseBase> List { get; } = [];
+    public ObservableCollection<WavePhraseBase> List { get; } = [];
 
     public CancellationToken Cancellation { get; set; }
 
@@ -48,7 +48,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
         }
     }
 
-    public void ReplacePhrases(IReadOnlyCollection<SamplePhraseBase> phrases)
+    public void ReplacePhrases(IReadOnlyCollection<WavePhraseBase> phrases)
     {
         List.Clear();
         foreach (var phrase in phrases)
@@ -75,7 +75,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void RemovePhrase(SamplePhraseBase phrase)
+    private void RemovePhrase(WavePhraseBase phrase)
     {
         if (phrase is not WaveStreamPhrase wave)
         {

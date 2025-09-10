@@ -17,7 +17,7 @@ public partial class PhraseDisplay : UserControl
 
     public event EventHandler<string>? NameChanged;
 
-    private string? PhraseText => (DataContext as SamplePhraseBase)?.Text;
+    private string? PhraseText => (DataContext as WavePhraseBase)?.Text;
 
     private string? _original;
 

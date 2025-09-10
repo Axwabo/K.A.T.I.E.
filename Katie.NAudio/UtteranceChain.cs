@@ -6,15 +6,15 @@ using NAudio.Wave;
 
 namespace Katie.NAudio;
 
-using PhraseClip = (ISampleProvider Provider, UtteranceSegment<SamplePhraseBase> Segment);
+using PhraseClip = (ISampleProvider Provider, UtteranceSegment<WavePhraseBase> Segment);
 
 public sealed class UtteranceChain : ISampleProvider
 {
 
-    public static UtteranceChain? Parse(ReadOnlySpan<char> text, PhraseTree<SamplePhraseBase> tree, ReadOnlySpan<char> language)
+    public static UtteranceChain? Parse(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> language)
     {
-        var segments = new Queue<UtteranceSegment<SamplePhraseBase>>();
-        var parser = new PhraseParser<SamplePhraseBase>(text, tree, language);
+        var segments = new Queue<UtteranceSegment<WavePhraseBase>>();
+        var parser = new PhraseParser<WavePhraseBase>(text, tree, language);
         SimpleWaveFormat? format = null;
         while (parser.Next(out var phrase))
         {
@@ -28,7 +28,7 @@ public sealed class UtteranceChain : ISampleProvider
         return segments.Count == 0 ? null : new UtteranceChain(segments, format.Value);
     }
 
-    public Queue<UtteranceSegment<SamplePhraseBase>> Remaining { get; }
+    public Queue<UtteranceSegment<WavePhraseBase>> Remaining { get; }
 
     private bool _ended;
 
@@ -38,7 +38,7 @@ public sealed class UtteranceChain : ISampleProvider
 
     public TimeSpan TotalTime { get; }
 
-    private UtteranceChain(Queue<UtteranceSegment<SamplePhraseBase>> remaining, SimpleWaveFormat waveFormat)
+    private UtteranceChain(Queue<UtteranceSegment<WavePhraseBase>> remaining, SimpleWaveFormat waveFormat)
     {
         Remaining = remaining;
         WaveFormat = waveFormat.ToIeeeFloat();

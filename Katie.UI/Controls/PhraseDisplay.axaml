@@ -5,7 +5,7 @@
              xmlns:phrases="clr-namespace:Katie.NAudio.Phrases;assembly=Katie.NAudio"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Katie.UI.Controls.PhraseDisplay"
-             x:DataType="phrases:SamplePhraseBase"
+             x:DataType="phrases:WavePhraseBase"
              x:Name="Root">
     <Grid ColumnDefinitions="*,Auto,Auto" Background="{Binding Converter={StaticResource PhraseToBrush}}">
         <Label x:Name="Label" Content="{Binding Text}" ToolTip.Tip="{Binding Text}" />

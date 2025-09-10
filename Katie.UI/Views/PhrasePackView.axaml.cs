@@ -11,7 +11,7 @@ public partial class PhrasePackView : UserControl
 
     private void PhraseDisplay_OnNameChanged(object? sender, string text)
     {
-        if (DataContext is not PhrasePackViewModel vm || sender is not UserControl {DataContext: SamplePhraseBase phrase})
+        if (DataContext is not PhrasePackViewModel vm || sender is not UserControl {DataContext: WavePhraseBase phrase})
             return;
         /*TODO: phrases to records
 

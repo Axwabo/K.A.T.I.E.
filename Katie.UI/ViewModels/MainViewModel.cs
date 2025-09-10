@@ -41,9 +41,9 @@ public sealed partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private double _progress;
 
-    private PhraseTree<SamplePhraseBase> _englishTree = new([]);
+    private PhraseTree<WavePhraseBase> _englishTree = new([]);
 
-    private PhraseTree<SamplePhraseBase> _hungarianTree = new([]);
+    private PhraseTree<WavePhraseBase> _hungarianTree = new([]);
 
     public PhrasePackViewModel Hungarian { get; }
 
@@ -90,9 +90,9 @@ public sealed partial class MainViewModel : ViewModelBase
     {
     }
 
-    private void RebuildHungarian() => _hungarianTree = new PhraseTree<SamplePhraseBase>(Global.List.Concat(Hungarian.List));
+    private void RebuildHungarian() => _hungarianTree = new PhraseTree<WavePhraseBase>(Global.List.Concat(Hungarian.List));
 
-    private void RebuildEnglish() => _englishTree = new PhraseTree<SamplePhraseBase>(Global.List.Concat(English.List));
+    private void RebuildEnglish() => _englishTree = new PhraseTree<WavePhraseBase>(Global.List.Concat(English.List));
 
     private void SetBlockingOperation(object? sender, PropertyChangedEventArgs e)
     {

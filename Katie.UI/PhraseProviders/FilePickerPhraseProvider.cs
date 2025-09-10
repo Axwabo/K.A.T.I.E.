@@ -29,7 +29,7 @@ internal sealed class FilePickerPhraseProvider : IPhraseProvider
         _converter = converter;
     }
 
-    public async IAsyncEnumerable<SamplePhraseBase> EnumeratePhrasesAsync()
+    public async IAsyncEnumerable<WavePhraseBase> EnumeratePhrasesAsync()
     {
         foreach (var file in await _storage.OpenFilePickerAsync(Options))
             yield return await _converter.ToPhraseAsync(file);

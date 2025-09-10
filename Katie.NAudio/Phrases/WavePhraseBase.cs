@@ -3,7 +3,7 @@ using NAudio.Wave;
 
 namespace Katie.NAudio.Phrases;
 
-public abstract class SamplePhraseBase : PhraseBase
+public abstract class WavePhraseBase : PhraseBase
 {
 
     public abstract SimpleWaveFormat WaveFormat { get; }

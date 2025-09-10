@@ -4,7 +4,7 @@ using NAudio.Wave;
 
 namespace Katie.UI;
 
-public sealed class RawSourceSamplePhrase : SamplePhraseBase
+public sealed class RawSourceSamplePhrase : WavePhraseBase
 {
 
     private readonly RawSourceSampleProvider _provider;

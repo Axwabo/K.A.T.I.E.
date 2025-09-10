@@ -6,7 +6,7 @@ using SecretLabNAudio.Core.Providers;
 
 namespace Katie.SecretLab;
 
-public sealed class RawSourcePhrase : SamplePhraseBase
+public sealed class RawSourcePhrase : WavePhraseBase
 {
 
     private readonly RawSourceSampleProvider _provider;

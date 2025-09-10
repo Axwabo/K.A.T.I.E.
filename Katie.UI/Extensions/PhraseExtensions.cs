@@ -2,7 +2,7 @@
 
 namespace Katie.UI.Extensions;
 
-using IndexedPhrase = (int Index, SamplePhraseBase Phrase);
+using IndexedPhrase = (int Index, WavePhraseBase Phrase);
 
 public static class PhraseExtensions
 {
@@ -10,7 +10,7 @@ public static class PhraseExtensions
     public static RawSourceSamplePhrase ToSamplePhrase(this WaveStreamPhrase phrase)
         => new(phrase.ToSampleProvider().ReadSamples(phrase.Duration), phrase.Text);
 
-    public static IEnumerable<Task<IndexedPhrase>> ToSamplePhrases(this IReadOnlyList<SamplePhraseBase> phrases, string language, IPhraseCacheManager? saver)
+    public static IEnumerable<Task<IndexedPhrase>> ToSamplePhrases(this IReadOnlyList<WavePhraseBase> phrases, string language, IPhraseCacheManager? saver)
     {
         for (var i = 0; i < phrases.Count; i++)
         {
