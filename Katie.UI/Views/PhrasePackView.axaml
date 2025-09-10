@@ -10,7 +10,7 @@
     <Design.DataContext>
         <viewModels:PhrasePackViewModel Language="Hungarian" />
     </Design.DataContext>
-    <Grid RowDefinitions="Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="5">
         <Label Classes="title" Content="{Binding Language}" />
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Button Command="{Binding AddPhrasesCommand}">Add</Button>
@@ -23,7 +23,7 @@
                     <DataTemplate>
                         <Grid ColumnDefinitions="*,Auto" Margin="0,0,5,0" Background="{Binding Converter={StaticResource PhraseToBrush}}">
                             <Label Content="{Binding Text}" ToolTip.Tip="{Binding Text}" />
-                            <Button Grid.Column="1" ToolTip.Tip="Delete" Command="{Binding #Root.RemovePhrase}" CommandParameter="{Binding}">X</Button>
+                            <Button Grid.Column="1" ToolTip.Tip="Delete" Padding="2" Command="{Binding #Root.RemovePhrase}" CommandParameter="{Binding}">❌</Button>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
