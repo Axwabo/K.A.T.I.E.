@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Katie.UI.ViewModels"
+             xmlns:controls="clr-namespace:Katie.UI.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Katie.UI.Views.PhrasePackView"
              x:DataType="viewModels:PhrasePackViewModel"
@@ -21,10 +22,8 @@
             <ItemsControl ItemsSource="{Binding List}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,5,0" Background="{Binding Converter={StaticResource PhraseToBrush}}">
-                            <Label Content="{Binding Text}" ToolTip.Tip="{Binding Text}" />
-                            <Button Grid.Column="1" ToolTip.Tip="Delete" Padding="2" Command="{Binding #Root.RemovePhrase}" CommandParameter="{Binding}">❌</Button>
-                        </Grid>
+                        <controls:PhraseDisplay Margin="0,0,5,0" DataContext="{Binding}"
+                                                Delete="{Binding #Root.RemovePhrase}" NameChanged="PhraseDisplay_OnNameChanged" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

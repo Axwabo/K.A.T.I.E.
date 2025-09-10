@@ -5,7 +5,7 @@ namespace Katie.UI.Extensions;
 public static class StreamExtensions
 {
 
-    public static async Task<MemoryStream> ToMemoryStream(this Stream stream)
+    public static async Task<MemoryStream> CopyToMemory(this Stream stream)
     {
         var memory = new MemoryStream();
         await stream.CopyToAsync(memory);

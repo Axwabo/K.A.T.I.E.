@@ -20,7 +20,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasBlockingOperation), nameof(Opacity))]
-    private string? _blockingOperation = "Loading phrases...";
+    private string? _blockingOperation = null; //"Loading phrases...";
 
     public bool HasBlockingOperation => BlockingOperation != null;
 
@@ -72,8 +72,12 @@ public sealed partial class MainViewModel : ViewModelBase
         _factory = audioPlayerFactory;
         Signals = signals;
         English = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "English", Cache = cacheSaver};
+        var np = new RawSourceSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 1), [], 0);
+        English.List.Add(new RawSourceSamplePhrase(np, "welcome"));
         Hungarian = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Hungarian", Cache = cacheSaver};
+        Hungarian.List.Add(new RawSourceSamplePhrase(np, "üdvözöljük"));
         Global = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Global", Cache = cacheSaver};
+        Global.List.Add(new RawSourceSamplePhrase(np, "Budapest"));
         Hungarian.PhrasesChanged += RebuildHungarian;
         English.PhrasesChanged += RebuildEnglish;
         Global.PhrasesChanged += RebuildHungarian;

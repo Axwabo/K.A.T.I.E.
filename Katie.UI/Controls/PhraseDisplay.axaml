@@ -1,0 +1,16 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:phrases="clr-namespace:Katie.NAudio.Phrases;assembly=Katie.NAudio"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Katie.UI.Controls.PhraseDisplay"
+             x:DataType="phrases:SamplePhraseBase"
+             x:Name="Root">
+    <Grid ColumnDefinitions="*,Auto,Auto" Background="{Binding Converter={StaticResource PhraseToBrush}}">
+        <Label x:Name="Label" Content="{Binding Text}" ToolTip.Tip="{Binding Text}" />
+        <TextBox Grid.Column="0" x:Name="Input" IsVisible="False" LostFocus="Text_OnLostFocus" />
+        <Button Grid.Column="1" ToolTip.Tip="Edit Text" Padding="2" Click="Button_OnClick">✏</Button>
+        <Button Grid.Column="2" ToolTip.Tip="Delete" Padding="2" Command="{Binding #Root.Delete}" CommandParameter="{Binding}">❌</Button>
+    </Grid>
+</UserControl>

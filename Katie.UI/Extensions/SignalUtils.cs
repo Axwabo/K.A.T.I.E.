@@ -11,7 +11,7 @@ public static class SignalUtils
 
     public static async Task<Signal> ReadSignalAsync(Stream stream, string path)
     {
-        var memory = await stream.ToMemoryStream();
+        var memory = await stream.CopyToMemory();
         var reader = new WaveFileReader(memory);
         return new Signal(reader, Path.GetFileNameWithoutExtension(path), reader.TotalTime);
     }
