@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Threading;
 using CommunityToolkit.Mvvm.Input;
+using Katie.NAudio.Extensions;
 using Katie.UI.Extensions;
 using Katie.UI.PhraseProviders;
 
@@ -9,13 +10,15 @@ namespace Katie.UI.ViewModels;
 public sealed partial class PhrasePackViewModel : ViewModelBase
 {
 
-    public required IPhraseProvider? PhraseProvider { get; init; }
-
-    public IPhraseCacheManager? Cache { get; init; }
+    private readonly ObservableCollection<WavePhraseBase> _list = [];
 
     public required string Language { get; set; }
 
-    public ObservableCollection<WavePhraseBase> List { get; } = [];
+    public IPhraseProvider? PhraseProvider { get; init; }
+
+    public IPhraseCacheManager? Cache { get; init; }
+
+    public IReadOnlyList<WavePhraseBase> List => _list;
 
     public CancellationToken Cancellation { get; set; }
 
@@ -27,6 +30,12 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
     [RelayCommand]
     private Task AddPhrases() => PhraseProvider == null ? Task.CompletedTask : AddPhrases(PhraseProvider);
 
+    public void Add(WavePhraseBase phrase)
+    {
+        _list.Add(phrase);
+        PhrasesChanged?.Invoke();
+    }
+
     public async Task AddPhrases(IPhraseProvider provider)
     {
         BlockingOperation = "Adding phrases...";
@@ -35,7 +44,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
             var any = false;
             await foreach (var phrase in provider.EnumeratePhrasesAsync().WithCancellation(Cancellation))
             {
-                List.Add(phrase);
+                _list.Add(phrase);
                 any = true;
             }
 
@@ -44,15 +53,15 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
         }
         finally
         {
-            Dispatcher.UIThread.Post(() => BlockingOperation = null);
+            CompleteOperation();
         }
     }
 
     public void ReplacePhrases(IReadOnlyCollection<WavePhraseBase> phrases)
     {
-        List.Clear();
+        _list.Clear();
         foreach (var phrase in phrases)
-            List.Add(phrase);
+            _list.Add(phrase);
         PhrasesChanged?.Invoke();
     }
 
@@ -60,31 +69,31 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
     public async Task CacheAll()
     {
         BlockingOperation = "Caching phrases...";
-        var any = false;
         await foreach (var task in Task.WhenEach(List.ToSamplePhrases(Language, Cache)).WithCancellation(Cancellation))
         {
-            any = true;
             var (index, phrase) = task.Result;
-            Dispatcher.UIThread.Post(() => List[index] = phrase);
+            Dispatcher.UIThread.Post(() =>
+            {
+                var previous = _list[index];
+                _list[index] = phrase;
+                for (var i = 0; i < _list.Count; i++)
+                    if (_list[i] is WavePhraseAlias {Original: var original, Text: var text} && original == previous)
+                        _list[i] = WavePhraseAlias.Create(phrase, text);
+            });
         }
 
-        if (any)
-            Dispatcher.UIThread.Post(() => BlockingOperation = null);
-        else
-            BlockingOperation = null; // avoid one frame delay
+        CompleteOperation();
+        PhrasesChanged?.InvokeOnUIThread();
     }
 
     [RelayCommand]
-    private void RemovePhrase(WavePhraseBase phrase)
+    public void Remove(WavePhraseBase phrase)
     {
-        if (phrase is not WaveStreamPhrase wave)
-        {
-            List.Remove(phrase);
-            return;
-        }
-
-        wave.Dispose();
-        List.Remove(wave);
+        if (phrase is WaveStreamPhrase wave)
+            wave.Dispose();
+        for (var i = _list.Count - 1; i >= 0; i--)
+            if (_list[i] == phrase || _list[i].IsAliasOf(phrase))
+                _list.RemoveAt(i);
         PhrasesChanged?.Invoke();
     }
 
@@ -94,8 +103,29 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
         foreach (var phrase in List)
             if (phrase is WaveStreamPhrase stream)
                 stream.Dispose();
-        List.Clear();
+        _list.Clear();
         PhrasesChanged?.Invoke();
+    }
+
+    public void EditOrCreateAlias(WavePhraseBase phrase, string text)
+    {
+        var index = _list.IndexOf(phrase);
+        if (index == -1)
+            return;
+        var alias = WavePhraseAlias.Create(phrase, text);
+        if (phrase is WavePhraseAlias)
+            _list[index] = alias;
+        else
+            _list.Add(alias);
+        PhrasesChanged?.Invoke();
+    }
+
+    private void CompleteOperation()
+    {
+        if (Dispatcher.UIThread.CheckAccess())
+            BlockingOperation = null; // avoid one frame delay
+        else
+            Dispatcher.UIThread.Post(() => BlockingOperation = null);
     }
 
 }

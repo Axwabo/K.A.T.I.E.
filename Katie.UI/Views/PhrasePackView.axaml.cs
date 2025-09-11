@@ -1,23 +1,16 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿namespace Katie.UI.Views;
 
-namespace Katie.UI.Views;
-
-public partial class PhrasePackView : UserControl
+public sealed partial class PhrasePackView : UserControl
 {
 
     public PhrasePackView() => InitializeComponent();
 
-    public IRelayCommand? RemovePhrase => (DataContext as PhrasePackViewModel)?.RemovePhraseCommand;
+    public PhrasePackViewModel Pack => (PhrasePackViewModel) DataContext!;
 
     private void PhraseDisplay_OnNameChanged(object? sender, string text)
     {
-        if (DataContext is not PhrasePackViewModel vm || sender is not UserControl {DataContext: WavePhraseBase phrase})
-            return;
-        /*TODO: phrases to records
-
-         var index = vm.List.IndexOf(phrase);
-        if (index != -1)
-            vm.List[index] = phrase with {Text = text};*/
+        if (sender is UserControl {DataContext: WavePhraseBase phrase})
+            Pack.EditOrCreateAlias(phrase, text);
     }
 
 }

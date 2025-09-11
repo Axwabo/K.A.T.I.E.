@@ -1,40 +1,82 @@
 ﻿using Avalonia;
+using Avalonia.Input;
 using Avalonia.Interactivity;
-using CommunityToolkit.Mvvm.Input;
+using Avalonia.VisualTree;
 
 namespace Katie.UI.Controls;
 
-public partial class PhraseDisplay : UserControl
+public sealed partial class PhraseDisplay : UserControl
 {
 
-    public static readonly StyledProperty<IRelayCommand> DeleteProperty = AvaloniaProperty.Register<PhraseDisplay, IRelayCommand>(nameof(Delete));
+    public static readonly StyledProperty<PhrasePackViewModel> PackProperty = AvaloniaProperty.Register<PhraseDisplay, PhrasePackViewModel>(nameof(Pack));
 
-    public required IRelayCommand Delete
+    public required PhrasePackViewModel Pack
     {
-        get => GetValue(DeleteProperty);
-        set => SetValue(DeleteProperty, value);
+        get => GetValue(PackProperty);
+        set => SetValue(PackProperty, value);
     }
-
-    public event EventHandler<string>? NameChanged;
-
-    private string? PhraseText => (DataContext as WavePhraseBase)?.Text;
 
     private string? _original;
 
-    public PhraseDisplay() => InitializeComponent();
+    private bool _lostFocus;
 
-    protected override void OnDataContextChanged(EventArgs e) => _original = PhraseText;
+    private Visual? FocusedVisual => TopLevel.GetTopLevel(this) is not {FocusManager: { } focus} ? null : focus.GetFocusedElement() as Visual;
 
-    private void Text_OnLostFocus(object? sender, RoutedEventArgs e)
+    private WavePhraseBase? Phrase => DataContext as WavePhraseBase;
+
+    private bool Editing
     {
-        var text = PhraseText;
-        if (!string.IsNullOrWhiteSpace(text) && !string.Equals(_original, text))
-            NameChanged?.Invoke(this, text);
-        ToggleEditing();
+        get => Input.IsVisible;
+        set => Input.IsVisible = value;
     }
 
-    private void Button_OnClick(object? sender, RoutedEventArgs e) => ToggleEditing();
+    public PhraseDisplay() => InitializeComponent();
 
-    private void ToggleEditing() => Input.IsVisible = !(Label.IsVisible = !Label.IsVisible);
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        base.OnDataContextChanged(e);
+        _original = Phrase?.Text;
+        Chain.IsVisible = DataContext is WavePhraseAlias;
+    }
+
+    protected override void OnLostFocus(RoutedEventArgs e)
+    {
+        base.OnLostFocus(e);
+        _lostFocus = !this.IsVisualAncestorOf(FocusedVisual);
+        if (_lostFocus && Editing)
+            ToggleEditing();
+    }
+
+    private void EditClicked(object? sender, RoutedEventArgs e)
+    {
+        var text = Input.Text;
+        if (Input.IsVisible && !string.IsNullOrWhiteSpace(text) && !string.Equals(_original, text))
+            Pack.EditOrCreateAlias(Phrase!, text);
+        if (FocusedVisual == Edit || !_lostFocus)
+            ToggleEditing(true);
+        _lostFocus = false;
+    }
+
+    private void ChainClicked(object? sender, RoutedEventArgs e)
+    {
+        var parent = this.FindAncestorOfType<ItemsControl>();
+        if (parent == null)
+            return;
+        var original = ((WavePhraseAlias) DataContext!).Original;
+        foreach (var child in parent.GetVisualDescendants())
+            if (child is PhraseDisplay display && display.DataContext == original)
+            {
+                display.Edit.Focus(NavigationMethod.Tab);
+                break;
+            }
+    }
+
+    private void ToggleEditing(bool focus = false)
+    {
+        Label.IsVisible = !(Editing = !Editing);
+        Edit.Content = Editing ? "✔" : "✏";
+        if (focus && Editing)
+            Input.Focus();
+    }
 
 }

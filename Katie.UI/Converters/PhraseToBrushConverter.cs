@@ -14,7 +14,7 @@ public sealed class PhraseToBrushConverter : IValueConverter
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         => !targetType.IsAssignableFrom(typeof(IBrush))
             ? throw new ArgumentException("Target must be an IBrush", nameof(targetType))
-            : value is RawSourceSamplePhrase
+            : value is RawSourceSamplePhrase or WavePhraseAlias {Original: RawSourceSamplePhrase}
                 ? Cached
                 : NotCached;
 

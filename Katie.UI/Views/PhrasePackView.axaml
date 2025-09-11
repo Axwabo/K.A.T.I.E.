@@ -18,12 +18,12 @@
             <Button Command="{Binding ClearCommand}">Clear</Button>
             <Button Command="{Binding CacheAllCommand}">Cache</Button>
         </StackPanel>
-        <ScrollViewer Grid.Row="2">
+        <ScrollViewer Grid.Row="2" BringIntoViewOnFocusChange="True">
             <ItemsControl ItemsSource="{Binding List}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <controls:PhraseDisplay Margin="0,0,5,0" DataContext="{Binding}"
-                                                Delete="{Binding #Root.RemovePhrase}" NameChanged="PhraseDisplay_OnNameChanged" />
+                                                Pack="{Binding #Root.Pack}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
