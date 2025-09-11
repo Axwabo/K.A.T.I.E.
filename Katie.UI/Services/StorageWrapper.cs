@@ -1,6 +1,6 @@
 ﻿using Avalonia.Platform.Storage;
 
-namespace Katie.UI;
+namespace Katie.UI.Services;
 
 public sealed class StorageWrapper
 {

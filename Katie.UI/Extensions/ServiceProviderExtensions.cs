@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Katie.UI;
+namespace Katie.UI.Extensions;
 
 internal static class ServiceProviderExtensions
 {

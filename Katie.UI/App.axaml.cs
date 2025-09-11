@@ -2,7 +2,9 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Katie.UI.Extensions;
 using Katie.UI.PhraseProviders;
+using Katie.UI.Services;
 using Katie.UI.Signals;
 using Microsoft.Extensions.DependencyInjection;
 
