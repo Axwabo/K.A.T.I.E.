@@ -1,11 +1,8 @@
-namespace Katie.UI.Views;
+﻿namespace Katie.UI.Views;
 
-public partial class MainView : UserControl
+public sealed partial class MainView : UserControl
 {
 
-    public MainView()
-    {
-        InitializeComponent();
-    }
+    public MainView() => InitializeComponent();
 
 }

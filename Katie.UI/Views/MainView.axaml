@@ -1,33 +1,20 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:Katie.UI.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+             xmlns:viewModels="clr-namespace:Katie.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Katie.UI.Views.MainView"
-             x:DataType="vm:MainViewModel">
+             x:DataType="viewModels:MainViewModel">
     <Design.DataContext>
-        <vm:MainViewModel />
+        <viewModels:MainViewModel />
     </Design.DataContext>
-    <Grid RowDefinitions="*,80,Auto,Auto,Auto" Margin="5" RowSpacing="5">
-        <Grid Grid.Row="0" ColumnDefinitions="*,*,*" IsEnabled="{Binding !HasBlockingOperation}" Opacity="{Binding Opacity}" ColumnSpacing="5">
-            <UserControl Content="{Binding Hungarian}" />
-            <UserControl Grid.Column="1" Content="{Binding English}" />
-            <UserControl Grid.Column="2" Content="{Binding Global}" />
-        </Grid>
-        <StackPanel Grid.Row="0" VerticalAlignment="Center" IsVisible="{Binding HasBlockingOperation}">
-            <ProgressBar IsIndeterminate="{Binding HasBlockingOperation}"
-                         Foreground="DodgerBlue" ShowProgressText="True" ProgressTextFormat="{Binding BlockingOperation}" MaxWidth="250" />
-            <Button HorizontalAlignment="Center" Command="{Binding CancelCommand}" IsEnabled="{Binding CanCancel}" Margin="0,5,0,0">Cancel</Button>
+    <Grid Margin="5" RowDefinitions="Auto,*">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5" IsEnabled="{Binding !NavigationBlocked}">
+            <Button Command="{Binding NavigateCommand}" CommandParameter="Phrases">Phrases</Button>
+            <Button Command="{Binding NavigateCommand}" CommandParameter="Shit">Shit</Button>
         </StackPanel>
-        <TextBox Grid.Row="1" Text="{Binding Text}" Watermark="Enter the text to announce" TextWrapping="Wrap" />
-        <StackPanel Grid.Row="2" Orientation="Horizontal" IsEnabled="{Binding !HasBlockingOperation}" Spacing="2">
-            <Button Command="{Binding PlayCommand}" CommandParameter="Hungarian">Play Hungarian</Button>
-            <Button Command="{Binding PlayCommand}" CommandParameter="English">Play English</Button>
-            <Button Command="{Binding StopCommand}">Stop</Button>
-            <Label Content="{Binding CurrentPhrase}" VerticalAlignment="Center" />
-        </StackPanel>
-        <UserControl Grid.Row="3" Content="{Binding Signals}" />
-        <ProgressBar Grid.Row="4" Height="3" Maximum="1" Value="{Binding Progress}" Foreground="Red" />
+        <UserControl Grid.Row="1" Content="{Binding Phrases}" Margin="5" IsVisible="{Binding PhrasesVisible}" />
+        <UserControl Grid.Row="1" Content="{Binding Shit}" Margin="5" IsVisible="{Binding ShitVisible}" />
     </Grid>
 </UserControl>

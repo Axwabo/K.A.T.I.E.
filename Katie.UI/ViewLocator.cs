@@ -9,6 +9,7 @@ public sealed class ViewLocator : IDataTemplate
     {
         null => null,
         MainViewModel main => Create<MainView>(main),
+        PhrasesPageViewModel phrases => Create<PhrasesPageView>(phrases),
         PhrasePackViewModel pack => Create<PhrasePackView>(pack),
         SignalsViewModel signals => Create<SignalsView>(signals),
         _ => new TextBox {Text = "Not found: " + param}
