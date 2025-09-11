@@ -7,8 +7,6 @@
              x:Class="Katie.UI.Views.MainView"
              x:DataType="vm:MainViewModel">
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
     <Grid RowDefinitions="*,80,Auto,Auto,Auto" Margin="5" RowSpacing="5">

@@ -10,6 +10,7 @@ public sealed class RadioButtonListItem : RadioButton
     {
         _list = list;
         _item = item;
+        Padding = default;
     }
 
     protected override Type StyleKeyOverride => typeof(RadioButton);
