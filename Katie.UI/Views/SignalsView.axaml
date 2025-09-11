@@ -7,15 +7,21 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Katie.UI.Views.SignalsView"
              x:DataType="viewModels:SignalsViewModel">
-    <StackPanel>
-        <Label Classes="title">Signal</Label>
+    <StackPanel Orientation="Horizontal" Spacing="5">
         <Button Command="{Binding AddSignalsCommand}">Add Signals</Button>
-        <controls:RadioButtonList ItemsSource="{Binding List}" SelectedValue="{Binding Selected}" GroupName="Signal">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Label Content="{Binding Name}" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </controls:RadioButtonList>
+        <ScrollViewer>
+            <controls:RadioButtonList ItemsSource="{Binding List}" SelectedValue="{Binding Selected}" GroupName="Signal">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="5" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding Name}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </controls:RadioButtonList>
+        </ScrollViewer>
     </StackPanel>
 </UserControl>
