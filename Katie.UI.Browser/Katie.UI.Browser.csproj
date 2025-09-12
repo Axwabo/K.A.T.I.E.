@@ -14,12 +14,4 @@
         <ProjectReference Include="../Katie.UI/Katie.UI.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <TypeScriptCompile Include="wwwroot\types.d.ts" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="wwwroot\types.d.ts" />
-    </ItemGroup>
-
 </Project>

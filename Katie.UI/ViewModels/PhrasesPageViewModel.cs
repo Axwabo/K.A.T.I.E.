@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel;
-using System.Text;
 using System.Threading;
-using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using Katie.NAudio;
 using Katie.NAudio.Extensions;
@@ -27,12 +25,6 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _text = "";
-
-    [ObservableProperty]
-    private string _split = "Parsed text will show up here";
-
-    [ObservableProperty]
-    private IImmutableBrush _brush = Brushes.White;
 
     [ObservableProperty]
     private string _currentPhrase = "";
@@ -129,22 +121,9 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
         if (_factory == null)
             return;
         var index = ++_playIndex;
-        UtteranceChain? chain;
-        try
-        {
-            chain = UtteranceChain.Parse(Text, language == "English" ? Phrases.EnglishTree : Phrases.HungarianTree, language);
-        }
-        catch (Exception e)
-        {
-            Split = e.Message;
-            Brush = Brushes.Red;
-            return;
-        }
-
-        Brush = Brushes.White;
+        var chain = UtteranceChain.Parse(Text, language == "English" ? Phrases.EnglishTree : Phrases.HungarianTree, language);
         if (chain == null)
             return;
-        SetSplit(chain);
         Progress = 0;
 
         var (signalProvider, signalName, signalDuration) = Signals.Selected;
@@ -174,24 +153,6 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
         }
 
         await player.Stop();
-    }
-
-    private void SetSplit(UtteranceChain provider)
-    {
-        var span = Text.AsSpan();
-        var builder = new StringBuilder(span.Length + 20);
-        var previous = Math.Max(0, provider.Current.Segment.EndIndex);
-        builder.Append(span[..previous]);
-        builder.Append('█');
-        foreach (var segment in provider.Remaining)
-        {
-            var current = segment.EndIndex == -1 ? span.Length : segment.EndIndex;
-            builder.Append(span[previous..current]);
-            builder.Append('█');
-            previous = current;
-        }
-
-        Split = builder.ToString();
     }
 
     [RelayCommand]
