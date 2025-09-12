@@ -1,5 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using Katie.UI.Services;
 using Katie.UI.Signals;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,41 +8,27 @@ namespace Katie.UI.ViewModels;
 public sealed partial class SignalsViewModel : ViewModelBase
 {
 
-    public static Signal DefaultSignal { get; } = new(null!, "None", TimeSpan.Zero);
-
-    public ObservableCollection<Signal> List { get; } = [DefaultSignal];
+    public IReadOnlyCollection<Signal> List { get; }
 
     [ObservableProperty]
-    private Signal _selected = DefaultSignal;
+    private Signal _selected = SignalManager.DefaultSignal;
+
+    private readonly SignalManager _manager;
 
     private readonly ISignalProvider? _signalPicker;
 
-    public SignalsViewModel([FromKeyedServices(nameof(FilePickerSignalProvider))] ISignalProvider? signalPicker, ISignalProvider? initialSignals = null)
+    public SignalsViewModel(SignalManager manager, [FromKeyedServices(nameof(FilePickerSignalProvider))] ISignalProvider? signalPicker)
     {
+        _manager = manager;
         _signalPicker = signalPicker;
-        if (!Design.IsDesignMode)
-            LoadSignals(initialSignals).ConfigureAwait(false);
+        List = manager.List;
     }
 
-    public SignalsViewModel()
+    public SignalsViewModel() : this(new SignalManager(), null)
     {
-    }
-
-    private async Task LoadSignals(ISignalProvider? signalProvider)
-    {
-        if (signalProvider == null)
-            return;
-        var signals = new List<Signal>();
-        await foreach (var provider in signalProvider.EnumerateSignalsAsync())
-            signals.Add(provider);
-        Dispatcher.UIThread.Post(() =>
-        {
-            foreach (var signal in signals)
-                List.Add(signal);
-        });
     }
 
     [RelayCommand]
-    private Task AddSignals() => LoadSignals(_signalPicker);
+    private Task AddSignals() => _manager.LoadSignals(_signalPicker);
 
 }

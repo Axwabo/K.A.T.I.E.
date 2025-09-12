@@ -8,6 +8,7 @@ using Katie.NAudio;
 using Katie.NAudio.Extensions;
 using Katie.UI.Audio;
 using Katie.UI.PhraseProviders;
+using Katie.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NAudio.Wave;
 
@@ -170,7 +171,7 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
 
         var (signalProvider, signalName, signalDuration) = Signals.Selected;
         ISampleProvider master;
-        if (Signals.Selected == SignalsViewModel.DefaultSignal)
+        if (Signals.Selected == SignalManager.DefaultSignal)
             master = chain;
         else
         {

@@ -21,6 +21,7 @@ public sealed class App : Application
     {
         Services.AddViewModels()
             .AddSingleton<StorageWrapper>()
+            .AddSingleton<SignalManager>()
             .AddKeyedSingleton<IPhraseProvider, FilePickerPhraseProvider>(nameof(FilePickerPhraseProvider))
             .AddKeyedSingleton<ISignalProvider, FilePickerSignalProvider>(nameof(FilePickerSignalProvider));
 
