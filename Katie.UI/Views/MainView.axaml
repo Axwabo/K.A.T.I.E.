@@ -15,7 +15,7 @@
                                 Pages="{Binding Pages}" CurrentPage="{Binding Page, Mode=TwoWay}" />
         <Panel Grid.Row="1">
             <UserControl Content="{Binding Phrases}" Margin="5" IsVisible="{Binding PhrasesVisible}" />
-            <UserControl Content="{Binding Shit}" Margin="5" IsVisible="{Binding ShitVisible}" />
+            <UserControl Content="{Binding Cache}" Margin="5" IsVisible="{Binding CacheVisible}" />
         </Panel>
     </Grid>
 </UserControl>

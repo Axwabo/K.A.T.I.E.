@@ -5,42 +5,34 @@ namespace Katie.UI.ViewModels;
 public sealed partial class MainViewModel : ViewModelBase
 {
 
-    public IReadOnlyCollection<string> Pages { get; } = [nameof(Phrases), nameof(Shit)];
+    public IReadOnlyCollection<string> Pages { get; } = [nameof(Phrases), nameof(Cache)];
 
     public PhrasesPageViewModel Phrases { get; }
 
-    public PageViewModel Shit { get; }
+    public CacheManagerViewModel Cache { get; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(PhrasesVisible), nameof(ShitVisible))]
-    private string _page;
+    [NotifyPropertyChangedFor(nameof(PhrasesVisible), nameof(CacheVisible))]
+    private string _page = nameof(Phrases);
 
     [ObservableProperty]
     private bool _navigationBlocked;
 
     public bool PhrasesVisible => Page == nameof(Phrases);
 
-    public bool ShitVisible => Page == nameof(Shit);
+    public bool CacheVisible => Page == nameof(Cache);
 
-    public MainViewModel(PhrasesPageViewModel phrases)
+    public MainViewModel(PhrasesPageViewModel phrases, CacheManagerViewModel cache)
     {
-        _page = nameof(Phrases);
         Phrases = phrases;
-        Shit = new ShitModel();
+        Cache = cache;
     }
 
-    public MainViewModel() : this(new PhrasesPageViewModel())
+    public MainViewModel() : this(new PhrasesPageViewModel(), new CacheManagerViewModel())
     {
     }
 
     [RelayCommand]
     private void Navigate(string page) => Page = page;
-
-}
-
-internal sealed class ShitModel : PageViewModel
-{
-
-    public override bool NavigationBlocked { get; }
 
 }

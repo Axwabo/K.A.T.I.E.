@@ -12,7 +12,8 @@ public sealed class ViewLocator : IDataTemplate
         PhrasesPageViewModel phrases => Create<PhrasesPageView>(phrases),
         PhrasePackViewModel pack => Create<PhrasePackView>(pack),
         SignalsViewModel signals => Create<SignalsView>(signals),
-        _ => new TextBox {Text = "Not found: " + param}
+        CacheManagerViewModel cache => Create<CacheManagerView>(cache),
+        _ => new TextBlock {Text = "Not found: " + param}
     };
 
     public bool Match(object? data) => data is ViewModelBase;

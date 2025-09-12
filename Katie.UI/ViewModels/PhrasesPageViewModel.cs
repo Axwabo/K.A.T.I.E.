@@ -13,7 +13,7 @@ using NAudio.Wave;
 
 namespace Katie.UI.ViewModels;
 
-public sealed partial class PhrasesPageViewModel : PageViewModel
+public sealed partial class PhrasesPageViewModel : ViewModelBase
 {
 
     private int _playIndex;
@@ -22,7 +22,7 @@ public sealed partial class PhrasesPageViewModel : PageViewModel
     [NotifyPropertyChangedFor(nameof(NavigationBlocked), nameof(Opacity))]
     private string? _blockingOperation;
 
-    public override bool NavigationBlocked => BlockingOperation != null;
+    public bool NavigationBlocked => BlockingOperation != null;
 
     public double Opacity => NavigationBlocked ? 0.5 : 1;
 

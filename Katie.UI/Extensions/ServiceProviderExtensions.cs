@@ -8,6 +8,7 @@ internal static class ServiceProviderExtensions
     public static IServiceCollection AddViewModels(this IServiceCollection collection)
         => collection.AddSingleton<MainViewModel>()
             .AddSingleton<PhrasesPageViewModel>()
+            .AddSingleton<CacheManagerViewModel>()
             .AddTransient<SignalsViewModel>();
 
 }
