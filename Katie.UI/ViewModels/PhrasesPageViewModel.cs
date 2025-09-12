@@ -3,13 +3,11 @@ using System.Text;
 using System.Threading;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
-using Katie.Core.DataStructures;
 using Katie.NAudio;
 using Katie.NAudio.Extensions;
 using Katie.UI.Audio;
 using Katie.UI.PhraseProviders;
 using Katie.UI.Services;
-using Microsoft.Extensions.DependencyInjection;
 using NAudio.Wave;
 
 namespace Katie.UI.ViewModels;
@@ -42,15 +40,7 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
     [ObservableProperty]
     private double _progress;
 
-    private PhraseTree<WavePhraseBase> _englishTree = new([]);
-
-    private PhraseTree<WavePhraseBase> _hungarianTree = new([]);
-
-    public PhrasePackViewModel Hungarian { get; }
-
-    public PhrasePackViewModel English { get; }
-
-    public PhrasePackViewModel Global { get; }
+    public PhraseManager Phrases { get; }
 
     public SignalsViewModel Signals { get; }
 
@@ -63,44 +53,32 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
 
     public PhrasesPageViewModel(
         SignalsViewModel signals,
+        PhraseManager phrases,
         IAudioPlayerFactory? audioPlayerFactory,
-        IInitialPhraseLoader? initialPhrases = null,
-        IPhraseCacheManager? cacheSaver = null,
-        [FromKeyedServices(nameof(FilePickerPhraseProvider))]
-        IPhraseProvider? phrasePicker = null
+        IInitialPhraseLoader? initialPhrases = null
     )
     {
         _factory = audioPlayerFactory;
+        Phrases = phrases;
         Signals = signals;
-        English = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "English", Cache = cacheSaver};
-        Hungarian = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Hungarian", Cache = cacheSaver};
-        Global = new PhrasePackViewModel {PhraseProvider = phrasePicker, Language = "Global", Cache = cacheSaver};
-        Hungarian.PhrasesChanged += RebuildHungarian;
-        English.PhrasesChanged += RebuildEnglish;
-        Global.PhrasesChanged += RebuildHungarian;
-        Global.PhrasesChanged += RebuildEnglish;
         if (!Design.IsDesignMode)
             LoadInitialPhrases(initialPhrases).ConfigureAwait(false);
     }
 
-    public PhrasesPageViewModel() : this(new SignalsViewModel(), null)
+    public PhrasesPageViewModel() : this(new SignalsViewModel(), new PhraseManager(), null)
     {
         var np = new RawSourceSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 1), [], 0);
-        English.Add(new RawSourceSamplePhrase(np, "welcome"));
-        Hungarian.Add(new RawSourceSamplePhrase(np, "üdvözöljük"));
-        Global.Add(new RawSourceSamplePhrase(np, "Budapest"));
+        Phrases.English.Add(new RawSourceSamplePhrase(np, "welcome"));
+        Phrases.Hungarian.Add(new RawSourceSamplePhrase(np, "üdvözöljük"));
+        Phrases.Global.Add(new RawSourceSamplePhrase(np, "Budapest"));
     }
-
-    private void RebuildHungarian() => _hungarianTree = new PhraseTree<WavePhraseBase>(Global.List.Concat(Hungarian.List));
-
-    private void RebuildEnglish() => _englishTree = new PhraseTree<WavePhraseBase>(Global.List.Concat(English.List));
 
     private void SetBlockingOperation(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is not nameof(PhrasePackViewModel.BlockingOperation))
             return;
         var hadOperation = NavigationBlocked;
-        BlockingOperation = Hungarian.BlockingOperation ?? English.BlockingOperation ?? Global.BlockingOperation;
+        BlockingOperation = Phrases.Hungarian.BlockingOperation ?? Phrases.English.BlockingOperation ?? Phrases.Global.BlockingOperation;
         if (hadOperation || !NavigationBlocked)
             return;
         _cts?.Cancel();
@@ -112,14 +90,14 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
     private void EnableCancellation()
     {
         CanCancel = true;
-        Hungarian.Cancellation = English.Cancellation = Global.Cancellation = _cts?.Token ?? CancellationToken.None;
+        Phrases.Hungarian.Cancellation = Phrases.English.Cancellation = Phrases.Global.Cancellation = _cts?.Token ?? CancellationToken.None;
     }
 
     private void SubscribeToOperations()
     {
-        Hungarian.PropertyChanged += SetBlockingOperation;
-        English.PropertyChanged += SetBlockingOperation;
-        Global.PropertyChanged += SetBlockingOperation;
+        Phrases.Hungarian.PropertyChanged += SetBlockingOperation;
+        Phrases.English.PropertyChanged += SetBlockingOperation;
+        Phrases.Global.PropertyChanged += SetBlockingOperation;
     }
 
     [RelayCommand]
@@ -140,7 +118,7 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
             return;
         }
 
-        await initialPhrases.LoadPhrasesAsync(Hungarian, English, Global);
+        await initialPhrases.LoadPhrasesAsync(Phrases.Hungarian, Phrases.English, Phrases.Global);
         SubscribeToOperations();
         Dispatcher.UIThread.Post(() => BlockingOperation = null);
     }
@@ -154,7 +132,7 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
         UtteranceChain? chain;
         try
         {
-            chain = UtteranceChain.Parse(Text, language == "English" ? _englishTree : _hungarianTree, language);
+            chain = UtteranceChain.Parse(Text, language == "English" ? Phrases.EnglishTree : Phrases.HungarianTree, language);
         }
         catch (Exception e)
         {
@@ -221,9 +199,9 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
 
     [RelayCommand]
     public Task Cache() => Task.WhenAll(
-        Hungarian.CacheAll(),
-        English.CacheAll(),
-        Global.CacheAll()
+        Phrases.Hungarian.CacheAll(),
+        Phrases.English.CacheAll(),
+        Phrases.Global.CacheAll()
     );
 
 }

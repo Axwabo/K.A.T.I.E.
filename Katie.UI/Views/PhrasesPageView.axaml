@@ -11,9 +11,9 @@
     </Design.DataContext>
     <Grid RowDefinitions="*,80,Auto,Auto,Auto" RowSpacing="5">
         <Grid Grid.Row="0" ColumnDefinitions="*,*,*" IsEnabled="{Binding !NavigationBlocked}" Opacity="{Binding Opacity}" ColumnSpacing="5">
-            <UserControl Content="{Binding Hungarian}" />
-            <UserControl Grid.Column="1" Content="{Binding English}" />
-            <UserControl Grid.Column="2" Content="{Binding Global}" />
+            <UserControl Content="{Binding Phrases.Hungarian}" />
+            <UserControl Grid.Column="1" Content="{Binding Phrases.English}" />
+            <UserControl Grid.Column="2" Content="{Binding Phrases.Global}" />
         </Grid>
         <StackPanel Grid.Row="0" VerticalAlignment="Center" IsVisible="{Binding NavigationBlocked}">
             <ProgressBar IsIndeterminate="{Binding NavigationBlocked}"

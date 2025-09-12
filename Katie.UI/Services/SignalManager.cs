@@ -8,7 +8,7 @@ public sealed class SignalManager
 
     public static Signal DefaultSignal { get; } = new(null!, "None", TimeSpan.Zero);
 
-    public ObservableCollection<Signal> List { get; } = [];
+    public ObservableCollection<Signal> List { get; } = [DefaultSignal];
 
     public SignalManager(ISignalProvider? initialSignals = null)
     {

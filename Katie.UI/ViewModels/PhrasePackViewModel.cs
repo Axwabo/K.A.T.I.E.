@@ -14,7 +14,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
 
     public required string Language { get; set; }
 
-    public IPhraseProvider? PhraseProvider { get; init; }
+    public IPhraseProvider? Picker { get; init; }
 
     public IPhraseCacheManager? Cache { get; init; }
 
@@ -28,7 +28,7 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
     private string? _blockingOperation;
 
     [RelayCommand]
-    private Task AddPhrases() => PhraseProvider == null ? Task.CompletedTask : AddPhrases(PhraseProvider);
+    private Task AddPhrases() => Picker == null ? Task.CompletedTask : AddPhrases(Picker);
 
     public void Add(WavePhraseBase phrase)
     {
