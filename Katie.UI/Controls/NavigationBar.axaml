@@ -1,0 +1,28 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:Katie.UI.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Katie.UI.Controls.NavigationBar"
+             x:Name="Root">
+    <UserControl.Styles>
+        <Style Selector=".navigationButton:checked Border">
+            <Setter Property="BorderBrush" Value="GreenYellow" />
+        </Style>
+    </UserControl.Styles>
+    <controls:RadioButtonList ItemsSource="{Binding #Root.Pages}" SelectedValue="{Binding #Root.CurrentPage}" ItemStyleKey="{x:Type Label}" ItemClasses="navigationButton">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="10" />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Border BorderThickness="0,0,0,2">
+                    <Label Content="{Binding}" FontWeight="Bold" />
+                </Border>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </controls:RadioButtonList>
+</UserControl>

@@ -3,18 +3,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Katie.UI.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:controls="clr-namespace:Katie.UI.Controls"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
              x:Class="Katie.UI.Views.MainView"
              x:DataType="viewModels:MainViewModel">
     <Design.DataContext>
         <viewModels:MainViewModel />
     </Design.DataContext>
     <Grid Margin="5" RowDefinitions="Auto,*">
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5" IsEnabled="{Binding !NavigationBlocked}">
-            <Button Command="{Binding NavigateCommand}" CommandParameter="Phrases">Phrases</Button>
-            <Button Command="{Binding NavigateCommand}" CommandParameter="Shit">Shit</Button>
-        </StackPanel>
-        <UserControl Grid.Row="1" Content="{Binding Phrases}" Margin="5" IsVisible="{Binding PhrasesVisible}" />
-        <UserControl Grid.Row="1" Content="{Binding Shit}" Margin="5" IsVisible="{Binding ShitVisible}" />
+        <controls:NavigationBar HorizontalAlignment="Center" IsEnabled="{Binding !NavigationBlocked}"
+                                Pages="{Binding Pages}" CurrentPage="{Binding Page, Mode=TwoWay}" />
+        <Panel Grid.Row="1">
+            <UserControl Content="{Binding Phrases}" Margin="5" IsVisible="{Binding PhrasesVisible}" />
+            <UserControl Content="{Binding Shit}" Margin="5" IsVisible="{Binding ShitVisible}" />
+        </Panel>
     </Grid>
 </UserControl>

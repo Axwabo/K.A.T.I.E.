@@ -5,6 +5,8 @@ namespace Katie.UI.ViewModels;
 public sealed partial class MainViewModel : ViewModelBase
 {
 
+    public IReadOnlyCollection<string> Pages { get; } = [nameof(Phrases), nameof(Shit)];
+
     public PhrasesPageViewModel Phrases { get; }
 
     public PageViewModel Shit { get; }
