@@ -5,7 +5,7 @@ namespace Katie.NAudio.Phrases;
 public sealed class WavePhraseAlias : WavePhraseBase
 {
 
-    public static WavePhraseBase Create(WavePhraseBase phrase, string text)
+    public static WavePhraseAlias Create(WavePhraseBase phrase, string text)
         => phrase is WavePhraseAlias alias
             ? new WavePhraseAlias(alias.Original, text)
             : new WavePhraseAlias(phrase, text);

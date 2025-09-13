@@ -10,7 +10,7 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
     public bool IsActive => _parser.IsActive;
 
     public HungarianNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal, out int advanced)
-        => _parser = SequentialNumberParser<T>.CreateTrimmed(text, tree, Map.Digits, ordinal, out advanced);
+        => _parser = SequentialNumberParser<T>.CreateTrimmed(text, tree, Map.Settings, ordinal, out advanced);
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced) => _parser.Next(out phrase, out advanced);
 
@@ -19,7 +19,7 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
 file static class Map
 {
 
-    public static DigitMappers Digits { get; } = new(Ten, TenExact, TenOrdinal, One, Ordinal);
+    public static NumberSettings Settings { get; } = new(Ten, TenExact, TenOrdinal, One, Ordinal, "száz");
 
     private static string Ten(char digit) => digit switch
     {

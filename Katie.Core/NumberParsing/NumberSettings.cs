@@ -2,10 +2,12 @@
 
 using Mapper = Func<char, string>;
 
-public sealed record DigitMappers(
+public sealed record NumberSettings(
     Mapper Ten,
     Mapper TenExact,
     Mapper TenOrdinal,
     Mapper OneExact,
-    Mapper OneOrdinal
+    Mapper OneOrdinal,
+    string Hundred,
+    string? And = null
 );

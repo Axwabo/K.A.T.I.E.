@@ -16,7 +16,7 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
     public EnglishNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal)
     {
         _tree = tree;
-        _parser = new SequentialNumberParser<T>(text, tree, Map.Digits, ordinal);
+        _parser = new SequentialNumberParser<T>(text, tree, Map.Settings, ordinal);
         _leadingZero = text[0] == '0';
     }
 
@@ -50,14 +50,14 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
     private bool Advance(out UtteranceSegment<T> phrase, out int advanced) => _parser.Next(out phrase, out advanced);
 
     public static EnglishNumberParser<T> CreateTrimmed(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal, out int advanced)
-        => new(tree, SequentialNumberParser<T>.CreateTrimmed(text, tree, Map.Digits, ordinal, out advanced));
+        => new(tree, SequentialNumberParser<T>.CreateTrimmed(text, tree, Map.Settings, ordinal, out advanced));
 
 }
 
 file static class Map
 {
 
-    public static DigitMappers Digits { get; } = new(Ten, Ten, Ten, OneExact, OneOrdinal);
+    public static NumberSettings Settings { get; } = new(Ten, Ten, Ten, OneExact, OneOrdinal, "hundred", "and");
 
     public static string TenTy(char one) => one switch
     {
