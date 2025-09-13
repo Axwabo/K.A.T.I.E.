@@ -71,7 +71,8 @@ internal sealed class AnnouncementManager : MonoBehaviour
         if (current == null || !_announcements.Remove(current, out var tuple))
             return;
         Subtitles.Announce(tuple.Announcement, tuple.Subtitles, tuple.Noisy);
-        Subtitles.ServerOnlyDelay(EndDelaySeconds);
+        if (!tuple.Noisy)
+            Subtitles.ServerOnlyDelay(EndDelaySeconds);
     }
 
     public bool OverrideCassieAnnouncement(string text, bool noisy)
