@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Katie.UI.Extensions;
 using Katie.UI.Signals;
 
 namespace Katie.UI.Desktop;
@@ -16,7 +15,7 @@ public sealed class DirectorySignalProvider : ISignalProvider
         foreach (var file in Directory.EnumerateFiles(_directory, "*.wav"))
         {
             await using var fileStream = File.OpenRead(file);
-            yield return await SignalUtils.ReadSignalAsync(fileStream, file);
+            yield return await Signal.LoadIntoMemory(fileStream, file);
         }
     }
 

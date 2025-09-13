@@ -7,7 +7,7 @@ namespace Katie.UI.ViewModels;
 public sealed partial class CacheManagerViewModel : ViewModelBase
 {
 
-    public static string BrowserInfo => "Caching saves phrases to the browser's cache storage, persisting them across sessions.";
+    public static string BrowserInfo => "Caching saves phrases and signals to the browser's cache storage, persisting them across sessions.";
 
     public static string DefaultInfo => "ℹ Caching reads all phrases into memory, releasing the file handles.";
 

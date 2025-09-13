@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using Katie.UI.Audio;
+using NAudio.Wave;
 
 namespace Katie.UI.Extensions;
 
