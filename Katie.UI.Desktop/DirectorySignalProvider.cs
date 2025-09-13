@@ -15,7 +15,7 @@ public sealed class DirectorySignalProvider : ISignalProvider
         foreach (var file in Directory.EnumerateFiles(_directory, "*.wav"))
         {
             await using var fileStream = File.OpenRead(file);
-            yield return await Signal.LoadIntoMemory(fileStream, file);
+            yield return await Signal.LoadIntoMemory(fileStream, Path.GetFileNameWithoutExtension(file));
         }
     }
 
