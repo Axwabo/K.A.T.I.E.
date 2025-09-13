@@ -30,7 +30,7 @@
                 <ItemsControl ItemsSource="{Binding Phrases.Global.List}" ItemTemplate="{StaticResource PhraseAsText}" />
             </ScrollViewer>
         </Grid>
-        <TextBlock Grid.Row="1" Text="{Binding Info}" TextWrapping="Wrap" HorizontalAlignment="Center" />
+        <TextBlock Grid.Row="1" TextWrapping="Wrap" HorizontalAlignment="Center" Text="{OnPlatform Browser={Binding BrowserInfo}, Default={Binding DefaultInfo}}" />
         <Button Grid.Row="2" HorizontalAlignment="Center" Command="{Binding CacheEverythingCommand}">Cache Everything</Button>
     </Grid>
 </UserControl>
