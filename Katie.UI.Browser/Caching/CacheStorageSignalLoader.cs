@@ -12,17 +12,17 @@ public sealed class CacheStorageSignalLoader : ISignalProvider
         try
         {
             await SignalCacheFunctions.PrepareCache();
-            var keys = PhraseCacheFunctions.GetKeys();
+            var keys = SignalCacheFunctions.GetKeys();
             foreach (var key in keys.Order())
             {
-                var bytes = PhraseCacheFunctions.Load(key);
+                var bytes = SignalCacheFunctions.Load(key);
                 var stream = new MemoryStream(bytes);
                 yield return await Signal.LoadIntoMemory(stream, key);
             }
         }
         finally
         {
-            PhraseCacheFunctions.ClearMemory();
+            SignalCacheFunctions.ClearMemory();
         }
     }
 
