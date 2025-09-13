@@ -9,6 +9,5 @@ public sealed record NumberSettings(
     Mapper OneExact,
     Mapper OneOrdinal,
     string Hundred,
-    bool OneBeforeHundred,
-    string? And = null
+    bool OneBeforeHundred
 );

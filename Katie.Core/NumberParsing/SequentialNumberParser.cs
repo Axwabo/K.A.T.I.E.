@@ -12,7 +12,6 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
     private readonly bool _isOrdinal;
 
     private bool _hundred;
-    private bool _and;
 
     public int PositionalIndex { get; private set; }
 
@@ -44,15 +43,6 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
             phrase = _tree.RootPhrase(_settings.Hundred);
             advanced = 0;
             _hundred = false;
-            _and = _settings.And != null && (_text[^2] != '0' || _text[^1] != '0');
-            return true;
-        }
-
-        if (_and)
-        {
-            phrase = _tree.RootPhrase(_settings.And!);
-            advanced = 0;
-            _and = false;
             return true;
         }
 
