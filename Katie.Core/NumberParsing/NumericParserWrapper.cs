@@ -14,11 +14,11 @@ public ref struct NumericParserWrapper<T> where T : PhraseBase
     private HungarianNumericParser<T> _hungarian;
     private EnglishNumericParser<T> _english;
 
-    public NumericParserWrapper(ReadOnlySpan<char> text, PhraseTree<T> tree, ReadOnlySpan<char> language)
+    public NumericParserWrapper(ReadOnlySpan<char> text, PhraseTree<T> tree)
     {
         _text = text;
         _tree = tree;
-        _isEnglish = language.Equals("English", StringComparison.OrdinalIgnoreCase);
+        _isEnglish = tree.Language.Equals("English", StringComparison.OrdinalIgnoreCase);
     }
 
     public bool Begin(ref int index, int primaryEnd, out UtteranceSegment<T> phrase)

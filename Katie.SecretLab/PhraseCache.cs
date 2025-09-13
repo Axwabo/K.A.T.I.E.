@@ -13,15 +13,15 @@ namespace Katie.SecretLab;
 public static class PhraseCache
 {
 
-    public static PhraseTree<WavePhraseBase> Hungarian { get; private set; } = new([]);
+    public static PhraseTree<WavePhraseBase> Hungarian { get; } = new(nameof(Hungarian));
 
-    public static PhraseTree<WavePhraseBase> English { get; private set; } = new([]);
+    public static PhraseTree<WavePhraseBase> English { get; } = new(nameof(English));
 
     private static readonly Dictionary<int, RawSourceSampleProvider> Signals = [];
 
     public static void Initialize(DirectoryInfo root)
     {
-        InitializeSignals(root.CreateSubdirectory("Signals"));
+        InitializeSignals(root.CreateSubdirectory(nameof(Signals)));
         InitializePhrases(root.CreateSubdirectory("Phrases"));
     }
 
@@ -41,15 +41,15 @@ public static class PhraseCache
     private static void InitializePhrases(DirectoryInfo phrases)
     {
         var global = phrases.EnumeratePhrases("Global").ToList();
-        Hungarian = new PhraseTree<WavePhraseBase>(global.Concat(phrases.EnumeratePhrases("Hungarian")));
-        English = new PhraseTree<WavePhraseBase>(global.Concat(phrases.EnumeratePhrases("English")));
+        Hungarian.Rebuild(global.Concat(phrases.EnumeratePhrases(nameof(Hungarian))));
+        English.Rebuild(global.Concat(phrases.EnumeratePhrases(nameof(English))));
     }
 
     public static bool TryGetTree(ReadOnlySpan<char> language, [NotNullWhen(true)] out PhraseTree<WavePhraseBase>? tree)
     {
-        tree = language.Equals("Hungarian", StringComparison.OrdinalIgnoreCase)
+        tree = language.Equals(nameof(Hungarian), StringComparison.OrdinalIgnoreCase)
             ? Hungarian
-            : language.Equals("English", StringComparison.OrdinalIgnoreCase)
+            : language.Equals(nameof(English), StringComparison.OrdinalIgnoreCase)
                 ? English
                 : null;
         return tree != null;

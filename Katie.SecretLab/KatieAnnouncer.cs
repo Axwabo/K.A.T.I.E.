@@ -14,10 +14,10 @@ public static class KatieAnnouncer
 
     public static bool IsAnyAnnouncerSpeaking => IsCassieSpeaking || IsKatieSpeaking;
 
-    public static void Play(ReadOnlySpan<char> text, ReadOnlySpan<char> language, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> signal)
-        => AnnouncementManager.Instance.Play(text, language, tree, signal, false);
+    public static void Play(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> signal)
+        => AnnouncementManager.Instance.Play(text, tree, signal, false);
 
-    public static void Play(ReadOnlySpan<char> text, ReadOnlySpan<char> language, PhraseTree<WavePhraseBase> tree, bool noisy)
-        => AnnouncementManager.Instance.Play(text, language, tree, ReadOnlySpan<char>.Empty, noisy);
+    public static void Play(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, bool noisy)
+        => AnnouncementManager.Instance.Play(text, tree, ReadOnlySpan<char>.Empty, noisy);
 
 }

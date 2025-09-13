@@ -86,13 +86,13 @@ internal sealed class AnnouncementManager : MonoBehaviour
         if (span.TryGetBracketsValue(languageEnd, out var signalEnd, out var signal))
             languageEnd = signalEnd + 1;
         var announcement = span[languageEnd..].Trim();
-        Play(announcement, language, tree, signal, noisy && signal.Trim().IsEmpty);
+        Play(announcement, tree, signal, noisy && signal.Trim().IsEmpty);
         return true;
     }
 
-    public void Play(ReadOnlySpan<char> text, ReadOnlySpan<char> language, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> signal, bool noisy)
+    public void Play(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> signal, bool noisy)
     {
-        var chain = UtteranceChain.Parse(text, tree, language);
+        var chain = UtteranceChain.Parse(text, tree);
         if (chain == null)
             return;
         if (PhraseCache.TryGetSignal(signal, out var signalProvider))

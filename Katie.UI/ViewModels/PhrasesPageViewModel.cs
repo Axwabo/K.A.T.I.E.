@@ -121,7 +121,7 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
         if (_factory == null)
             return;
         var index = ++_playIndex;
-        var chain = UtteranceChain.Parse(Text, language == "English" ? Phrases.EnglishTree : Phrases.HungarianTree, language);
+        var chain = UtteranceChain.Parse(Text, language == "English" ? Phrases.EnglishTree : Phrases.HungarianTree);
         if (chain == null)
             return;
         Progress = 0;

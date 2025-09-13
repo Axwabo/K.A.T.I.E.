@@ -13,9 +13,9 @@ public sealed class PhraseManager
 
     public PhrasePackViewModel Global { get; }
 
-    public PhraseTree<WavePhraseBase> EnglishTree { get; private set; } = new([]);
+    public PhraseTree<WavePhraseBase> EnglishTree { get; } = new(nameof(English));
 
-    public PhraseTree<WavePhraseBase> HungarianTree { get; private set; } = new([]);
+    public PhraseTree<WavePhraseBase> HungarianTree { get; } = new(nameof(Hungarian));
 
     public PhraseManager([FromKeyedServices(nameof(FilePickerPhraseProvider))] IPhraseProvider? phrasePicker = null)
     {
@@ -28,8 +28,8 @@ public sealed class PhraseManager
         Global.PhrasesChanged += RebuildEnglish;
     }
 
-    private void RebuildHungarian() => HungarianTree = new PhraseTree<WavePhraseBase>(Global.List.Concat(Hungarian.List));
+    private void RebuildHungarian() => HungarianTree.Rebuild(Global.List.Concat(Hungarian.List));
 
-    private void RebuildEnglish() => EnglishTree = new PhraseTree<WavePhraseBase>(Global.List.Concat(English.List));
+    private void RebuildEnglish() => EnglishTree.Rebuild(Global.List.Concat(English.List));
 
 }

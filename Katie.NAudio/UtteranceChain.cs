@@ -11,10 +11,10 @@ using PhraseClip = (ISampleProvider Provider, UtteranceSegment<WavePhraseBase> S
 public sealed class UtteranceChain : ISampleProvider
 {
 
-    public static UtteranceChain? Parse(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> language)
+    public static UtteranceChain? Parse(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree)
     {
         var segments = new Queue<UtteranceSegment<WavePhraseBase>>();
-        var parser = new PhraseParser<WavePhraseBase>(text, tree, language);
+        var parser = new PhraseParser<WavePhraseBase>(text, tree);
         SimpleWaveFormat? format = null;
         while (parser.Next(out var phrase))
         {

@@ -6,9 +6,19 @@ namespace Katie.Core.DataStructures;
 public sealed class PhraseTree<T> where T : PhraseBase
 {
 
-    private readonly PhraseTreeNode<T> _rootNode = new("");
+    public string Language { get; }
 
-    public PhraseTree(IEnumerable<T> values)
+    private PhraseTreeNode<T> _rootNode = new("");
+
+    public PhraseTree(string language) => Language = language;
+
+    public void Rebuild(IEnumerable<T> values)
+    {
+        _rootNode = new PhraseTreeNode<T>("");
+        Build(values);
+    }
+
+    private void Build(IEnumerable<T> values)
     {
         foreach (var phrase in values.OrderBy(e => e.Text.Length))
             Add(phrase);
