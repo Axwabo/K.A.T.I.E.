@@ -18,17 +18,17 @@ public static class Subtitles
 
     private const ushort CassieRpcHash = unchecked((ushort) -31296712);
 
-    public static void Play(string announcement, string subtitles)
+    public static void Announce(string announcement, string subtitles, bool noisy = false)
     {
         var queue = NineTailedFoxAnnouncer.singleton.queue;
         var start = queue.Count;
-        NineTailedFoxAnnouncer.singleton.AddPhraseToQueue(announcement, false, false, false, true, subtitles);
+        NineTailedFoxAnnouncer.singleton.AddPhraseToQueue(announcement, noisy, false, false, true, subtitles);
         for (var i = start; i < queue.Count; i++)
             queue[i].collection = Collection;
         using var writer = NetworkWriterPool.Get();
         writer.WriteString(announcement);
         writer.WriteBool(false); // makeHold
-        writer.WriteBool(false); // makeNoise
+        writer.WriteBool(noisy); // makeNoise
         writer.WriteBool(true); // customAnnouncement
         writer.WriteString(subtitles);
         foreach (var controller in RespawnEffectsController.AllControllers)
@@ -38,10 +38,10 @@ public static class Subtitles
                 componentIndex = controller.ComponentIndex,
                 functionHash = CassieRpcHash,
                 payload = writer.ToArraySegment()
-            }.SendToHubsConditionally(hub => hub.Mode == ClientInstanceMode.ReadyClient);
+            }.SendToHubsConditionally(static hub => hub.Mode == ClientInstanceMode.ReadyClient);
     }
 
-    public static void Delay(float seconds)
+    public static void ServerOnlyDelay(float seconds)
         => NineTailedFoxAnnouncer.singleton.queue.Add(new NineTailedFoxAnnouncer.VoiceLine {apiName = ".", length = seconds, collection = Collection});
 
     public static (string Announcement, string Subtitles) MakeCassieAnnouncement(UtteranceChain chain, ReadOnlySpan<char> text)

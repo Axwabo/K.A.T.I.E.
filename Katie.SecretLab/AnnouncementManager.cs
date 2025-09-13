@@ -1,4 +1,6 @@
-﻿using Katie.NAudio;
+﻿using Katie.Core.DataStructures;
+using Katie.NAudio;
+using Katie.NAudio.Phrases;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using SecretLabNAudio.Core;
@@ -12,6 +14,8 @@ namespace Katie.SecretLab;
 internal sealed class AnnouncementManager : MonoBehaviour
 {
 
+    private const float EndDelaySeconds = 4;
+
     private static readonly SpeakerSettings Settings = new()
     {
         IsSpatial = false,
@@ -19,20 +23,22 @@ internal sealed class AnnouncementManager : MonoBehaviour
         Volume = 1
     };
 
-    private static readonly TimeSpan Delay = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan StartNoise = TimeSpan.FromSeconds(2.5);
+
+    private static readonly TimeSpan Delay = TimeSpan.FromSeconds(EndDelaySeconds);
 
     public static AnnouncementManager Instance { get; private set; } = null!;
 
     public static void Initialize()
     {
-        var player = AudioPlayer.Create(AudioPlayerPool.NextAvailableId, Settings);
+        var player = AudioPlayer.Create(AudioPlayerPool.NextAvailableId, Settings).WithMasterAmplification(2);
         Instance = player.gameObject.AddComponent<AnnouncementManager>();
         Instance.Player = player;
     }
 
     private readonly SampleProviderQueue _queue = new(AudioPlayer.SupportedFormat);
 
-    private readonly Dictionary<ISampleProvider, (string Announcement, string Subtitles)> _announcements = [];
+    private readonly Dictionary<ISampleProvider, (string Announcement, string Subtitles, bool Noisy)> _announcements = [];
 
     private ISampleProvider? _previousProvider;
 
@@ -40,14 +46,17 @@ internal sealed class AnnouncementManager : MonoBehaviour
 
     public AudioPlayer Player { get; private set; } = null!;
 
+    // ReSharper disable once MergeIntoPattern
+    public bool IsSpeaking => !Player.IsPaused && !Player.HasEnded;
+
     private void Awake() => Instance = this;
 
-    private void Start() => Player.SampleProvider = _queue.Volume(2);
+    private void Start() => Player.SampleProvider = _queue;
 
     private void Update()
     {
-        if (NineTailedFoxAnnouncer.singleton.queue is [{collection: not Subtitles.Collection}, ..])
-            _pauseTime = 5;
+        if (KatieAnnouncer.IsCassieSpeaking)
+            _pauseTime = EndDelaySeconds;
         if ((_pauseTime -= Time.deltaTime) >= 0)
         {
             Player.IsPaused = true;
@@ -61,29 +70,38 @@ internal sealed class AnnouncementManager : MonoBehaviour
         _previousProvider = current;
         if (current == null || !_announcements.Remove(current, out var tuple))
             return;
-        Subtitles.Play(tuple.Announcement, tuple.Subtitles);
-        Subtitles.Delay(3);
+        Subtitles.Announce(tuple.Announcement, tuple.Subtitles, tuple.Noisy);
+        Subtitles.ServerOnlyDelay(EndDelaySeconds);
     }
 
-    public bool Play(string text)
+    public bool OverrideCassieAnnouncement(string text, bool noisy)
     {
         var span = text.AsSpan().Trim();
         if (!span.TryGetBracketsValue(0, out var languageEnd, out var language) || !PhraseCache.TryGetTree(language.Trim(), out var tree))
             return false;
         languageEnd++;
-        RawSourceSampleProvider? signal = null;
-        if (span.TryGetBracketsValue(languageEnd, out var signalEnd, out var signalName) && PhraseCache.TryGetSignal(signalName.Trim(), out signal))
+        if (span.TryGetBracketsValue(languageEnd, out var signalEnd, out var signal))
             languageEnd = signalEnd + 1;
         var announcement = span[languageEnd..].Trim();
-        var chain = UtteranceChain.Parse(announcement, tree, language);
-        if (chain == null)
-            return true;
-        var offset = new OffsetSampleProvider(chain) {LeadOut = Delay};
-        if (signal != null)
-            _queue.Enqueue(signal.Copy(true));
-        _queue.Enqueue(offset);
-        _announcements[offset] = Subtitles.MakeCassieAnnouncement(chain, announcement);
+        Play(announcement, language, tree, signal, noisy && signal.Trim().IsEmpty);
         return true;
+    }
+
+    public void Play(ReadOnlySpan<char> text, ReadOnlySpan<char> language, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> signal, bool noisy)
+    {
+        var chain = UtteranceChain.Parse(text, tree, language);
+        if (chain == null)
+            return;
+        if (PhraseCache.TryGetSignal(signal, out var signalProvider))
+            _queue.Enqueue(signalProvider.Copy(true));
+        var offset = new OffsetSampleProvider(chain)
+        {
+            DelayBy = noisy ? StartNoise : TimeSpan.Zero,
+            LeadOut = Delay
+        };
+        _queue.Enqueue(offset);
+        var (announcement, subtitles) = Subtitles.MakeCassieAnnouncement(chain, text);
+        _announcements[offset] = (announcement, subtitles, noisy);
     }
 
 }
