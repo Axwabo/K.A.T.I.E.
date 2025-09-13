@@ -57,7 +57,7 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
 file static class Map
 {
 
-    public static NumberSettings Settings { get; } = new(Ten, Ten, Ten, OneExact, OneOrdinal, "hundred", "and");
+    public static NumberSettings Settings { get; } = new(Ten, Ten, Ten, OneExact, OneOrdinal, "hundred", true, "and");
 
     public static string TenTy(char one) => one switch
     {

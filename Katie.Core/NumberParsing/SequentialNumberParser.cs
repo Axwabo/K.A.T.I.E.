@@ -11,6 +11,9 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
     private readonly NumberSettings _settings;
     private readonly bool _isOrdinal;
 
+    private bool _hundred;
+    private bool _and;
+
     public int PositionalIndex { get; private set; }
 
     public char Digit => IsActive
@@ -23,7 +26,7 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
     {
         if (text.IsEmpty)
             throw new ArgumentException("Number text cannot be empty", nameof(text));
-        if (text.Length > 2)
+        if (text.Length > 3)
             throw new ArgumentException($"Cannot parse a number of {text.Length} digits", nameof(text));
         if (!text.IsDigit())
             throw new ArgumentException("Number text must contain only digits", nameof(text));
@@ -36,20 +39,30 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
     {
+        if (_hundred)
+        {
+            phrase = _tree.RootPhrase(_settings.Hundred);
+            advanced = 0;
+            _hundred = false;
+            _and = _settings.And != null && (_text[^2] != '0' || _text[^1] != '0');
+            return true;
+        }
+
+        if (_and)
+        {
+            phrase = _tree.RootPhrase(_settings.And!);
+            advanced = 0;
+            _and = false;
+            return true;
+        }
+
         switch (PositionalIndex)
         {
+            case 2:
+                ProcessHundred(out phrase, out advanced);
+                return true;
             case 1:
-                if (_text[^1] == '0')
-                {
-                    phrase = _tree.Digit(_text[^2], _isOrdinal ? _settings.TenOrdinal : _settings.TenExact);
-                    advanced = 2;
-                    PositionalIndex = -1;
-                    return true;
-                }
-
-                phrase = _tree.Digit(Digit, _settings.Ten);
-                advanced = 1;
-                PositionalIndex = 0;
+                ProcessTen(out phrase, out advanced);
                 return true;
             case 0:
                 phrase = _tree.Digit(Digit, _isOrdinal ? _settings.OneOrdinal : _settings.OneExact);
@@ -61,6 +74,31 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
                 advanced = 0;
                 return false;
         }
+    }
+
+    private void ProcessHundred(out UtteranceSegment<T> phrase, out int advanced)
+    {
+        var hundredNow = !_settings.OneBeforeHundred && _text[^3] == '1';
+        var zeroes = _text.Count('0', ^2);
+        phrase = hundredNow ? _tree.RootPhrase(_settings.Hundred) : _tree.Digit(_text[^3], _settings.OneExact);
+        advanced = 1 + zeroes;
+        PositionalIndex -= advanced;
+        _hundred = !hundredNow;
+    }
+
+    private void ProcessTen(out UtteranceSegment<T> phrase, out int advanced)
+    {
+        if (_text[^1] == '0')
+        {
+            phrase = _tree.Digit(_text[^2], _isOrdinal ? _settings.TenOrdinal : _settings.TenExact);
+            advanced = 2;
+            PositionalIndex = -1;
+            return;
+        }
+
+        phrase = _tree.Digit(Digit, _settings.Ten);
+        advanced = 1;
+        PositionalIndex = 0;
     }
 
     public static SequentialNumberParser<T> CreateTrimmed(ReadOnlySpan<char> text, PhraseTree<T> tree, NumberSettings mappers, bool isOrdinal, out int advanced)

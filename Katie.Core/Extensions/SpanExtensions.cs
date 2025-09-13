@@ -37,4 +37,13 @@ public static class SpanExtensions
         return true;
     }
 
+    public static int Count(this ReadOnlySpan<char> span, char c, Index start)
+    {
+        var count = 0;
+        for (var i = start.GetOffset(span.Length); i < span.Length; i++)
+            if (span[i] == c)
+                count++;
+        return count;
+    }
+
 }
