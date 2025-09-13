@@ -25,6 +25,8 @@ internal sealed class AnnouncementManager : MonoBehaviour
 
     private static readonly TimeSpan StartNoise = TimeSpan.FromSeconds(2.5);
 
+    private static readonly TimeSpan EndNoise = TimeSpan.FromSeconds(0.2);
+
     private static readonly TimeSpan Delay = TimeSpan.FromSeconds(EndDelaySeconds);
 
     public static AnnouncementManager Instance { get; private set; } = null!;
@@ -95,10 +97,10 @@ internal sealed class AnnouncementManager : MonoBehaviour
             return;
         if (PhraseCache.TryGetSignal(signal, out var signalProvider))
             _queue.Enqueue(signalProvider.Copy(true));
-        var offset = new OffsetSampleProvider(chain)
+        var offset = new OffsetSampleProvider(noisy ? chain.Volume(1.2f) : chain)
         {
             DelayBy = noisy ? StartNoise : TimeSpan.Zero,
-            LeadOut = Delay
+            LeadOut = noisy ? Delay + EndNoise : Delay
         };
         _queue.Enqueue(offset);
         var (announcement, subtitles) = Subtitles.MakeCassieAnnouncement(chain, text);
