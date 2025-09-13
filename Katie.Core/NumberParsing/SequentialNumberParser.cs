@@ -11,15 +11,15 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
     private readonly NumberSettings _settings;
     private readonly bool _isOrdinal;
 
-    private bool _hundred;
+    public bool Hundred { get; private set; }
 
     public int PositionalIndex { get; private set; }
 
     public char Digit => IsActive
-        ? _text[_text.Length - PositionalIndex - 1]
+        ? _text[Math.Max(0, _text.Length - PositionalIndex - 1)]
         : throw new InvalidOperationException("Cannot access the digit on an inactive parser");
 
-    public bool IsActive => PositionalIndex != -1 && !_text.IsEmpty;
+    public bool IsActive => (Hundred || PositionalIndex != -1) && !_text.IsEmpty;
 
     public SequentialNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, NumberSettings settings, bool isOrdinal)
     {
@@ -38,11 +38,11 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
     {
-        if (_hundred)
+        if (Hundred)
         {
             phrase = _tree.RootPhrase(_settings.Hundred);
             advanced = 0;
-            _hundred = false;
+            Hundred = false;
             return true;
         }
 
@@ -73,7 +73,7 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
         phrase = hundredNow ? _tree.RootPhrase(_settings.Hundred) : _tree.Digit(_text[^3], _settings.OneExact);
         advanced = 1 + zeroes;
         PositionalIndex -= advanced;
-        _hundred = !hundredNow;
+        Hundred = !hundredNow;
     }
 
     private void ProcessTen(out UtteranceSegment<T> phrase, out int advanced)

@@ -9,6 +9,8 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
     private readonly PhraseTree<T> _tree;
     private readonly bool _leadingZero;
 
+    private int _previousPosition;
+
     private SequentialNumberParser<T> _parser;
 
     public bool IsActive => _parser.IsActive;
@@ -29,6 +31,17 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
     {
+        if (_parser.Hundred)
+            return Advance(out phrase, out advanced);
+        var previous = _previousPosition;
+        _previousPosition = _parser.PositionalIndex;
+        if (previous == 2 && _parser.PositionalIndex < 2)
+        {
+            phrase = _tree.RootPhrase("and");
+            advanced = 0;
+            return true;
+        }
+
         switch (_parser.PositionalIndex, _parser.Digit)
         {
             case (not 0, '0') when _leadingZero:
@@ -36,7 +49,7 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
                 return Advance(out _, out advanced);
             case (1, '1'):
                 Advance(out phrase, out advanced);
-                if (advanced == 2)
+                if (advanced != 1)
                     return true;
                 advanced++;
                 phrase = _tree.RootPhrase(Map.TenTy(_parser.Digit));
