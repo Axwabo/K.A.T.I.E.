@@ -24,4 +24,9 @@ public sealed class SignalManager
             Dispatcher.UIThread.Post(() => List.Add(signal));
     }
 
+    public Task CacheAll(ISignalCacheManager? signalCache)
+        => signalCache == null
+            ? Task.CompletedTask
+            : Task.WhenAll(List.Select(signalCache.CacheAsync));
+
 }

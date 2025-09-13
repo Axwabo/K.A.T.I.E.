@@ -10,6 +10,6 @@ public sealed class MemoryStreamPhrase : WaveStreamPhrase
 
     public MemoryStreamPhrase(MemoryStream source, string name) : base(source, name) => _source = source;
 
-    public ArraySegment<byte> Data => new(_source.GetBuffer(), 0, (int) _source.Length);
+    public ArraySegment<byte> Data => _source.ToArraySegment();
 
 }

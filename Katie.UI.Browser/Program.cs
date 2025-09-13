@@ -32,6 +32,7 @@ internal static class Program
         .AddSingleton<IFileToPhraseConverter, MemoryPhraseConverter>()
         .AddSingleton<IPhraseCacheManager, CacheStoragePhraseManager>()
         .AddSingleton<IInitialPhraseLoader, CacheStoragePhraseLoader>()
-        .AddSingleton<ISignalProvider, CacheStorageSignalLoader>();
+        .AddSingleton<ISignalProvider, CacheStorageSignalLoader>()
+        .AddSingleton<ISignalCacheManager, CacheStorageSignalManager>();
 
 }
