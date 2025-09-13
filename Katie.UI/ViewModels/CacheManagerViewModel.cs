@@ -1,26 +1,34 @@
-﻿using Katie.UI.PhraseProviders;
+﻿using CommunityToolkit.Mvvm.Input;
+using Katie.UI.PhraseProviders;
 using Katie.UI.Services;
 
 namespace Katie.UI.ViewModels;
 
-public sealed class CacheManagerViewModel : ViewModelBase
+public sealed partial class CacheManagerViewModel : ViewModelBase
 {
 
-    private readonly PhraseManager? _phraseManager;
+    public PhraseManager Phrases { get; }
 
-    private readonly IPhraseCacheManager? _cacheManager;
+    public IPhraseCacheManager? Cache { get; }
 
     public string Info { get; }
 
-    public CacheManagerViewModel(PhraseManager? phraseManager, IPhraseCacheManager? cacheManager = null)
+    public CacheManagerViewModel(PhraseManager phraseManager, IPhraseCacheManager? cacheManager = null)
     {
-        _phraseManager = phraseManager;
-        _cacheManager = cacheManager;
+        Phrases = phraseManager;
+        Cache = cacheManager;
         Info = cacheManager?.Info ?? "ℹ Caching reads all phrases into memory, releasing the file handles.";
     }
 
-    public CacheManagerViewModel() : this(null)
+    public CacheManagerViewModel() : this(new PhraseManager())
     {
     }
+
+    [RelayCommand]
+    private async Task CacheEverything() => await Task.WhenAll(
+        Phrases.Hungarian.CacheAll(Cache),
+        Phrases.English.CacheAll(Cache),
+        Phrases.Global.CacheAll(Cache)
+    );
 
 }

@@ -17,11 +17,11 @@ public sealed class PhraseManager
 
     public PhraseTree<WavePhraseBase> HungarianTree { get; private set; } = new([]);
 
-    public PhraseManager([FromKeyedServices(nameof(FilePickerPhraseProvider))] IPhraseProvider? phrasePicker = null, IPhraseCacheManager? cacheSaver = null)
+    public PhraseManager([FromKeyedServices(nameof(FilePickerPhraseProvider))] IPhraseProvider? phrasePicker = null)
     {
-        English = new PhrasePackViewModel {Picker = phrasePicker, Language = "English", Cache = cacheSaver};
-        Hungarian = new PhrasePackViewModel {Picker = phrasePicker, Language = "Hungarian", Cache = cacheSaver};
-        Global = new PhrasePackViewModel {Picker = phrasePicker, Language = "Global", Cache = cacheSaver};
+        English = new PhrasePackViewModel {Picker = phrasePicker, Language = "English"};
+        Hungarian = new PhrasePackViewModel {Picker = phrasePicker, Language = "Hungarian"};
+        Global = new PhrasePackViewModel {Picker = phrasePicker, Language = "Global"};
         Hungarian.PhrasesChanged += RebuildHungarian;
         English.PhrasesChanged += RebuildEnglish;
         Global.PhrasesChanged += RebuildHungarian;

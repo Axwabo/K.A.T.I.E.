@@ -16,8 +16,6 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
 
     public IPhraseProvider? Picker { get; init; }
 
-    public IPhraseCacheManager? Cache { get; init; }
-
     public IReadOnlyList<WavePhraseBase> List => _list;
 
     public CancellationToken Cancellation { get; set; }
@@ -66,10 +64,10 @@ public sealed partial class PhrasePackViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public async Task CacheAll()
+    public async Task CacheAll(IPhraseCacheManager? manager)
     {
         BlockingOperation = "Caching phrases...";
-        await foreach (var task in Task.WhenEach(List.ToSamplePhrases(Language, Cache)).WithCancellation(Cancellation))
+        await foreach (var task in Task.WhenEach(List.ToSamplePhrases(Language, manager)).WithCancellation(Cancellation))
         {
             var (index, phrase) = task.Result;
             Dispatcher.UIThread.Post(() =>

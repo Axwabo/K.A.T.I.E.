@@ -158,11 +158,4 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
     [RelayCommand]
     public void Stop() => _playIndex = -1;
 
-    [RelayCommand]
-    public Task Cache() => Task.WhenAll(
-        Phrases.Hungarian.CacheAll(),
-        Phrases.English.CacheAll(),
-        Phrases.Global.CacheAll()
-    );
-
 }
