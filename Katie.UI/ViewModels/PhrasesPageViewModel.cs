@@ -133,7 +133,7 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
         else
         {
             signalProvider.Position = 0;
-            master = new WaveFileReader(signalProvider).ToSampleProvider().EnsureFormat(chain.WaveFormat).FollowedBy(chain);
+            master = signalProvider.ToSampleProvider().EnsureFormat(chain.WaveFormat).FollowedBy(chain);
         }
 
         using var player = _factory.CreatePlayer(master);
