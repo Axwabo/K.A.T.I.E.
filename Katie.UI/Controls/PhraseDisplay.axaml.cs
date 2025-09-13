@@ -74,7 +74,7 @@ public sealed partial class PhraseDisplay : UserControl
     private void ToggleEditing(bool focus = false)
     {
         Label.IsVisible = !(Editing = !Editing);
-        Edit.Content = Editing ? "✔" : "✏";
+        Edit.Classes.Set("editing", Editing);
         if (focus && Editing)
             Input.Focus();
     }

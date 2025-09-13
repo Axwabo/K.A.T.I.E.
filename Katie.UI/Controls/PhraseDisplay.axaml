@@ -1,17 +1,32 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+﻿<!-- ReSharper disable once Xaml.RedundantNamespaceAlias -->
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:phrases="clr-namespace:Katie.NAudio.Phrases;assembly=Katie.NAudio"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Katie.UI.Controls.PhraseDisplay"
              x:DataType="phrases:WavePhraseBase"
              x:Name="Root">
+    <UserControl.Styles>
+        <Style Selector="Button:not(.editing)">
+            <Setter Property="Content" Value="{OnPlatform Default=✏, Browser=Alias}" />
+        </Style>
+        <Style Selector="Button.editing">
+            <Setter Property="Content" Value="{OnPlatform Default=✔, Browser=Save}" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="FontSize" Value="{OnPlatform Default=12, Browser=10, x:TypeArguments=system:Double}" />
+        </Style>
+    </UserControl.Styles>
     <Grid ColumnDefinitions="*,Auto,Auto,Auto" Background="{Binding Converter={StaticResource PhraseToBrush}}">
-        <Label x:Name="Label" Content="{Binding Text}" ToolTip.Tip="{Binding Text}" />
+        <Label x:Name="Label" ToolTip.Tip="{Binding Text}" Content="{Binding Text}" />
         <TextBox Grid.Column="0" x:Name="Input" Padding="2" IsVisible="False" Watermark="{Binding Text}" />
-        <Button Grid.Column="1" x:Name="Chain" ToolTip.Tip="Go To Original" Padding="2" IsVisible="False" Click="ChainClicked">🔗</Button>
-        <Button Grid.Column="2" x:Name="Edit" ToolTip.Tip="Edit Text" Padding="2" Click="EditClicked">✏</Button>
-        <Button Grid.Column="3" ToolTip.Tip="Delete" Padding="2" Command="{Binding #Root.Pack.RemoveCommand}" CommandParameter="{Binding}">❌</Button>
+        <Button Grid.Column="1" x:Name="Chain" ToolTip.Tip="Go To Original" IsVisible="False" Click="ChainClicked" Content="{OnPlatform Default=🔗, Browser=To Original}" />
+        <Button Grid.Column="2" x:Name="Edit" ToolTip.Tip="Edit Text" Click="EditClicked" />
+        <Button Grid.Column="3" ToolTip.Tip="Delete" Command="{Binding #Root.Pack.RemoveCommand}" CommandParameter="{Binding}"
+                Content="{OnPlatform Default=❌, Browser=Delete}" />
     </Grid>
 </UserControl>

@@ -10,12 +10,12 @@
     <Design.DataContext>
         <viewModels:MainViewModel />
     </Design.DataContext>
-    <Grid Margin="5" RowDefinitions="Auto,*">
-        <controls:NavigationBar HorizontalAlignment="Center" IsEnabled="{Binding !NavigationBlocked}"
+    <Grid RowDefinitions="Auto,*">
+        <controls:NavigationBar IsEnabled="{Binding !NavigationBlocked}"
                                 Pages="{Binding Pages}" CurrentPage="{Binding Page, Mode=TwoWay}" />
-        <Panel Grid.Row="1">
-            <UserControl Content="{Binding Phrases}" Margin="5" IsVisible="{Binding PhrasesVisible}" />
-            <UserControl Content="{Binding Cache}" Margin="5" IsVisible="{Binding CacheVisible}" />
+        <Panel Grid.Row="1" Margin="5">
+            <UserControl Content="{Binding Phrases}" IsVisible="{Binding PhrasesVisible}" />
+            <UserControl Content="{Binding Cache}" IsVisible="{Binding CacheVisible}" />
         </Panel>
     </Grid>
 </UserControl>

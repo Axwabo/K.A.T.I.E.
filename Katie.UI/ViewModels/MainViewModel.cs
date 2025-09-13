@@ -28,7 +28,7 @@ public sealed partial class MainViewModel : ViewModelBase
         Cache = cache;
     }
 
-    public MainViewModel() : this(new PhrasesPageViewModel(), new CacheManagerViewModel())
+    public MainViewModel() : this(new PhrasesPageViewModel(), new CacheManagerViewModel(null))
     {
     }
 
