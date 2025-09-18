@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Text;
+using Avalonia.Layout;
 using CommunityToolkit.Mvvm.Input;
 using Katie.Core;
 using Katie.UI.Audio;
@@ -18,6 +18,12 @@ public sealed partial class InspectPageViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _error = "";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Orientation))]
+    private bool _vertical;
+
+    public Orientation Orientation => Vertical ? Orientation.Vertical : Orientation.Horizontal;
 
     public ObservableCollection<ParsedText> Parsed { get; } = [];
 
@@ -44,17 +50,20 @@ public sealed partial class InspectPageViewModel : ViewModelBase
             Parsed.Clear();
             var parser = new PhraseParser<WavePhraseBase>(Input, language == "English" ? _manager.EnglishTree : _manager.HungarianTree);
             var index = 0;
+            var list = new List<UtteranceSegment<WavePhraseBase>>();
             while (parser.Next(out var phrase))
             {
                 if (index == phrase.EndIndex && Parsed.Count != 0)
                 {
-                    Parsed[^1].Segments.Add(phrase);
+                    list.Add(phrase);
                     continue;
                 }
 
                 var start = index;
                 index = phrase.EndIndex == -1 ? Input.Length : phrase.EndIndex;
-                Parsed.Add(new ParsedText(Input.Substring(start, index - start), [phrase]));
+                list.Add(phrase);
+                Parsed.Add(new ParsedText(Input.Substring(start, index - start), list));
+                list = [];
             }
         }
         catch (Exception e)
@@ -65,13 +74,4 @@ public sealed partial class InspectPageViewModel : ViewModelBase
 
 }
 
-public sealed record ParsedText(string Text, ObservableCollection<UtteranceSegment<WavePhraseBase>> Segments)
-{
-
-    private bool PrintMembers(StringBuilder builder)
-    {
-        builder.Append("Text = ").Append(Text).Append(", ").Append("Segments = [ ").AppendJoin(", ", Segments).Append(" ]");
-        return true;
-    }
-
-}
+public sealed record ParsedText(string Text, IReadOnlyCollection<UtteranceSegment<WavePhraseBase>> Segments);

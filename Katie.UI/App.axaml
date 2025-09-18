@@ -20,6 +20,7 @@
 
     <Application.Resources>
         <converters:PhraseToBrushConverter x:Key="PhraseToBrush" />
+        <converters:PhraseToTextConverter x:Key="PhraseToText" />
         <converters:UtteranceSegmentListConverter x:Key="UtteranceSegmentList" x:TypeArguments="phrases:WavePhraseBase" />
         <ControlTheme x:Key="{x:Type controls:RadioButtonList}" TargetType="controls:RadioButtonList">
             <Setter Property="Template">
