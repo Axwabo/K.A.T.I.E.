@@ -17,12 +17,12 @@
     </UserControl.Styles>
     <UserControl.Resources>
         <DataTemplate x:Key="Minimal" x:DataType="viewModels:ParsedText">
-            <Border Background="Transparent" BorderBrush="Red" BorderThickness="0,0,1,0" ToolTip.Tip="{Binding Segments, Converter={StaticResource UtteranceSegmentList}}">
+            <Border Background="Transparent" BorderBrush="Gray" BorderThickness="0,0,1,1" ToolTip.Tip="{Binding Segments, Converter={StaticResource UtteranceSegmentList}}">
                 <Label Content="{Binding Text}" />
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="Full" x:DataType="viewModels:ParsedText">
-            <Border BorderBrush="Gray" BorderThickness="1" Margin="2" Padding="2">
+            <Border BorderBrush="Gray" BorderThickness="1" Margin="2" Padding="4">
                 <StackPanel Orientation="Vertical">
                     <TextBlock Text="{Binding Text}" FontWeight="Bold" TextDecorations="Underline" />
                     <ItemsControl ItemsSource="{Binding Segments}">
@@ -40,15 +40,16 @@
             </Border>
         </DataTemplate>
     </UserControl.Resources>
-    <Grid RowDefinitions="100,Auto,*,Auto" RowSpacing="5">
-        <TextBox Text="{Binding Input}" TextWrapping="Wrap" Watermark="Enter text" />
+    <Grid RowDefinitions="100,Auto,Auto,*" RowSpacing="5">
+        <TextBox Text="{Binding PhrasesView.Text}" TextWrapping="Wrap" Watermark="Enter text" />
         <WrapPanel Grid.Row="1" Orientation="Horizontal" ItemSpacing="5">
             <Button Command="{Binding ParseCommand}" CommandParameter="Hungarian">Parse Hungarian</Button>
             <Button Command="{Binding ParseCommand}" CommandParameter="English">Parse English</Button>
             <CheckBox IsChecked="{Binding Vertical}">Vertical</CheckBox>
             <CheckBox IsChecked="{Binding #Root.Minimal}">Minimal</CheckBox>
         </WrapPanel>
-        <ScrollViewer Grid.Row="2">
+        <TextBlock Grid.Row="2" Text="{Binding Note}" Foreground="{Binding NoteBrush}" TextWrapping="Wrap" FontWeight="Bold" />
+        <ScrollViewer Grid.Row="3">
             <ItemsControl ItemsSource="{Binding Parsed}" ItemTemplate="{Binding #Root.ItemTemplate}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
