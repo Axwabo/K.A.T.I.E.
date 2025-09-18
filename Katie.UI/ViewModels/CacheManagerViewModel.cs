@@ -33,6 +33,12 @@ public sealed partial class CacheManagerViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private Task Cache(PhrasePackViewModel pack) => pack.CacheAll(PhraseCache);
+
+    [RelayCommand]
+    private Task CacheSignals() => Signals.CacheAll(SignalCache);
+
+    [RelayCommand]
     private async Task CacheEverything() => await Task.WhenAll(
         Phrases.Hungarian.CacheAll(PhraseCache),
         Phrases.English.CacheAll(PhraseCache),

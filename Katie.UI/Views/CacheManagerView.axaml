@@ -7,30 +7,36 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Katie.UI.Views.CacheManagerView"
              x:DataType="viewModels:CacheManagerViewModel">
+    <Design.DataContext>
+        <viewModels:CacheManagerViewModel />
+    </Design.DataContext>
     <UserControl.Resources>
         <DataTemplate x:Key="PhraseAsText" x:DataType="phrases:WavePhraseBase">
             <Label Content="{Binding Text}" Background="{Binding Converter={StaticResource PhraseToBrush}}" />
         </DataTemplate>
     </UserControl.Resources>
-    <Design.DataContext>
-        <viewModels:CacheManagerViewModel />
-    </Design.DataContext>
     <Grid RowDefinitions="*,Auto,Auto" RowSpacing="5">
-        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,*" ColumnSpacing="5">
+        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,*" ColumnSpacing="5">
             <Label Classes="title">Hungarian</Label>
-            <ScrollViewer Grid.Row="1" Grid.Column="0">
+            <Button Grid.Row="1" Grid.Column="0" Command="{Binding CacheCommand}" CommandParameter="{Binding Phrases.Hungarian}">Cache</Button>
+            <ScrollViewer Grid.Row="2" Grid.Column="0">
                 <ItemsControl ItemsSource="{Binding Phrases.Hungarian.List}" ItemTemplate="{StaticResource PhraseAsText}" />
             </ScrollViewer>
             <Label Grid.Row="0" Grid.Column="1" Classes="title">English</Label>
-            <ScrollViewer Grid.Row="1" Grid.Column="1">
+            <Button Grid.Row="1" Grid.Column="1" Command="{Binding CacheCommand}" CommandParameter="{Binding Phrases.English}">Cache</Button>
+            <ScrollViewer Grid.Row="2" Grid.Column="1">
                 <ItemsControl ItemsSource="{Binding Phrases.English.List}" ItemTemplate="{StaticResource PhraseAsText}" />
             </ScrollViewer>
             <Label Grid.Row="0" Grid.Column="2" Classes="title">Global</Label>
-            <ScrollViewer Grid.Row="1" Grid.Column="2">
+            <Button Grid.Row="2" Grid.Column="0" Command="{Binding CacheCommand}" CommandParameter="{Binding Phrases.Global}">Cache</Button>
+            <ScrollViewer Grid.Row="2" Grid.Column="2">
                 <ItemsControl ItemsSource="{Binding Phrases.Global.List}" ItemTemplate="{StaticResource PhraseAsText}" />
             </ScrollViewer>
         </Grid>
         <TextBlock Grid.Row="1" TextWrapping="Wrap" HorizontalAlignment="Center" Text="{OnPlatform Browser={Binding BrowserInfo}, Default={Binding DefaultInfo}}" />
-        <Button Grid.Row="2" HorizontalAlignment="Center" Command="{Binding CacheEverythingCommand}">Cache Everything</Button>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+            <Button Command="{Binding CacheSignalsCommand}">Cache Signals</Button>
+            <Button Command="{Binding CacheEverythingCommand}">Cache Everything</Button>
+        </StackPanel>
     </Grid>
 </UserControl>

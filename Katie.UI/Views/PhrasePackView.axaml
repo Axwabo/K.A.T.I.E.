@@ -16,7 +16,6 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Button Command="{Binding AddPhrasesCommand}">Add</Button>
             <Button Command="{Binding ClearCommand}">Clear</Button>
-            <Button Command="{Binding CacheAllCommand}">Cache</Button>
         </StackPanel>
         <ScrollViewer Grid.Row="2" BringIntoViewOnFocusChange="True">
             <ItemsControl ItemsSource="{Binding List}">
