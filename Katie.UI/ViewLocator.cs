@@ -13,6 +13,7 @@ public sealed class ViewLocator : IDataTemplate
         PhrasePackViewModel pack => Create<PhrasePackView>(pack),
         SignalsViewModel signals => Create<SignalsView>(signals),
         CacheManagerViewModel cache => Create<CacheManagerView>(cache),
+        InspectPageViewModel inspect => Create<InspectPageView>(inspect),
         _ => new TextBlock {Text = "Not found: " + param}
     };
 

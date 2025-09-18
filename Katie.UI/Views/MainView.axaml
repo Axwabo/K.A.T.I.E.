@@ -16,6 +16,7 @@
         <Panel Grid.Row="1" Margin="5">
             <UserControl Content="{Binding Phrases}" IsVisible="{Binding PhrasesVisible}" />
             <UserControl Content="{Binding Cache}" IsVisible="{Binding CacheVisible}" />
+            <UserControl Content="{Binding Inspect}" IsVisible="{Binding InspectVisible}" />
         </Panel>
     </Grid>
 </UserControl>

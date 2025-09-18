@@ -3,6 +3,7 @@
              xmlns:local="using:Katie.UI"
              xmlns:controls="clr-namespace:Katie.UI.Controls"
              xmlns:converters="clr-namespace:Katie.UI.Converters"
+             xmlns:phrases="clr-namespace:Katie.NAudio.Phrases;assembly=Katie.NAudio"
              x:Class="Katie.UI.App"
              RequestedThemeVariant="Dark">
     <Application.DataTemplates>
@@ -19,6 +20,7 @@
 
     <Application.Resources>
         <converters:PhraseToBrushConverter x:Key="PhraseToBrush" />
+        <converters:UtteranceSegmentListConverter x:Key="UtteranceSegmentList" x:TypeArguments="phrases:WavePhraseBase" />
         <ControlTheme x:Key="{x:Type controls:RadioButtonList}" TargetType="controls:RadioButtonList">
             <Setter Property="Template">
                 <ControlTemplate>
