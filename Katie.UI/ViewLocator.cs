@@ -14,6 +14,7 @@ public sealed class ViewLocator : IDataTemplate
         SignalsViewModel signals => Create<SignalsView>(signals),
         CacheManagerViewModel cache => Create<CacheManagerView>(cache),
         InspectPageViewModel inspect => Create<InspectPageView>(inspect),
+        QueuePageViewModel queue => Create<QueuePageView>(queue),
         _ => new TextBlock {Text = "Not found: " + param}
     };
 

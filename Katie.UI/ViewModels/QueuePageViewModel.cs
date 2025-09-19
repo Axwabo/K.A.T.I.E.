@@ -18,6 +18,9 @@ public sealed partial class QueuePageViewModel : ViewModelBase
 
     private QueueSampleProvider? _provider;
 
+    [ObservableProperty]
+    private string _input = "";
+
     public QueuePageViewModel(PhrasesPageViewModel phrasesPage, IAudioPlayerFactory? factory)
     {
         PhrasesPage = phrasesPage;
@@ -34,12 +37,12 @@ public sealed partial class QueuePageViewModel : ViewModelBase
         if (_factory == null)
             return;
         var format = _provider == null ? (SimpleWaveFormat?) null : (SimpleWaveFormat) _provider.WaveFormat;
-        var chain = UtteranceChain.Parse(PhrasesPage.Text, PhrasesPage.Phrases[language], format);
+        var chain = UtteranceChain.Parse(Input, PhrasesPage.Phrases[language], format);
         if (chain == null)
             return;
         var startPlayback = _provider == null;
-        var provider = PhrasesPage.AddSignal(chain, out _, out _);
-        var announcement = new QueuedAnnouncement(PhrasesPage.Text, language, provider, PhrasesPage.Signals.Selected == SignalManager.DefaultSignal ? null : PhrasesPage.Signals.Selected);
+        var provider = PhrasesPage.PrependSignal(chain, out var signalName, out _);
+        var announcement = new QueuedAnnouncement(Input, language, provider, PhrasesPage.Signals.Selected == SignalManager.DefaultSignal ? null : signalName);
         _provider ??= new QueueSampleProvider(Queue, announcement);
         Queue.Add(announcement);
         if (startPlayback)

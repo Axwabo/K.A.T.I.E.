@@ -1,0 +1,30 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Katie.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Katie.UI.Views.QueuePageView"
+             x:DataType="viewModels:QueuePageViewModel">
+    <Grid RowDefinitions="100,Auto,Auto,*" RowSpacing="5">
+        <TextBox Text="{Binding Input}" Watermark="Enter text to announce" />
+        <UserControl Grid.Row="1" Content="{Binding PhrasesPage.Signals}" />
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="5">
+            <Button Command="{Binding EnqueueCommand}" CommandParameter="Hungarian">Queue Hungarian</Button>
+            <Button Command="{Binding EnqueueCommand}" CommandParameter="English">Queue English</Button>
+        </StackPanel>
+        <ScrollViewer Grid.Row="3">
+            <ItemsControl ItemsSource="{Binding Queue}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,Auto">
+                            <TextBox Grid.ColumnSpan="3" Text="{Binding Text}" />
+                            <Label Grid.Row="1" Grid.Column="2" Content="{OnPlatform Browser=Signal:, Default=🎵}" IsVisible="{Binding SignalName, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                            <Label Grid.Row="1" Grid.Column="2" Content="{Binding SignalName}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

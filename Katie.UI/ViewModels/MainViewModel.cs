@@ -5,7 +5,7 @@ namespace Katie.UI.ViewModels;
 public sealed partial class MainViewModel : ViewModelBase
 {
 
-    public IReadOnlyCollection<string> Pages { get; } = [nameof(Phrases), nameof(Cache), nameof(Inspect)];
+    public IReadOnlyCollection<string> Pages { get; } = [nameof(Phrases), nameof(Cache), nameof(Inspect), nameof(Queue)];
 
     public PhrasesPageViewModel Phrases { get; }
 
@@ -13,8 +13,10 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public InspectPageViewModel Inspect { get; }
 
+    public QueuePageViewModel Queue { get; }
+
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(PhrasesVisible), nameof(CacheVisible), nameof(InspectVisible))]
+    [NotifyPropertyChangedFor(nameof(PhrasesVisible), nameof(CacheVisible), nameof(InspectVisible), nameof(QueueVisible))]
     private string _page = nameof(Phrases);
 
     [ObservableProperty]
@@ -26,15 +28,22 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public bool InspectVisible => Page == nameof(Inspect);
 
-    public MainViewModel(PhrasesPageViewModel phrases, CacheManagerViewModel cache, InspectPageViewModel inspect)
+    public bool QueueVisible => Page == nameof(Queue);
+
+    public MainViewModel(PhrasesPageViewModel phrases, CacheManagerViewModel cache, InspectPageViewModel inspect, QueuePageViewModel queue)
     {
         Phrases = phrases;
         Cache = cache;
         Inspect = inspect;
+        Queue = queue;
     }
 
-    public MainViewModel() : this(new PhrasesPageViewModel(), new CacheManagerViewModel(), new InspectPageViewModel())
+    public MainViewModel()
     {
+        Phrases = new PhrasesPageViewModel();
+        Cache = new CacheManagerViewModel();
+        Inspect = new InspectPageViewModel(Phrases);
+        Queue = new QueuePageViewModel(Phrases, null);
     }
 
     [RelayCommand]

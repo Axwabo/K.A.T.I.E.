@@ -9,7 +9,8 @@ internal static class ServiceProviderExtensions
         => collection.AddSingleton<MainViewModel>()
             .AddSingleton<PhrasesPageViewModel>()
             .AddSingleton<CacheManagerViewModel>()
-            .AddTransient<SignalsViewModel>()
-            .AddSingleton<InspectPageViewModel>();
+            .AddSingleton<SignalsViewModel>()
+            .AddSingleton<InspectPageViewModel>()
+            .AddSingleton<QueuePageViewModel>();
 
 }
