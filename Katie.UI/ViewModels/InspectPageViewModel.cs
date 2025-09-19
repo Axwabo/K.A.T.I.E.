@@ -13,7 +13,7 @@ public sealed partial class InspectPageViewModel : ViewModelBase
 
     private const string DefaultNote = "There may be words that do not map to any phrase. These will be replaced with a pause of (number of characters * 100) milliseconds.";
 
-    public PhrasesPageViewModel PhrasesView { get; }
+    public PhrasesPageViewModel PhrasesPage { get; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NoteBrush))]
@@ -29,7 +29,7 @@ public sealed partial class InspectPageViewModel : ViewModelBase
 
     public ObservableCollection<ParsedText> Parsed { get; } = [];
 
-    public InspectPageViewModel(PhrasesPageViewModel phrasesView) => PhrasesView = phrasesView;
+    public InspectPageViewModel(PhrasesPageViewModel phrasesPage) => PhrasesPage = phrasesPage;
 
     public InspectPageViewModel() : this(new PhrasesPageViewModel())
     {
@@ -48,8 +48,8 @@ public sealed partial class InspectPageViewModel : ViewModelBase
         {
             Note = DefaultNote;
             Parsed.Clear();
-            var input = PhrasesView.Text;
-            var parser = new PhraseParser<WavePhraseBase>(input, language == "English" ? PhrasesView.Phrases.EnglishTree : PhrasesView.Phrases.HungarianTree);
+            var input = PhrasesPage.Text;
+            var parser = new PhraseParser<WavePhraseBase>(input, language == "English" ? PhrasesPage.Phrases.EnglishTree : PhrasesPage.Phrases.HungarianTree);
             var index = 0;
             var list = new List<UtteranceSegment<WavePhraseBase>>();
             while (parser.Next(out var phrase))

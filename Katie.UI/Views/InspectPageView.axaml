@@ -41,7 +41,7 @@
         </DataTemplate>
     </UserControl.Resources>
     <Grid RowDefinitions="100,Auto,Auto,*" RowSpacing="5">
-        <TextBox Text="{Binding PhrasesView.Text}" TextWrapping="Wrap" Watermark="Enter text" />
+        <TextBox Text="{Binding PhrasesPage.Text}" TextWrapping="Wrap" Watermark="Enter text" />
         <WrapPanel Grid.Row="1" Orientation="Horizontal" ItemSpacing="5">
             <Button Command="{Binding ParseCommand}" CommandParameter="Hungarian">Parse Hungarian</Button>
             <Button Command="{Binding ParseCommand}" CommandParameter="English">Parse English</Button>

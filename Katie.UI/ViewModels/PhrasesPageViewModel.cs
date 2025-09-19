@@ -121,22 +121,13 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
         if (_factory == null)
             return;
         var index = ++_playIndex;
-        var chain = UtteranceChain.Parse(Text, language == "English" ? Phrases.EnglishTree : Phrases.HungarianTree);
+        var chain = UtteranceChain.Parse(Text, Phrases[language]);
         if (chain == null)
             return;
         Progress = 0;
 
-        var (signalProvider, signalName, signalDuration) = Signals.Selected;
-        ISampleProvider master;
-        if (Signals.Selected == SignalManager.DefaultSignal)
-            master = chain;
-        else
-        {
-            signalProvider.Position = 0;
-            master = signalProvider.ToSampleProvider().EnsureFormat(chain.WaveFormat).FollowedBy(chain);
-        }
-
-        using var player = _factory.CreatePlayer(master);
+        var provider = AddSignal(chain, out var signalName, out var signalDuration);
+        using var player = _factory.CreatePlayer(provider);
         await player.Play();
         var totalTime = signalDuration + chain.TotalTime;
         while (true)
@@ -153,6 +144,15 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
         }
 
         await player.Stop();
+    }
+
+    public ISampleProvider AddSignal(UtteranceChain chain, out string signalName, out TimeSpan signalDuration)
+    {
+        (var signalProvider, signalName, signalDuration) = Signals.Selected;
+        if (Signals.Selected == SignalManager.DefaultSignal)
+            return chain;
+        signalProvider.Position = 0;
+        return signalProvider.ToSampleProvider().EnsureFormat(chain.WaveFormat).FollowedBy(chain);
     }
 
     [RelayCommand]

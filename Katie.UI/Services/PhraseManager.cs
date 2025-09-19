@@ -17,6 +17,8 @@ public sealed class PhraseManager
 
     public PhraseTree<WavePhraseBase> HungarianTree { get; } = new(nameof(Hungarian));
 
+    public PhraseTree<WavePhraseBase> this[string language] => language == "English" ? EnglishTree : HungarianTree;
+
     public PhraseManager([FromKeyedServices(nameof(FilePickerPhraseProvider))] IPhraseProvider? phrasePicker = null)
     {
         English = new PhrasePackViewModel {Picker = phrasePicker, Language = "English"};
