@@ -2,15 +2,11 @@
 using CommunityToolkit.Mvvm.Input;
 using Katie.NAudio;
 using Katie.UI.Audio;
-using Katie.UI.Extensions;
-using Katie.UI.Services;
 
 namespace Katie.UI.ViewModels;
 
 public sealed partial class QueuePageViewModel : ViewModelBase
 {
-
-    private static readonly TimeSpan Delay = TimeSpan.FromSeconds(3);
 
     public PhrasesPageViewModel PhrasesPage { get; }
 
@@ -39,12 +35,11 @@ public sealed partial class QueuePageViewModel : ViewModelBase
         if (_factory == null)
             return;
         var format = _provider == null ? (SimpleWaveFormat?) null : (SimpleWaveFormat) _provider.WaveFormat;
-        var chain = UtteranceChain.From(Input, PhrasesPage.Phrases[language], format);
-        if (chain == null)
+        var segments = UtteranceChain.ParseToQueue(Input, PhrasesPage.Phrases[language], ref format);
+        if (segments.Count == 0)
             return;
         var startPlayback = _provider == null;
-        var provider = PhrasesPage.PrependSignal(chain, out _, out _);
-        var announcement = new QueuedAnnouncement(Input, language, provider.LeadOut(Delay), PhrasesPage.Signals.Selected, PhrasesPage.Signals.Selected == SignalManager.DefaultSignal);
+        var announcement = new QueuedAnnouncement(Input, language, segments, format.Value, PhrasesPage.Signals.Selected);
         _provider ??= new QueueSampleProvider(Queue, announcement);
         Queue.Add(announcement);
         if (startPlayback)

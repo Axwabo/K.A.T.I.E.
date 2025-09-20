@@ -17,12 +17,6 @@ public static class SampleProviderExtensions
         return new RawSourceSampleProvider(provider.WaveFormat, buffer, total);
     }
 
-    public static OffsetSampleProvider LeadOut(this ISampleProvider provider, TimeSpan duration)
-    {
-        if (provider is not OffsetSampleProvider offset)
-            return new OffsetSampleProvider(provider) {LeadOut = duration};
-        offset.LeadOut = duration;
-        return offset;
-    }
+    public static OffsetSampleProvider LeadOut(this ISampleProvider provider, TimeSpan duration) => new(provider) {LeadOut = duration};
 
 }
