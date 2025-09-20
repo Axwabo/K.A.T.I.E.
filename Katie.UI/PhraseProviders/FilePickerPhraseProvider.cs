@@ -10,14 +10,7 @@ internal sealed class FilePickerPhraseProvider : IPhraseProvider
     {
         Title = "Add phrases",
         AllowMultiple = true,
-        FileTypeFilter =
-        [
-            new FilePickerFileType("Wave files")
-            {
-                Patterns = ["*.wav"],
-                MimeTypes = ["audio/wav"]
-            }
-        ]
+        FileTypeFilter = [StorageWrapper.WaveFiles]
     };
 
     private readonly StorageWrapper _storage;

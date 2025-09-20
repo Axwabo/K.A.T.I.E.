@@ -1,0 +1,17 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Katie.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Katie.UI.Views.ExportPageView"
+             x:DataType="viewModels:ExportPageViewModel">
+    <Grid RowDefinitions="100,Auto,Auto" RowSpacing="5">
+        <TextBox Text="{Binding Input}" Watermark="Enter text to announce" TextWrapping="Wrap" />
+        <UserControl Grid.Row="1" Content="{Binding PhrasesPage.Signals}" />
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="5" IsEnabled="{Binding CanSave}">
+            <Button Command="{Binding ExportCommand}" CommandParameter="Hungarian">Export Hungarian</Button>
+            <Button Command="{Binding ExportCommand}" CommandParameter="English">Export English</Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

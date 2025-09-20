@@ -5,6 +5,12 @@ namespace Katie.UI.Services;
 public sealed class StorageWrapper
 {
 
+    public static FilePickerFileType WaveFiles { get; } = new("Wave files")
+    {
+        Patterns = ["*.wav"],
+        MimeTypes = ["audio/wav"]
+    };
+
     private readonly HostControl? _host;
 
     private IStorageProvider? _provider;
@@ -22,8 +28,5 @@ public sealed class StorageWrapper
 
     public Task<IStorageFile?> SaveFilePickerAsync(FilePickerSaveOptions options)
         => Provider?.SaveFilePickerAsync(options) ?? Task.FromResult<IStorageFile?>(null);
-
-    public Task<IStorageFolder?> TryGetFolderFromPathAsync(Uri folderPath)
-        => Provider?.TryGetFolderFromPathAsync(folderPath) ?? Task.FromResult<IStorageFolder?>(null);
 
 }

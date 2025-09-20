@@ -18,6 +18,7 @@
             <UserControl Content="{Binding Cache}" IsVisible="{Binding CacheVisible}" />
             <UserControl Content="{Binding Inspect}" IsVisible="{Binding InspectVisible}" />
             <UserControl Content="{Binding Queue}" IsVisible="{Binding QueueVisible}" />
+            <UserControl Content="{Binding Export}" IsVisible="{Binding ExportVisible}" />
         </Panel>
     </Grid>
 </UserControl>

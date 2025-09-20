@@ -11,6 +11,7 @@ internal static class ServiceProviderExtensions
             .AddSingleton<CacheManagerViewModel>()
             .AddSingleton<SignalsViewModel>()
             .AddSingleton<InspectPageViewModel>()
-            .AddSingleton<QueuePageViewModel>();
+            .AddSingleton<QueuePageViewModel>()
+            .AddSingleton<ExportPageViewModel>();
 
 }

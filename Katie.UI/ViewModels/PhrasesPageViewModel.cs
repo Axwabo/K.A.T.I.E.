@@ -125,10 +125,7 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
             return;
         Progress = 0;
 
-        var (signalProvider, signalName, signalDuration) = Signals.Selected;
-        var provider = Signals.Selected == SignalManager.DefaultSignal
-            ? chain
-            : new RestartingSampleProvider(signalProvider, chain.WaveFormat).FollowedBy(chain);
+        var provider = PrependSignal(chain, out var signalName, out var signalDuration);
         using var player = _factory.CreatePlayer(provider);
         await player.Play();
         var totalTime = signalDuration + chain.TotalTime;
@@ -146,6 +143,15 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
         }
 
         await player.Stop();
+    }
+
+    public ISampleProvider PrependSignal(UtteranceChain chain, out string signalName, out TimeSpan signalDuration)
+    {
+        (var signalProvider, signalName, signalDuration) = Signals.Selected;
+        var provider = Signals.Selected == SignalManager.DefaultSignal
+            ? chain
+            : new RestartingSampleProvider(signalProvider, chain.WaveFormat).FollowedBy(chain);
+        return provider;
     }
 
     [RelayCommand]
