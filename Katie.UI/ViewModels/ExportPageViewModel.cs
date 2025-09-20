@@ -42,13 +42,13 @@ public sealed partial class ExportPageViewModel : ViewModelBase
         var file = await Storage.SaveFilePickerAsync(SaveOptions);
         if (file == null)
             return;
-        var provider = PhrasesPage.PrependSignal(chain, out _, out _).ToWaveProvider16();
+        var provider = PhrasesPage.PrependSignal(chain, out _, out _);
         await using var writer = await file.OpenWriteAsync();
-        await using var waveWriter = new WaveFileWriter(writer, provider.WaveFormat);
-        var buffer = new byte[provider.WaveFormat.AverageBytesPerSecond];
+        await using var waveWriter = new WaveFileWriter(writer, new WaveFormat(provider.WaveFormat.SampleRate, provider.WaveFormat.Channels));
+        var buffer = new float[480];
         int read;
         while ((read = provider.Read(buffer, 0, buffer.Length)) != 0)
-            waveWriter.Write(buffer, 0, read);
+            waveWriter.WriteSamples(buffer, 0, read);
     }
 
 }
