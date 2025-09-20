@@ -1,5 +1,6 @@
 ﻿using Katie.UI.Audio;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Katie.UI.Extensions;
 
@@ -14,6 +15,14 @@ public static class SampleProviderExtensions
         while ((read = provider.Read(buffer, total, Math.Min(4800, buffer.Length - total))) != 0)
             total += read;
         return new RawSourceSampleProvider(provider.WaveFormat, buffer, total);
+    }
+
+    public static OffsetSampleProvider LeadOut(this ISampleProvider provider, TimeSpan duration)
+    {
+        if (provider is not OffsetSampleProvider offset)
+            return new OffsetSampleProvider(provider) {LeadOut = duration};
+        offset.LeadOut = duration;
+        return offset;
     }
 
 }

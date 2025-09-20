@@ -92,7 +92,7 @@ internal sealed class AnnouncementManager : MonoBehaviour
 
     public void Play(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> signal, bool noisy)
     {
-        var chain = UtteranceChain.Parse(text, tree);
+        var chain = UtteranceChain.From(text, tree);
         if (chain == null)
             return;
         if (PhraseCache.TryGetSignal(signal, out var signalProvider))

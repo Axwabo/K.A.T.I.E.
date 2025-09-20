@@ -1,8 +1,9 @@
-﻿using NAudio.Wave;
+﻿using Katie.UI.Signals;
+using NAudio.Wave;
 
 namespace Katie.UI.Audio;
 
-public sealed record QueuedAnnouncement(string Text, string Language, ISampleProvider Provider, string? SignalName);
+public sealed record QueuedAnnouncement(string Text, string Language, ISampleProvider Provider, Signal Signal, bool DefaultSignal);
 
 public sealed partial class QueueSampleProvider : ObservableObject, ISampleProvider
 {

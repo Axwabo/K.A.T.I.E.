@@ -2,7 +2,6 @@
 using System.Threading;
 using CommunityToolkit.Mvvm.Input;
 using Katie.NAudio;
-using Katie.NAudio.Extensions;
 using Katie.UI.Audio;
 using Katie.UI.PhraseProviders;
 using Katie.UI.Services;
@@ -121,7 +120,7 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
         if (_factory == null)
             return;
         var index = ++_playIndex;
-        var chain = UtteranceChain.Parse(Text, Phrases[language]);
+        var chain = UtteranceChain.From(Text, Phrases[language]);
         if (chain == null)
             return;
         Progress = 0;
@@ -149,10 +148,9 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
     public ISampleProvider PrependSignal(UtteranceChain chain, out string signalName, out TimeSpan signalDuration)
     {
         (var signalProvider, signalName, signalDuration) = Signals.Selected;
-        if (Signals.Selected == SignalManager.DefaultSignal)
-            return chain;
-        signalProvider.Position = 0;
-        return signalProvider.ToSampleProvider().EnsureFormat(chain.WaveFormat).FollowedBy(chain);
+        return Signals.Selected == SignalManager.DefaultSignal
+            ? chain
+            : new RestartingSampleProvider(signalProvider, chain.WaveFormat).FollowedBy(chain);
     }
 
     [RelayCommand]
