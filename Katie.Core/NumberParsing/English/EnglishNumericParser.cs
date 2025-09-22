@@ -65,16 +65,20 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
         _shape = NumericShapeDetector.Identify(_text[index..], length);
         (_part, phrase) = _shape switch
         {
-            NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(ref index, length)),
-            NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, interpretation: NumberInterpretation.Ordinal)),
-            NumericTokenShape.TimeHourMinute => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2, false)),
-            NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2, false)),
+            NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(
+                ref index,
+                length,
+                true,
+                length > 3 ? NumberInterpretation.SeparateDigits : NumberInterpretation.Ordinal
+            )),
+            NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, true, NumberInterpretation.Ordinal)),
+            NumericTokenShape.TimeHourMinute or NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2, false)),
             _ => (NumericTokenPart.None, default)
         };
         return _shape is not (NumericTokenShape.None or NumericTokenShape.RegularSuffixed);
     }
 
-    private UtteranceSegment<T> BeginNumber(ref int index, int length, bool trim = true, NumberInterpretation interpretation = NumberInterpretation.Regular)
+    private UtteranceSegment<T> BeginNumber(ref int index, int length, bool trim, NumberInterpretation interpretation = NumberInterpretation.Regular)
     {
         var span = _text[index..(index + length)];
         var advanced = 0;
