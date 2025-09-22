@@ -6,6 +6,8 @@ namespace Katie.Core.NumberParsing;
 public ref struct SequentialNumberParser<T> where T : PhraseBase
 {
 
+    public const int MaxDigits = 3;
+
     private readonly ReadOnlySpan<char> _text;
     private readonly PhraseTree<T> _tree;
     private readonly NumberSettings _settings;
@@ -25,7 +27,7 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
     {
         if (text.IsEmpty)
             throw new ArgumentException("Number text cannot be empty", nameof(text));
-        if (text.Length > 3)
+        if (text.Length > MaxDigits)
             throw new ArgumentException($"Cannot parse a number of {text.Length} digits", nameof(text));
         if (!text.IsDigit())
             throw new ArgumentException("Number text must contain only digits", nameof(text));
