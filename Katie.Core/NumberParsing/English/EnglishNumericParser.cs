@@ -65,10 +65,10 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
         _shape = NumericShapeDetector.Identify(_text[index..], length);
         (_part, phrase) = _shape switch
         {
-            NumericTokenShape.Regular when length > SequentialNumberParser<PhraseBase>.MaxDigits => (NumericTokenPart.None, BeginNumber(ref index, length, false)),
             NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(ref index, length)),
             NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, ordinal: true)),
-            NumericTokenShape.TimeHourMinute or NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2, false)),
+            NumericTokenShape.TimeHourMinute => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2, false)),
+            NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2, false)),
             _ => (NumericTokenPart.None, default)
         };
         return _shape is not (NumericTokenShape.None or NumericTokenShape.RegularSuffixed);

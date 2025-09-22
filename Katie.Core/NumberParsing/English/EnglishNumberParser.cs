@@ -7,25 +7,19 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
 {
 
     private readonly PhraseTree<T> _tree;
-    private readonly ReadOnlySpan<char> _raw;
     private readonly bool _leadingZero;
 
     private int _previousPosition;
 
     private SequentialNumberParser<T> _parser;
 
-    public bool IsActive => _raw.IsEmpty ? _parser.IsActive : _previousPosition < _raw.Length;
+    public bool IsActive => _parser.IsActive;
 
     public EnglishNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal)
     {
         _tree = tree;
-        if (SequentialNumberParser<T>.MaxDigits < text.Length)
-            _raw = text;
-        else
-        {
-            _parser = new SequentialNumberParser<T>(text, tree, Map.Settings, ordinal);
-            _leadingZero = text[0] == '0';
-        }
+        _parser = new SequentialNumberParser<T>(text, tree, Map.Settings, ordinal);
+        _leadingZero = text[0] == '0';
     }
 
     private EnglishNumberParser(PhraseTree<T> tree, SequentialNumberParser<T> parser)
@@ -37,8 +31,6 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
     {
-        if (!_raw.IsEmpty)
-            return NextDigit(out phrase, out advanced);
         if (_parser.Hundred)
             return Advance(out phrase, out advanced);
         var previous = _previousPosition;
@@ -66,13 +58,6 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
             default:
                 return Advance(out phrase, out advanced);
         }
-    }
-
-    private bool NextDigit(out UtteranceSegment<T> phrase, out int advanced)
-    {
-        phrase = _tree.Digit(_raw[_previousPosition++], Map.OneExact);
-        advanced = 1;
-        return true;
     }
 
     private bool Advance(out UtteranceSegment<T> phrase, out int advanced) => _parser.Next(out phrase, out advanced);
@@ -116,7 +101,7 @@ file static class Map
         _ => ""
     };
 
-    public static string OneExact(char digit) => digit switch
+    private static string OneExact(char digit) => digit switch
     {
         '0' => "zero",
         '1' => "one",
