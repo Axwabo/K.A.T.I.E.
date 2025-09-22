@@ -69,7 +69,7 @@ public ref struct EnglishNumericParser<T> where T : PhraseBase
                 ref index,
                 length,
                 true,
-                length > 3 ? NumberInterpretation.SeparateDigits : NumberInterpretation.Ordinal
+                length > 3 ? NumberInterpretation.SeparateDigits : NumberInterpretation.Regular
             )),
             NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, true, NumberInterpretation.Ordinal)),
             NumericTokenShape.TimeHourMinute or NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2, false)),

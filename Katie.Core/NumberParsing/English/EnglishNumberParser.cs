@@ -31,11 +31,11 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
     {
-        if (_parser.Hundred || _parser.Interpretation == NumberInterpretation.SeparateDigits)
+        if (_parser.Thousand || _parser.Hundred || _parser.Interpretation == NumberInterpretation.SeparateDigits)
             return Advance(out phrase, out advanced);
         var previous = _previousPosition;
         _previousPosition = _parser.PositionalIndex;
-        if (previous == 2 && _parser.PositionalIndex < 2)
+        if (previous is 2 or 3 && _parser.PositionalIndex < 2)
         {
             phrase = _tree.RootPhrase("and");
             advanced = 0;
@@ -70,7 +70,7 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
 file static class Map
 {
 
-    public static NumberSettings Settings { get; } = new(Ten, Ten, Ten, OneExact, OneOrdinal, "hundred", true);
+    public static NumberSettings Settings { get; } = new(Ten, Ten, Ten, OneExact, OneOrdinal, "hundred", "thousand", true);
 
     public static string TenTy(char one) => one switch
     {

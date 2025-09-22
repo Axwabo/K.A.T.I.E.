@@ -19,7 +19,7 @@ public ref struct HungarianNumberParser<T> where T : PhraseBase
 file static class Map
 {
 
-    public static NumberSettings Settings { get; } = new(Ten, TenExact, TenOrdinal, One, Ordinal, "száz", false);
+    public static NumberSettings Settings { get; } = new(Ten, TenExact, TenOrdinal, One, Ordinal, "száz", "ezer", false);
 
     private static string Ten(char digit) => digit switch
     {

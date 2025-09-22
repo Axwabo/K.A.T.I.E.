@@ -6,13 +6,15 @@ namespace Katie.Core.NumberParsing;
 public ref struct SequentialNumberParser<T> where T : PhraseBase
 {
 
-    public const int MaxDigits = 3;
+    public const int MaxDigits = 4;
 
     private readonly ReadOnlySpan<char> _text;
     private readonly PhraseTree<T> _tree;
     private readonly NumberSettings _settings;
 
     public NumberInterpretation Interpretation { get; }
+
+    public bool Thousand { get; private set; }
 
     public bool Hundred { get; private set; }
 
@@ -22,7 +24,7 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
         ? _text[Math.Max(0, _text.Length - PositionalIndex - 1)]
         : throw new InvalidOperationException("Cannot access the digit on an inactive parser");
 
-    public bool IsActive => (Hundred || PositionalIndex != -1) && !_text.IsEmpty;
+    public bool IsActive => (Thousand || Hundred || PositionalIndex != -1) && !_text.IsEmpty;
 
     public SequentialNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, NumberSettings settings, NumberInterpretation interpretation)
     {
@@ -43,6 +45,14 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
     {
         if (Interpretation == NumberInterpretation.SeparateDigits)
             return NextDigit(out phrase, out advanced);
+        if (Thousand)
+        {
+            phrase = _tree.RootPhrase(_settings.Thousand);
+            advanced = 0;
+            Thousand = false;
+            return true;
+        }
+
         if (Hundred)
         {
             phrase = _tree.RootPhrase(_settings.Hundred);
@@ -53,6 +63,9 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
 
         switch (PositionalIndex)
         {
+            case 3:
+                ProcessThousand(out phrase, out advanced);
+                return true;
             case 2:
                 ProcessHundred(out phrase, out advanced);
                 return true;
@@ -73,12 +86,22 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
 
     private void ProcessHundred(out UtteranceSegment<T> phrase, out int advanced)
     {
-        var hundredNow = !_settings.OneBeforeHundred && _text[^3] == '1';
+        var hundredNow = !_settings.ExplicitOne && _text[^3] == '1';
         var zeroes = _text.Count('0', ^2);
         phrase = hundredNow ? _tree.RootPhrase(_settings.Hundred) : _tree.Digit(_text[^3], _settings.OneExact);
         advanced = 1 + zeroes;
         PositionalIndex -= advanced;
         Hundred = !hundredNow;
+    }
+
+    private void ProcessThousand(out UtteranceSegment<T> phrase, out int advanced)
+    {
+        var thousandNow = !_settings.ExplicitOne && _text[^4] == '1';
+        var zeroes = _text.Count('0', ^3);
+        phrase = thousandNow ? _tree.RootPhrase(_settings.Thousand) : _tree.Digit(_text[^4], _settings.OneExact);
+        advanced = 1 + zeroes;
+        PositionalIndex -= advanced;
+        Thousand = !thousandNow;
     }
 
     private void ProcessTen(out UtteranceSegment<T> phrase, out int advanced)
