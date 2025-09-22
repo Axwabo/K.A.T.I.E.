@@ -9,7 +9,8 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
     private readonly ReadOnlySpan<char> _text;
     private readonly PhraseTree<T> _tree;
     private readonly NumberSettings _settings;
-    private readonly bool _isOrdinal;
+
+    public NumberInterpretation Interpretation { get; }
 
     public bool Hundred { get; private set; }
 
@@ -21,23 +22,25 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
 
     public bool IsActive => (Hundred || PositionalIndex != -1) && !_text.IsEmpty;
 
-    public SequentialNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, NumberSettings settings, bool isOrdinal)
+    public SequentialNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, NumberSettings settings, NumberInterpretation interpretation)
     {
         if (text.IsEmpty)
             throw new ArgumentException("Number text cannot be empty", nameof(text));
-        if (text.Length > 3)
+        if (interpretation != NumberInterpretation.SeparateDigits && text.Length > 3)
             throw new ArgumentException($"Cannot parse a number of {text.Length} digits", nameof(text));
         if (!text.IsDigit())
             throw new ArgumentException("Number text must contain only digits", nameof(text));
         _text = text;
         _tree = tree;
         _settings = settings;
-        _isOrdinal = isOrdinal;
+        Interpretation = interpretation;
         PositionalIndex = _text.Length - 1;
     }
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
     {
+        if (Interpretation == NumberInterpretation.SeparateDigits)
+            return NextDigit(out phrase, out advanced);
         if (Hundred)
         {
             phrase = _tree.RootPhrase(_settings.Hundred);
@@ -55,7 +58,7 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
                 ProcessTen(out phrase, out advanced);
                 return true;
             case 0:
-                phrase = _tree.Digit(Digit, _isOrdinal ? _settings.OneOrdinal : _settings.OneExact);
+                phrase = _tree.Digit(Digit, Interpretation == NumberInterpretation.Ordinal ? _settings.OneOrdinal : _settings.OneExact);
                 advanced = 1;
                 PositionalIndex = -1;
                 return true;
@@ -80,7 +83,7 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
     {
         if (_text[^1] == '0')
         {
-            phrase = _tree.Digit(_text[^2], _isOrdinal ? _settings.TenOrdinal : _settings.TenExact);
+            phrase = _tree.Digit(_text[^2], Interpretation == NumberInterpretation.Ordinal ? _settings.TenOrdinal : _settings.TenExact);
             advanced = 2;
             PositionalIndex = -1;
             return;
@@ -91,13 +94,21 @@ public ref struct SequentialNumberParser<T> where T : PhraseBase
         PositionalIndex = 0;
     }
 
-    public static SequentialNumberParser<T> CreateTrimmed(ReadOnlySpan<char> text, PhraseTree<T> tree, NumberSettings mappers, bool isOrdinal, out int advanced)
+    private bool NextDigit(out UtteranceSegment<T> phrase, out int advanced)
+    {
+        phrase = _tree.Digit(Digit, _settings.OneExact);
+        advanced = 1;
+        PositionalIndex--;
+        return true;
+    }
+
+    public static SequentialNumberParser<T> CreateTrimmed(ReadOnlySpan<char> text, PhraseTree<T> tree, NumberSettings mappers, NumberInterpretation interpretation, out int advanced)
     {
         var trimmed = text.TrimStart('0');
         if (trimmed.IsEmpty)
             trimmed = "0";
         advanced = text.Length - trimmed.Length;
-        return new SequentialNumberParser<T>(trimmed, tree, mappers, isOrdinal);
+        return new SequentialNumberParser<T>(trimmed, tree, mappers, interpretation);
     }
 
 }

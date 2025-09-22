@@ -98,20 +98,20 @@ public ref struct HungarianNumericParser<T> where T : PhraseBase
         {
             NumericTokenShape.Regular => (NumericTokenPart.None, BeginNumber(ref index, length)),
             NumericTokenShape.RegularSuffixed => (NumericTokenPart.BeforeRegularSuffix, BeginSuffixed(ref index)),
-            NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, true)),
+            NumericTokenShape.Ordinal => (NumericTokenPart.None, BeginNumber(ref index, length, NumberInterpretation.Ordinal)),
             NumericTokenShape.TimeHourMinute or NumericTokenShape.TimeHourOnly => (NumericTokenPart.HourNumber, BeginNumber(ref index, 2)),
             _ => (NumericTokenPart.None, default)
         };
         return _shape != NumericTokenShape.None;
     }
 
-    private UtteranceSegment<T> BeginNumber(ref int index, int length, bool ordinal = false)
+    private UtteranceSegment<T> BeginNumber(ref int index, int length, NumberInterpretation interpretation = NumberInterpretation.Regular)
     {
-        _numberParser = new HungarianNumberParser<T>(_text[index..(index + length)], _tree, ordinal, out var advanced);
+        _numberParser = new HungarianNumberParser<T>(_text[index..(index + length)], _tree, interpretation, out var advanced);
         index += advanced;
         _numberParser.Next(out var phrase, out advanced);
         index += advanced;
-        if (ordinal)
+        if (interpretation == NumberInterpretation.Ordinal)
             index++;
         return phrase;
     }

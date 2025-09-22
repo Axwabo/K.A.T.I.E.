@@ -15,10 +15,10 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
 
     public bool IsActive => _parser.IsActive;
 
-    public EnglishNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal)
+    public EnglishNumberParser(ReadOnlySpan<char> text, PhraseTree<T> tree, NumberInterpretation interpretation)
     {
         _tree = tree;
-        _parser = new SequentialNumberParser<T>(text, tree, Map.Settings, ordinal);
+        _parser = new SequentialNumberParser<T>(text, tree, Map.Settings, interpretation);
         _leadingZero = text[0] == '0';
     }
 
@@ -31,7 +31,7 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
 
     public bool Next(out UtteranceSegment<T> phrase, out int advanced)
     {
-        if (_parser.Hundred)
+        if (_parser.Hundred || _parser.Interpretation == NumberInterpretation.SeparateDigits)
             return Advance(out phrase, out advanced);
         var previous = _previousPosition;
         _previousPosition = _parser.PositionalIndex;
@@ -62,8 +62,8 @@ public ref struct EnglishNumberParser<T> where T : PhraseBase
 
     private bool Advance(out UtteranceSegment<T> phrase, out int advanced) => _parser.Next(out phrase, out advanced);
 
-    public static EnglishNumberParser<T> CreateTrimmed(ReadOnlySpan<char> text, PhraseTree<T> tree, bool ordinal, out int advanced)
-        => new(tree, SequentialNumberParser<T>.CreateTrimmed(text, tree, Map.Settings, ordinal, out advanced));
+    public static EnglishNumberParser<T> CreateTrimmed(ReadOnlySpan<char> text, PhraseTree<T> tree, NumberInterpretation interpretation, out int advanced)
+        => new(tree, SequentialNumberParser<T>.CreateTrimmed(text, tree, Map.Settings, interpretation, out advanced));
 
 }
 
