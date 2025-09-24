@@ -24,7 +24,8 @@ public sealed class App : Application
             .AddSingleton<PhraseManager>()
             .AddSingleton<SignalManager>()
             .AddKeyedSingleton<IPhraseProvider, FilePickerPhraseProvider>(nameof(FilePickerPhraseProvider))
-            .AddKeyedSingleton<ISignalProvider, FilePickerSignalProvider>(nameof(FilePickerSignalProvider));
+            .AddKeyedSingleton<ISignalProvider, FilePickerSignalProvider>(nameof(FilePickerSignalProvider))
+            .AddKeyedSingleton<IInitialPhraseLoader, ZipPhraseLoader>(nameof(ZipPhraseLoader));
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

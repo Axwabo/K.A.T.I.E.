@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Katie.UI.Browser.JSInterop;
+using Katie.UI.Extensions;
 using Katie.UI.Signals;
 
 namespace Katie.UI.Browser.Caching;

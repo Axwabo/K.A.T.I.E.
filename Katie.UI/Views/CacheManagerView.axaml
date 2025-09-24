@@ -35,6 +35,7 @@
         </Grid>
         <TextBlock Grid.Row="1" TextWrapping="Wrap" HorizontalAlignment="Center" Text="{OnPlatform Browser={Binding BrowserInfo}, Default={Binding DefaultInfo}}" />
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+            <Button Command="{Binding LoadArchiveCommand}">Load From Archive</Button>
             <Button Command="{Binding CacheSignalsCommand}">Cache Signals</Button>
             <Button Command="{Binding CacheEverythingCommand}">Cache Everything</Button>
         </StackPanel>

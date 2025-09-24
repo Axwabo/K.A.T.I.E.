@@ -1,10 +1,7 @@
 ﻿using System.IO;
-using System.Threading.Tasks;
-using Katie.NAudio.Phrases;
 using Katie.UI.Extensions;
-using Katie.UI.PhraseProviders;
 
-namespace Katie.UI.Browser;
+namespace Katie.UI.PhraseProviders;
 
 public sealed class MemoryPhraseConverter : IStreamToPhraseConverter
 {

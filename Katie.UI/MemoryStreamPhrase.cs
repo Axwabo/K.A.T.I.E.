@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using Katie.NAudio.Phrases;
+using Katie.UI.Extensions;
 
-namespace Katie.UI.Browser;
+namespace Katie.UI;
 
 public sealed class MemoryStreamPhrase : WaveStreamPhrase
 {

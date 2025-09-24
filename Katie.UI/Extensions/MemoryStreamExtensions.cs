@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Katie.UI.Browser;
+namespace Katie.UI.Extensions;
 
 public static class MemoryStreamExtensions
 {
