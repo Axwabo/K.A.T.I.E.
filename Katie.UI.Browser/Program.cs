@@ -29,7 +29,7 @@ internal static class Program
 
     private static IServiceCollection CreateServiceCollection() => new ServiceCollection()
         .AddSingleton<IAudioPlayerFactory, WebAudioFactory>()
-        .AddSingleton<IFileToPhraseConverter, MemoryPhraseConverter>()
+        .AddSingleton<IStreamToPhraseConverter, MemoryPhraseConverter>()
         .AddSingleton<IPhraseCacheManager, CacheStoragePhraseManager>()
         .AddSingleton<IInitialPhraseLoader, CacheStoragePhraseLoader>()
         .AddSingleton<ISignalProvider, CacheStorageSignalLoader>()

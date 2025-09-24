@@ -23,7 +23,7 @@ internal static class Program
 
     private static IServiceCollection CreateServiceCollection() => new ServiceCollection()
         .AddSingleton<IAudioPlayerFactory, SoundFlowFactory>()
-        .AddSingleton<IFileToPhraseConverter, FileStreamToPhraseConverter>()
+        .AddSingleton<IStreamToPhraseConverter, FileStreamToPhraseConverter>()
         .AddInitialProviders();
 
 }

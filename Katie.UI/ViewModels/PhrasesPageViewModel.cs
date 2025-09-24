@@ -98,7 +98,7 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
         _cts?.Cancel();
     }
 
-    private async Task LoadInitialPhrases(IInitialPhraseLoader? initialPhrases)
+    public async Task LoadInitialPhrases(IInitialPhraseLoader? initialPhrases)
     {
         BlockingOperation = "Loading phrases...";
         EnableCancellation();
