@@ -16,7 +16,7 @@ public sealed class CacheStorageSignalLoader : ISignalProvider
             foreach (var key in keys.Order())
             {
                 var bytes = SignalCacheFunctions.Load(key);
-                var stream = new MemoryStream(bytes);
+                var stream = new MemoryStream(bytes, 0, bytes.Length, false, true);
                 yield return await Signal.LoadIntoMemory(stream, key);
             }
         }
