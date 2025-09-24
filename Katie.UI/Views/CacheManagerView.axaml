@@ -38,6 +38,8 @@
             <Button Command="{Binding LoadArchiveCommand}">Load From Archive</Button>
             <Button Command="{Binding CacheSignalsCommand}">Cache Signals</Button>
             <Button Command="{Binding CacheEverythingCommand}">Cache Everything</Button>
+            <Button Command="{Binding ClearPhraseCacheCommand}" IsVisible="{Binding PhraseCache, Converter={x:Static ObjectConverters.IsNotNull}}">Clear Phrase Cache</Button>
+            <Button Command="{Binding ClearSignalCacheCommand}" IsVisible="{Binding PhraseCache, Converter={x:Static ObjectConverters.IsNotNull}}">Clear Signal Cache</Button>
         </StackPanel>
     </Grid>
 </UserControl>
