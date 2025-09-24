@@ -24,6 +24,7 @@ internal static class Program
     private static IServiceCollection CreateServiceCollection() => new ServiceCollection()
         .AddSingleton<IAudioPlayerFactory, SoundFlowFactory>()
         .AddSingleton<IStreamToPhraseConverter, FileStreamToPhraseConverter>()
+        .AddSingleton<IZipOpener, DirectZipOpener>()
         .AddInitialProviders();
 
 }

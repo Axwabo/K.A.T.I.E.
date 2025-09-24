@@ -22,15 +22,20 @@ internal sealed class ZipPhraseLoader : IInitialPhraseLoader
     };
 
     private readonly StorageWrapper _storage;
+    private readonly IZipOpener _zipOpener;
     private readonly MemoryPhraseConverter _converter = new();
 
-    public ZipPhraseLoader(StorageWrapper storage) => _storage = storage;
+    public ZipPhraseLoader(StorageWrapper storage, IZipOpener zipOpener)
+    {
+        _storage = storage;
+        _zipOpener = zipOpener;
+    }
 
     public async Task LoadPhrasesAsync(PhrasePackViewModel hungarian, PhrasePackViewModel english, PhrasePackViewModel global)
     {
         if (await _storage.OpenFilePickerAsync(Options) is not [var file])
             return;
-        using var zipArchive = new ZipArchive(await file.OpenReadAsync());
+        using var zipArchive = await _zipOpener.OpenArchiveAsync(file);
         await LoadEntries(zipArchive, hungarian, english, global);
     }
 

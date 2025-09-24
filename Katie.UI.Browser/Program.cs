@@ -33,6 +33,7 @@ internal static class Program
         .AddSingleton<IPhraseCacheManager, CacheStoragePhraseManager>()
         .AddSingleton<IInitialPhraseLoader, CacheStoragePhraseLoader>()
         .AddSingleton<ISignalProvider, CacheStorageSignalLoader>()
-        .AddSingleton<ISignalCacheManager, CacheStorageSignalManager>();
+        .AddSingleton<ISignalCacheManager, CacheStorageSignalManager>()
+        .AddSingleton<IZipOpener, BrowserZipOpener>();
 
 }
