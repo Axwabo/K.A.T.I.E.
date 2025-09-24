@@ -24,6 +24,7 @@ public sealed class WebAudioPlayer : IAudioPlayer
 
     public async Task Stop()
     {
+        Provider = null;
         await WebAudioFunctions.Stop();
         IsPlaying = false;
     }

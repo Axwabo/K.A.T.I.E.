@@ -1,4 +1,5 @@
-﻿using Avalonia.Platform.Storage;
+﻿using System.IO;
+using Avalonia.Platform.Storage;
 using Katie.UI.Services;
 
 namespace Katie.UI.Signals;
@@ -29,7 +30,7 @@ internal sealed class FilePickerSignalProvider : ISignalProvider
         foreach (var file in await _storage.OpenFilePickerAsync(Options))
         {
             await using var fileStream = await file.OpenReadAsync();
-            yield return await Signal.LoadIntoMemory(fileStream, file.Name);
+            yield return await Signal.LoadIntoMemory(fileStream, Path.GetFileNameWithoutExtension(file.Name));
         }
     }
 
