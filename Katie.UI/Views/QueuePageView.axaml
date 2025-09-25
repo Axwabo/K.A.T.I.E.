@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Katie.UI.ViewModels"
+             xmlns:controls="clr-namespace:Katie.UI.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Katie.UI.Views.QueuePageView"
              x:DataType="viewModels:QueuePageViewModel">
@@ -14,18 +15,7 @@
             <Button Command="{Binding EnqueueCommand}" CommandParameter="English">Queue English</Button>
         </StackPanel>
         <ScrollViewer Grid.Row="3">
-            <ItemsControl ItemsSource="{Binding Queue}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,Auto,Auto">
-                            <TextBlock Grid.ColumnSpan="3" Text="{Binding Text}" TextWrapping="Wrap" />
-                            <Label Grid.Row="1" Grid.Column="1" Content="{Binding Language}" FontWeight="Bold" />
-                            <Label Grid.Row="1" Grid.Column="2" Content="{OnPlatform Browser=Signal:, Default=🎵}" IsVisible="{Binding !DefaultSignal}" />
-                            <Label Grid.Row="1" Grid.Column="3" Content="{Binding Signal.Name}" IsVisible="{Binding !DefaultSignal}" />
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <controls:QuewueDisplay DataContext="{Binding}" />
         </ScrollViewer>
     </Grid>
 </UserControl>

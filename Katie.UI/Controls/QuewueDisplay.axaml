@@ -1,0 +1,27 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Katie.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Katie.UI.Controls.QuewueDisplay"
+             x:DataType="viewModels:QueuePageViewModel"
+             x:Name="Root">
+    <UserControl.Styles>
+        <Style Selector="Grid.current">
+            <Setter Property="Background" Value="#4432FF00" />
+        </Style>
+    </UserControl.Styles>
+    <ItemsControl ItemsSource="{Binding Queue}" x:Name="Items">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,Auto,Auto" Tag="{Binding}">
+                    <TextBlock Grid.ColumnSpan="3" Text="{Binding Text}" TextWrapping="Wrap" />
+                    <Label Grid.Row="1" Grid.Column="1" Content="{Binding Language}" FontWeight="Bold" />
+                    <Label Grid.Row="1" Grid.Column="2" Content="{OnPlatform Browser=Signal:, Default=🎵}" IsVisible="{Binding !DefaultSignal}" />
+                    <Label Grid.Row="1" Grid.Column="3" Content="{Binding Signal.Name}" IsVisible="{Binding !DefaultSignal}" />
+                </Grid>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

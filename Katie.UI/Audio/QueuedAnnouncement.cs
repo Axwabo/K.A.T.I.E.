@@ -12,7 +12,13 @@ public sealed record QueuedAnnouncement(string Text, string Language, Queue<Utte
 
     public bool DefaultSignal => Signal == SignalManager.DefaultSignal;
 
+    private UtteranceChain? _utteranceChain;
+
     private ISampleProvider? _provider;
+
+    public TimeSpan CurrentTime => _utteranceChain?.CurrentTime ?? TimeSpan.Zero;
+
+    public TimeSpan TotalTime => _utteranceChain?.TotalTime ?? TimeSpan.Zero;
 
     public ISampleProvider Provider
     {
@@ -20,7 +26,8 @@ public sealed record QueuedAnnouncement(string Text, string Language, Queue<Utte
         {
             if (_provider != null)
                 return _provider;
-            ISampleProvider provider = new UtteranceChain(Segments.Dequeue(), Segments, Format);
+            _utteranceChain = new UtteranceChain(Segments.Dequeue(), Segments, Format);
+            ISampleProvider provider = _utteranceChain;
             if (!DefaultSignal)
                 provider = new RestartingSampleProvider(Signal.Provider, Format).FollowedBy(provider);
             return _provider = provider.LeadOut(TimeSpan.FromSeconds(3));
