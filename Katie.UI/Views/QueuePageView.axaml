@@ -7,12 +7,18 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Katie.UI.Views.QueuePageView"
              x:DataType="viewModels:QueuePageViewModel">
+    <Design.DataContext>
+        <viewModels:QueuePageViewModel />
+    </Design.DataContext>
     <Grid RowDefinitions="100,Auto,Auto,*" RowSpacing="5">
         <TextBox Text="{Binding Input}" Watermark="Enter text to announce" TextWrapping="Wrap" />
         <UserControl Grid.Row="1" Content="{Binding PhrasesPage.Signals}" />
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="5">
             <Button Command="{Binding EnqueueCommand}" CommandParameter="Hungarian">Queue Hungarian</Button>
             <Button Command="{Binding EnqueueCommand}" CommandParameter="English">Queue English</Button>
+            <Button Command="{Binding RestartAllCommand}">Restart All</Button>
+            <Button Command="{Binding ClearCommand}">Clear</Button>
+            <Button Command="{Binding TogglePauseCommand}" Content="{Binding PlayPauseText}" />
         </StackPanel>
         <ScrollViewer Grid.Row="3">
             <controls:QuewueDisplay DataContext="{Binding}" />

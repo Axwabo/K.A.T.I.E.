@@ -19,6 +19,15 @@ public sealed partial class QueuePageViewModel : ViewModelBase
     [ObservableProperty]
     private string _input = "";
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PlayPauseText))]
+    private bool _playing;
+
+    [ObservableProperty]
+    private bool _canTogglePlayback;
+
+    public string PlayPauseText => Playing ? "Pause" : "Resume";
+
     public QueuedAnnouncement? Current => _provider?.Current;
 
     public QueuePageViewModel(PhrasesPageViewModel phrasesPage, IAudioPlayerFactory? factory)
@@ -32,16 +41,18 @@ public sealed partial class QueuePageViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void Enqueue(string language)
+    private void Enqueue(string language) => Enqueue(Input, language);
+
+    private void Enqueue(string input, string language)
     {
         if (_factory == null)
             return;
         var format = _provider == null ? (SimpleWaveFormat?) null : (SimpleWaveFormat) _provider.WaveFormat;
-        var segments = UtteranceChain.ParseToQueue(Input, PhrasesPage.Phrases[language], ref format);
+        var segments = UtteranceChain.ParseToQueue(input, PhrasesPage.Phrases[language], ref format);
         if (segments.Count == 0)
             return;
         var startPlayback = _provider == null;
-        var announcement = new QueuedAnnouncement(Input, language, segments, format.Value, PhrasesPage.Signals.Selected);
+        var announcement = new QueuedAnnouncement(input, language, segments, format.Value, PhrasesPage.Signals.Selected);
         _provider ??= new QueueSampleProvider(Queue, announcement);
         Queue.Add(announcement);
         if (startPlayback)
@@ -52,10 +63,39 @@ public sealed partial class QueuePageViewModel : ViewModelBase
     {
         using var player = _factory!.CreatePlayer(_provider!);
         await player.Play();
-        while (player.IsPlaying)
+        Playing = true;
+        CanTogglePlayback = true;
+        while (player.IsPlaying && Playing)
             await Task.Delay(10);
-        _provider = null;
+        Playing = false;
+        Dispatcher.UIThread.Post(() => CanTogglePlayback = _provider != null);
         await player.Stop();
+    }
+
+    [RelayCommand]
+    private void TogglePause()
+    {
+        if (Playing)
+            Playing = false;
+        else
+            _ = Play().ConfigureAwait(false);
+    }
+
+    [RelayCommand]
+    private void Clear()
+    {
+        Playing = false;
+        _provider = null;
+        Queue.Clear();
+    }
+
+    [RelayCommand]
+    private void RestartAll()
+    {
+        var announcements = Queue.Select(e => (e.Text, e.Language)).ToArray();
+        Clear();
+        foreach (var (text, language) in announcements)
+            Enqueue(text, language);
     }
 
 }
