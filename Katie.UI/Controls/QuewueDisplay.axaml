@@ -18,7 +18,7 @@
     <ItemsControl ItemsSource="{Binding Queue}" x:Name="Items">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <Border Classes="announcement queued" Padding="2" Tag="{Binding}">
+                <Border Classes="announcement queued" Padding="5" Tag="{Binding}">
                     <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto,Auto,Auto" RowSpacing="2">
                         <TextBlock Grid.ColumnSpan="3" Text="{Binding Text}" TextWrapping="Wrap" />
                         <Label Grid.Row="1" Grid.Column="1" Content="{Binding Language}" FontWeight="Bold" />

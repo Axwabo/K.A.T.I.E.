@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Katie.NAudio;
 using Katie.UI.Audio;
+using Katie.UI.Signals;
 
 namespace Katie.UI.ViewModels;
 
@@ -41,9 +42,9 @@ public sealed partial class QueuePageViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void Enqueue(string language) => Enqueue(Input, language);
+    private void Enqueue(string language) => Enqueue(Input, language, PhrasesPage.Signals.Selected);
 
-    private void Enqueue(string input, string language)
+    private void Enqueue(string input, string language, Signal signal)
     {
         if (_factory == null)
             return;
@@ -52,7 +53,7 @@ public sealed partial class QueuePageViewModel : ViewModelBase
         if (segments.Count == 0)
             return;
         var startPlayback = _provider == null;
-        var announcement = new QueuedAnnouncement(input, language, segments, format.Value, PhrasesPage.Signals.Selected);
+        var announcement = new QueuedAnnouncement(input, language, segments, format.Value, signal);
         _provider ??= new QueueSampleProvider(Queue, announcement);
         Queue.Add(announcement);
         if (startPlayback)
@@ -92,10 +93,10 @@ public sealed partial class QueuePageViewModel : ViewModelBase
     [RelayCommand]
     private void RestartAll()
     {
-        var announcements = Queue.Select(e => (e.Text, e.Language)).ToArray();
+        var announcements = Queue.Select(e => (e.Text, e.Language, e.Signal)).ToArray();
         Clear();
-        foreach (var (text, language) in announcements)
-            Enqueue(text, language);
+        foreach (var (text, language, signal) in announcements)
+            Enqueue(text, language, signal);
     }
 
 }
