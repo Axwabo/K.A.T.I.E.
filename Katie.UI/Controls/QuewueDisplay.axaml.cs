@@ -1,29 +1,32 @@
-﻿using System.ComponentModel;
+﻿using System.Threading;
+using Avalonia.VisualTree;
 
 namespace Katie.UI.Controls;
 
 public sealed partial class QuewueDisplay : UserControl
 {
 
-    public QuewueDisplay() => InitializeComponent();
+    private readonly CancellationTokenSource _cts = new();
 
-    protected override void OnDataContextChanged(EventArgs e)
+    public QuewueDisplay()
     {
-        base.OnDataContextChanged(e);
-        if (DataContext is not QueuePageViewModel vm)
-            return;
-        vm.PropertyChanged += VmOnPropertyChanged;
+        InitializeComponent();
+        UpdateAsync(_cts.Token).ConfigureAwait(false);
     }
 
-    private void VmOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private async Task UpdateAsync(CancellationToken token)
     {
-        if (e.PropertyName == nameof(QueuePageViewModel.Current))
-            SetHighlight(((QueuePageViewModel) sender!).Current);
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
+        while (await timer.WaitForNextTickAsync(token))
+            Dispatcher.UIThread.Post(SetHighlight);
     }
 
-    private void SetHighlight(object? announcement)
+    private void SetHighlight()
     {
-        var children = Items.Presenter.Panel.Children;
+        var current = ((QueuePageViewModel) DataContext!).Current;
+        foreach (var control in this.GetVisualDescendants())
+            if (control is Grid grid)
+                grid.Classes.Set("current", ReferenceEquals(current, grid.Tag));
     }
 
 }

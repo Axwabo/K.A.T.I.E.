@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Katie.NAudio;
 using Katie.UI.Audio;
@@ -20,8 +19,7 @@ public sealed partial class QueuePageViewModel : ViewModelBase
     [ObservableProperty]
     private string _input = "";
 
-    [ObservableProperty]
-    private QueuedAnnouncement? _current;
+    public QueuedAnnouncement? Current => _provider?.Current;
 
     public QueuePageViewModel(PhrasesPageViewModel phrasesPage, IAudioPlayerFactory? factory)
     {
@@ -44,12 +42,7 @@ public sealed partial class QueuePageViewModel : ViewModelBase
             return;
         var startPlayback = _provider == null;
         var announcement = new QueuedAnnouncement(Input, language, segments, format.Value, PhrasesPage.Signals.Selected);
-        if (_provider == null)
-        {
-            _provider = new QueueSampleProvider(Queue, announcement);
-            _provider.PropertyChanged += ProviderOnPropertyChanged;
-        }
-
+        _provider ??= new QueueSampleProvider(Queue, announcement);
         Queue.Add(announcement);
         if (startPlayback)
             _ = Play().ConfigureAwait(false);
@@ -61,16 +54,8 @@ public sealed partial class QueuePageViewModel : ViewModelBase
         await player.Play();
         while (player.IsPlaying)
             await Task.Delay(10);
-        _provider!.PropertyChanged -= ProviderOnPropertyChanged;
         _provider = null;
-        Current = null;
         await player.Stop();
-    }
-
-    private void ProviderOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(QueueSampleProvider.Current))
-            Dispatcher.UIThread.Post(() => Current = _provider?.Current);
     }
 
 }

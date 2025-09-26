@@ -2,20 +2,19 @@
 
 namespace Katie.UI.Audio;
 
-public sealed partial class QueueSampleProvider : ObservableObject, ISampleProvider
+public sealed partial class QueueSampleProvider : ISampleProvider
 {
 
     public IList<QueuedAnnouncement> List { get; }
 
-    [ObservableProperty]
-    private QueuedAnnouncement? _current;
+    public QueuedAnnouncement? Current { get; private set; }
 
     public WaveFormat WaveFormat { get; }
 
     public QueueSampleProvider(IList<QueuedAnnouncement> list, QueuedAnnouncement initial)
     {
         List = list;
-        _current = initial;
+        Current = initial;
         WaveFormat = initial.Provider.WaveFormat;
     }
 
