@@ -24,7 +24,7 @@
                         <Label Grid.Row="1" Grid.Column="1" Content="{Binding Language}" FontWeight="Bold" />
                         <Label Grid.Row="1" Grid.Column="2" Content="{OnPlatform Browser=Signal:, Default=🎵}" IsVisible="{Binding !DefaultSignal}" />
                         <Label Grid.Row="1" Grid.Column="3" Content="{Binding Signal.Name}" IsVisible="{Binding !DefaultSignal}" />
-                        <ProgressBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Foreground="Red" Maximum="1" IsIndeterminate="True" />
+                        <ProgressBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Foreground="Red" Maximum="1" />
                     </Grid>
                 </Border>
             </DataTemplate>
