@@ -1,4 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using CommunityToolkit.Mvvm.Input;
 using Katie.NAudio;
 using Katie.UI.Audio;
@@ -8,6 +10,8 @@ namespace Katie.UI.ViewModels;
 
 public sealed partial class QueuePageViewModel : ViewModelBase
 {
+
+    private CancellationTokenSource? _cts;
 
     public PhrasesPageViewModel PhrasesPage { get; }
 
@@ -27,9 +31,7 @@ public sealed partial class QueuePageViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PlayPauseText))]
-    private int _playIndex = -1;
-
-    private bool Playing => PlayIndex != -1;
+    private bool _playing;
 
     public string PlayPauseText => Playing || !HasProvider ? "Pause" : "Resume";
 
@@ -59,35 +61,49 @@ public sealed partial class QueuePageViewModel : ViewModelBase
         var announcement = new QueuedAnnouncement(input, language, segments, format.Value, signal);
         Provider ??= new QueueSampleProvider(Queue, announcement);
         Queue.Add(announcement);
-        if (PlayIndex == -1)
-            _ = Play().ConfigureAwait(false);
+        if (!Playing)
+            Play();
     }
 
-    private async Task Play()
+    private void Play()
     {
-        using var player = _factory!.CreatePlayer(Provider!);
-        await player.Play();
-        var index = PlayIndex = Random.Shared.Next();
-        while (player.IsPlaying && PlayIndex == index)
-            await Task.Delay(10);
-        if (PlayIndex != -1 && PlayIndex != index)
-            return;
-        Dispatcher.UIThread.Post(() =>
+        StopPlayback();
+        _ = PlayCore(_cts.Token).ConfigureAwait(false);
+        return;
+
+        async Task PlayCore(CancellationToken token)
         {
-            PlayIndex = -1;
-            if (Current is null)
-                Provider = null;
-        });
-        await player.Stop();
+            using var player = _factory!.CreatePlayer(Provider!);
+            await player.Play();
+            Dispatcher.UIThread.Post(() => Playing = true);
+            try
+            {
+                while (player.IsPlaying && !token.IsCancellationRequested)
+                    await Task.Delay(10, token);
+            }
+            finally
+            {
+                Dispatcher.UIThread.Post(() => Playing = false);
+                await player.Stop();
+            }
+        }
+    }
+
+    [MemberNotNull(nameof(_cts))]
+    private void StopPlayback()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
     }
 
     [RelayCommand]
     private void TogglePause()
     {
         if (Playing)
-            PlayIndex = -1;
+            StopPlayback();
         else
-            _ = Play().ConfigureAwait(false);
+            Play();
     }
 
     [RelayCommand]
@@ -132,7 +148,7 @@ public sealed partial class QueuePageViewModel : ViewModelBase
     [RelayCommand]
     private void Stop()
     {
-        PlayIndex = -1;
+        StopPlayback();
         Provider = null;
     }
 
