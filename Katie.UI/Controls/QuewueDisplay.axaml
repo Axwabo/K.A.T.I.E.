@@ -8,19 +8,25 @@
              x:DataType="viewModels:QueuePageViewModel"
              x:Name="Root">
     <UserControl.Styles>
-        <Style Selector="Grid.current">
+        <Style Selector="Border.announcement.current">
             <Setter Property="Background" Value="#4432FF00" />
+        </Style>
+        <Style Selector=".queued ProgressBar">
+            <Setter Property="Opacity" Value="0" />
         </Style>
     </UserControl.Styles>
     <ItemsControl ItemsSource="{Binding Queue}" x:Name="Items">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,Auto,Auto" Tag="{Binding}">
-                    <TextBlock Grid.ColumnSpan="3" Text="{Binding Text}" TextWrapping="Wrap" />
-                    <Label Grid.Row="1" Grid.Column="1" Content="{Binding Language}" FontWeight="Bold" />
-                    <Label Grid.Row="1" Grid.Column="2" Content="{OnPlatform Browser=Signal:, Default=🎵}" IsVisible="{Binding !DefaultSignal}" />
-                    <Label Grid.Row="1" Grid.Column="3" Content="{Binding Signal.Name}" IsVisible="{Binding !DefaultSignal}" />
-                </Grid>
+                <Border Classes="announcement queued" Padding="2" Tag="{Binding}">
+                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto,Auto,Auto" RowSpacing="2">
+                        <TextBlock Grid.ColumnSpan="3" Text="{Binding Text}" TextWrapping="Wrap" />
+                        <Label Grid.Row="1" Grid.Column="1" Content="{Binding Language}" FontWeight="Bold" />
+                        <Label Grid.Row="1" Grid.Column="2" Content="{OnPlatform Browser=Signal:, Default=🎵}" IsVisible="{Binding !DefaultSignal}" />
+                        <Label Grid.Row="1" Grid.Column="3" Content="{Binding Signal.Name}" IsVisible="{Binding !DefaultSignal}" />
+                        <ProgressBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Foreground="Red" Maximum="1" IsIndeterminate="True" />
+                    </Grid>
+                </Border>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>

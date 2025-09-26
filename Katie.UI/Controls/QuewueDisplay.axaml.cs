@@ -24,9 +24,19 @@ public sealed partial class QuewueDisplay : UserControl
     private void SetHighlight()
     {
         var current = ((QueuePageViewModel) DataContext!).Current;
-        foreach (var control in this.GetVisualDescendants())
-            if (control is Grid grid)
-                grid.Classes.Set("current", ReferenceEquals(current, grid.Tag));
+        foreach (var visual in this.GetVisualDescendants())
+        {
+            if (visual is not Control control || !control.Classes.Contains("announcement"))
+                continue;
+            var isCurrent = ReferenceEquals(current, control.Tag);
+            control.Classes.Set("current", isCurrent);
+            if (!isCurrent || current is null)
+                continue;
+            control.Classes.Remove("queued");
+            var progressBar = control.FindDescendantOfType<ProgressBar>()!;
+            progressBar.Value = current.CurrentTime / current.TotalTime;
+            progressBar.IsIndeterminate = current.CurrentTime == TimeSpan.Zero;
+        }
     }
 
 }
