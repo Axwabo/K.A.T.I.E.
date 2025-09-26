@@ -15,21 +15,27 @@ public sealed partial class QueuePageViewModel : ViewModelBase
 
     private readonly IAudioPlayerFactory? _factory;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasProvider), nameof(PlayPauseText))]
     private QueueSampleProvider? _provider;
 
     [ObservableProperty]
     private string _input = "";
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(PlayPauseText))]
-    private bool _playing;
+    private string _error = "";
 
     [ObservableProperty]
-    private bool _canTogglePlayback;
+    [NotifyPropertyChangedFor(nameof(PlayPauseText))]
+    private int _playIndex = -1;
 
-    public string PlayPauseText => Playing ? "Pause" : "Resume";
+    private bool Playing => PlayIndex != -1;
 
-    public QueuedAnnouncement? Current => _provider?.Current;
+    public string PlayPauseText => Playing || !HasProvider ? "Pause" : "Resume";
+
+    public bool HasProvider => Provider != null;
+
+    public QueuedAnnouncement? Current => Provider?.Current;
 
     public QueuePageViewModel(PhrasesPageViewModel phrasesPage, IAudioPlayerFactory? factory)
     {
@@ -41,35 +47,37 @@ public sealed partial class QueuePageViewModel : ViewModelBase
     {
     }
 
-    [RelayCommand]
-    private void Enqueue(string language) => Enqueue(Input, language, PhrasesPage.Signals.Selected);
-
     private void Enqueue(string input, string language, Signal signal)
     {
         if (_factory == null)
             return;
-        var format = _provider == null ? (SimpleWaveFormat?) null : (SimpleWaveFormat) _provider.WaveFormat;
+        Error = "";
+        var format = Provider == null ? (SimpleWaveFormat?) null : (SimpleWaveFormat) Provider.WaveFormat;
         var segments = UtteranceChain.ParseToQueue(input, PhrasesPage.Phrases[language], ref format);
         if (segments.Count == 0)
             return;
-        var startPlayback = _provider == null;
         var announcement = new QueuedAnnouncement(input, language, segments, format.Value, signal);
-        _provider ??= new QueueSampleProvider(Queue, announcement);
+        Provider ??= new QueueSampleProvider(Queue, announcement);
         Queue.Add(announcement);
-        if (startPlayback)
+        if (PlayIndex == -1)
             _ = Play().ConfigureAwait(false);
     }
 
     private async Task Play()
     {
-        using var player = _factory!.CreatePlayer(_provider!);
+        using var player = _factory!.CreatePlayer(Provider!);
         await player.Play();
-        Playing = true;
-        CanTogglePlayback = true;
-        while (player.IsPlaying && Playing)
+        var index = PlayIndex = Random.Shared.Next();
+        while (player.IsPlaying && PlayIndex == index)
             await Task.Delay(10);
-        Playing = false;
-        Dispatcher.UIThread.Post(() => CanTogglePlayback = _provider != null);
+        if (PlayIndex != -1 && PlayIndex != index)
+            return;
+        Dispatcher.UIThread.Post(() =>
+        {
+            PlayIndex = -1;
+            if (Current is null)
+                Provider = null;
+        });
         await player.Stop();
     }
 
@@ -77,16 +85,28 @@ public sealed partial class QueuePageViewModel : ViewModelBase
     private void TogglePause()
     {
         if (Playing)
-            Playing = false;
+            PlayIndex = -1;
         else
             _ = Play().ConfigureAwait(false);
     }
 
     [RelayCommand]
+    private void Enqueue(string language)
+    {
+        try
+        {
+            Enqueue(Input, language, PhrasesPage.Signals.Selected);
+        }
+        catch (Exception e)
+        {
+            Error = e.Message;
+        }
+    }
+
+    [RelayCommand]
     private void Clear()
     {
-        Playing = false;
-        _provider = null;
+        Stop();
         Queue.Clear();
     }
 
@@ -95,8 +115,25 @@ public sealed partial class QueuePageViewModel : ViewModelBase
     {
         var announcements = Queue.Select(e => (e.Text, e.Language, e.Signal)).ToArray();
         Clear();
-        foreach (var (text, language, signal) in announcements)
-            Enqueue(text, language, signal);
+        try
+        {
+            foreach (var (text, language, signal) in announcements)
+                Enqueue(text, language, signal);
+        }
+        catch (Exception e)
+        {
+            Error = e.Message;
+        }
+    }
+
+    [RelayCommand]
+    private void Skip() => Provider?.Next();
+
+    [RelayCommand]
+    private void Stop()
+    {
+        PlayIndex = -1;
+        Provider = null;
     }
 
 }

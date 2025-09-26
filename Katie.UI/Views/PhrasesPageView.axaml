@@ -25,7 +25,7 @@
             <Button Command="{Binding PlayCommand}" CommandParameter="Hungarian">Play Hungarian</Button>
             <Button Command="{Binding PlayCommand}" CommandParameter="English">Play English</Button>
             <Button Command="{Binding StopCommand}">Stop</Button>
-            <Label Content="{Binding CurrentPhrase}" VerticalAlignment="Center" />
+            <Label Content="{Binding CurrentPhrase}" VerticalAlignment="Center" Foreground="{Binding PhraseBrush}" />
         </StackPanel>
         <UserControl Grid.Row="3" Content="{Binding Signals}" />
         <ProgressBar Grid.Row="4" Height="3" Maximum="1" Value="{Binding Progress}" Foreground="Red" />

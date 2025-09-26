@@ -12,6 +12,7 @@
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="5" IsEnabled="{Binding CanSave}">
             <Button Command="{Binding ExportCommand}" CommandParameter="Hungarian">Export Hungarian</Button>
             <Button Command="{Binding ExportCommand}" CommandParameter="English">Export English</Button>
+            <Label Foreground="Red" Content="{Binding Error}" />
         </StackPanel>
     </Grid>
 </UserControl>

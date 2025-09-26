@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Threading;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using Katie.NAudio;
 using Katie.UI.Audio;
@@ -27,6 +28,9 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _currentPhrase = "";
+
+    [ObservableProperty]
+    private IBrush _phraseBrush = Brushes.White;
 
     [ObservableProperty]
     private double _progress;
@@ -120,7 +124,19 @@ public sealed partial class PhrasesPageViewModel : ViewModelBase
         if (_factory == null)
             return;
         var index = ++_playIndex;
-        var chain = UtteranceChain.From(Text, Phrases[language]);
+        UtteranceChain? chain;
+        try
+        {
+            chain = UtteranceChain.From(Text, Phrases[language]);
+            PhraseBrush = Brushes.White;
+        }
+        catch (Exception e)
+        {
+            CurrentPhrase = e.Message;
+            PhraseBrush = Brushes.Red;
+            return;
+        }
+
         if (chain == null)
             return;
         Progress = 0;

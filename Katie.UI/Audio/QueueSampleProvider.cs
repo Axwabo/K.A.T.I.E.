@@ -2,7 +2,7 @@
 
 namespace Katie.UI.Audio;
 
-public sealed partial class QueueSampleProvider : ISampleProvider
+public sealed class QueueSampleProvider : ISampleProvider
 {
 
     public IList<QueuedAnnouncement> List { get; }
@@ -23,17 +23,24 @@ public sealed partial class QueueSampleProvider : ISampleProvider
         if (Current == null)
             return 0;
         var read = Current.Provider.Read(buffer, offset, count);
-        if (read >= count)
-            return read;
-        var index = List.IndexOf(Current);
-        if (++index >= List.Count)
+        return read >= count || !Next()
+            ? read
+            : read + Current.Provider.Read(buffer, offset + read, count - read);
+    }
+
+    public bool Next()
+    {
+        if (Current is null)
+            return false;
+        var index = List.IndexOf(Current) + 1;
+        if (index >= List.Count)
         {
             Current = null;
-            return read;
+            return false;
         }
 
         Current = List[index];
-        return read + Current.Provider.Read(buffer, offset + read, count - read);
+        return true;
     }
 
 }

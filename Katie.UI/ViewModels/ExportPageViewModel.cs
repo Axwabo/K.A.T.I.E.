@@ -19,6 +19,9 @@ public sealed partial class ExportPageViewModel : ViewModelBase
     [ObservableProperty]
     private string _input = "";
 
+    [ObservableProperty]
+    private string _error = "";
+
     public bool CanSave => Storage?.CanSave ?? false;
 
     public StorageWrapper? Storage { get; }
@@ -36,19 +39,31 @@ public sealed partial class ExportPageViewModel : ViewModelBase
     {
         if (Storage == null)
             return;
-        var chain = UtteranceChain.From(Input, PhrasesPage.Phrases[language]);
-        if (chain == null)
-            return;
-        var file = await Storage.SaveFilePickerAsync(SaveOptions);
-        if (file == null)
-            return;
-        var provider = PhrasesPage.PrependSignal(chain, out _, out _);
-        await using var writer = await file.OpenWriteAsync();
-        await using var waveWriter = new WaveFileWriter(writer, new WaveFormat(provider.WaveFormat.SampleRate, provider.WaveFormat.Channels));
-        var buffer = new float[480];
-        int read;
-        while ((read = provider.Read(buffer, 0, buffer.Length)) != 0)
-            waveWriter.WriteSamples(buffer, 0, read);
+        try
+        {
+            var chain = UtteranceChain.From(Input, PhrasesPage.Phrases[language]);
+            if (chain == null)
+            {
+                Error = "Nothing to export";
+                return;
+            }
+
+            Error = "";
+            var file = await Storage.SaveFilePickerAsync(SaveOptions);
+            if (file == null)
+                return;
+            var provider = PhrasesPage.PrependSignal(chain, out _, out _);
+            await using var writer = await file.OpenWriteAsync();
+            await using var waveWriter = new WaveFileWriter(writer, new WaveFormat(provider.WaveFormat.SampleRate, provider.WaveFormat.Channels));
+            var buffer = new float[480];
+            int read;
+            while ((read = provider.Read(buffer, 0, buffer.Length)) != 0)
+                waveWriter.WriteSamples(buffer, 0, read);
+        }
+        catch (Exception e)
+        {
+            Error = e.Message;
+        }
     }
 
 }
