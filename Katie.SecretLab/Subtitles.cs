@@ -18,19 +18,20 @@ public static class Subtitles
 
     private const ushort CassieRpcHash = unchecked((ushort) -31296712);
 
-    public static void Announce(string announcement, string subtitles, bool noisy = false)
+    public static void Announce(string announcement, string? subtitles, bool noisy = false)
     {
         var queue = NineTailedFoxAnnouncer.singleton.queue;
         var start = queue.Count;
-        NineTailedFoxAnnouncer.singleton.AddPhraseToQueue(announcement, noisy, false, false, true, subtitles);
+        var custom = !string.IsNullOrEmpty(subtitles);
+        NineTailedFoxAnnouncer.singleton.AddPhraseToQueue(announcement, noisy, false, false, custom, subtitles ?? "");
         for (var i = start; i < queue.Count; i++)
             queue[i].collection = Collection;
         using var writer = NetworkWriterPool.Get();
         writer.WriteString(announcement);
         writer.WriteBool(false); // makeHold
         writer.WriteBool(noisy); // makeNoise
-        writer.WriteBool(true); // customAnnouncement
-        writer.WriteString(subtitles);
+        writer.WriteBool(custom); // customAnnouncement
+        writer.WriteString(subtitles ?? "");
         foreach (var controller in RespawnEffectsController.AllControllers)
             new RpcMessage
             {

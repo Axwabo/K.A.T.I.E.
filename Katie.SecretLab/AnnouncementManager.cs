@@ -11,6 +11,8 @@ using UnityEngine;
 
 namespace Katie.SecretLab;
 
+using Announcement = (string Announcement, string? Subtitles, bool Noisy);
+
 internal sealed class AnnouncementManager : MonoBehaviour
 {
 
@@ -40,7 +42,7 @@ internal sealed class AnnouncementManager : MonoBehaviour
 
     private readonly SampleProviderQueue _queue = new(AudioPlayer.SupportedFormat);
 
-    private readonly Dictionary<ISampleProvider, (string Announcement, string Subtitles, bool Noisy)> _announcements = [];
+    private readonly Dictionary<ISampleProvider, Announcement> _announcements = [];
 
     private ISampleProvider? _previousProvider;
 
@@ -90,12 +92,12 @@ internal sealed class AnnouncementManager : MonoBehaviour
         return true;
     }
 
-    public void Play(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> signal, bool noisy)
+    public void Play(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> signal, bool noisy, bool showSubtitles = true)
     {
         var chain = UtteranceChain.From(text, tree);
         if (chain == null)
             return;
-        if (PhraseCache.TryGetSignal(signal, out var signalProvider))
+        if (!signal.IsEmpty && PhraseCache.TryGetSignal(signal, out var signalProvider))
             _queue.Enqueue(signalProvider.Copy(true));
         var offset = new OffsetSampleProvider(noisy ? chain.Volume(1.2f) : chain)
         {
@@ -104,7 +106,7 @@ internal sealed class AnnouncementManager : MonoBehaviour
         };
         _queue.Enqueue(offset);
         var (announcement, subtitles) = Subtitles.MakeCassieAnnouncement(chain, text);
-        _announcements[offset] = (announcement, subtitles, noisy);
+        _announcements[offset] = (announcement, showSubtitles ? subtitles : null, noisy);
     }
 
 }

@@ -10,8 +10,22 @@ internal sealed class EventHandlers : CustomEventsHandler
 
     public override void OnServerCassieAnnouncing(CassieAnnouncingEventArgs ev)
     {
-        if (AnnouncementManager.Instance.OverrideCassieAnnouncement(ev.Words, ev.MakeNoise))
+        if (ev.CustomAnnouncement && AnnouncementManager.Instance.OverrideCassieAnnouncement(ev.Words, ev.MakeNoise))
+        {
             ev.IsAllowed = false;
+            return;
+        }
+
+        var config = KatiePlugin.Instance.Config!;
+        if (!config.ReplaceCassie || !PhraseCache.TryGetTree(config.DefaultLanguage, out var tree))
+            return;
+        ev.IsAllowed = false;
+        if (ev is {CustomAnnouncement: true, MakeNoise: true})
+            KatieAnnouncer.Play(ev.Words, tree, true);
+        else if (!string.IsNullOrEmpty(config.DefaultSignal))
+            KatieAnnouncer.Play(ev.Words, tree, config.DefaultSignal, ev.CustomAnnouncement);
+        else
+            KatieAnnouncer.Play(ev.Words, tree, ev.MakeNoise, ev.CustomAnnouncement);
     }
 
 }

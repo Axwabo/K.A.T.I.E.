@@ -40,7 +40,7 @@ public static class PhraseCache
 
     private static void InitializePhrases(DirectoryInfo phrases)
     {
-        var global = phrases.EnumeratePhrases("Global").ToList();
+        var global = phrases.EnumeratePhrases("Global").ToArray();
         Hungarian.Rebuild(global.Concat(phrases.EnumeratePhrases(nameof(Hungarian))));
         English.Rebuild(global.Concat(phrases.EnumeratePhrases(nameof(English))));
     }
