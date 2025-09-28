@@ -109,6 +109,12 @@ internal sealed class AnnouncementManager : MonoBehaviour
         _announcements[offset] = (announcement, showSubtitles ? subtitles : null, noisy);
     }
 
+    public void Stop()
+    {
+        _queue.Clear();
+        _queue.Next();
+    }
+
 }
 
 file static class Extensions

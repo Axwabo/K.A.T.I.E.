@@ -1,11 +1,16 @@
 ﻿using LabApi.Events.CustomHandlers;
 using LabApi.Loader;
 using LabApi.Loader.Features.Plugins;
+using Mirror;
+using Mirror.RemoteCalls;
+using Respawning;
 
 namespace Katie.SecretLab;
 
 public sealed class KatiePlugin : Plugin<KatieConfig>
 {
+
+    private const string ClearQueue = "System.Void Respawning.RespawnEffectsController::RpcClearQueue()";
 
     public static KatiePlugin Instance { get; private set; } = null!;
 
@@ -23,6 +28,14 @@ public sealed class KatiePlugin : Plugin<KatieConfig>
         var config = this.GetConfigDirectory();
         PhraseCache.Initialize(config);
         CustomHandlersManager.RegisterEventsHandler(_handlers);
+        _ = RespawnEffectsController.AllControllers; // invoke static ctor
+        var hash = (ushort) (ClearQueue.GetStableHashCode() & ushort.MaxValue);
+        RemoteProcedureCalls.RemoveDelegate(hash);
+        RemoteProcedureCalls.RegisterRpc(typeof(RespawnEffectsController), ClearQueue, (_, _, _) =>
+        {
+            KatieAnnouncer.Stop();
+            NineTailedFoxAnnouncer.singleton.ClearQueue();
+        });
     }
 
     public override void Disable() => CustomHandlersManager.UnregisterEventsHandler(_handlers);

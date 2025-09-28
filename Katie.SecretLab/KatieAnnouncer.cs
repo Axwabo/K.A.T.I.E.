@@ -20,4 +20,6 @@ public static class KatieAnnouncer
     public static void Play(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, bool noisy, bool showSubtitles = true)
         => AnnouncementManager.Instance.Play(text, tree, ReadOnlySpan<char>.Empty, noisy, showSubtitles);
 
+    public static void Stop() => AnnouncementManager.Instance.Stop();
+
 }
