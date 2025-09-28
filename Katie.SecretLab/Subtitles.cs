@@ -50,32 +50,37 @@ public static class Subtitles
         var announcementBuilder = new StringBuilder();
         var subtitleBuilder = new StringBuilder(SubtitlePrefix);
         var time = chain.Current.Segment.Duration;
-        var start = 0;
+        var start = Index.Start;
+        var end = Index.Start;
         var wasFullStop = false;
-        var anySplits = false;
+        var endsWithSplit = false;
         foreach (var segment in chain.Remaining)
         {
-            time += segment.Duration;
+            endsWithSplit = wasFullStop;
             if (wasFullStop)
             {
-                announcementBuilder.AppendSilence(time).Append(Split);
-                var end = segment.EndIndex == -1 ? ^0 : segment.EndIndex + 1;
-                subtitleBuilder.Append(text[start..end].Trim());
-                subtitleBuilder.Append(Split).Append(SubtitlePrefix);
-                start = end.GetOffset(text.Length);
-                time = segment.Duration;
                 wasFullStop = false;
-                anySplits = true;
+                subtitleBuilder.Append(text[start..end]).Append(Split).Append(SubtitlePrefix);
+                start = end;
+                time = TimeSpan.Zero;
             }
 
-            if (segment.EndIndex == -1 || text[segment.EndIndex] == '.')
-                wasFullStop = true;
+            time += segment.Duration;
+            if (segment.EndIndex < 1 || text[segment.EndIndex - 1] != '.')
+                continue;
+            wasFullStop = true;
+            end = segment.EndIndex;
         }
 
-        return (
-            announcementBuilder.RemoveEnd(Split.Length, anySplits).ToString(),
-            subtitleBuilder.RemoveEnd(Split.Length + SubtitlePrefix.Length, anySplits).ToString()
-        );
+        return endsWithSplit
+            ? (
+                announcementBuilder.RemoveEnd(Split.Length, endsWithSplit).ToString(),
+                subtitleBuilder.RemoveEnd(Split.Length + SubtitlePrefix.Length, endsWithSplit).ToString()
+            )
+            : (
+                announcementBuilder.AppendSilence(time).ToString(),
+                subtitleBuilder.Append(text[end..].Trim()).ToString()
+            );
     }
 
     private static StringBuilder AppendSilence(this StringBuilder builder, TimeSpan time)

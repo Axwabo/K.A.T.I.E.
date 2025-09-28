@@ -22,8 +22,8 @@ internal sealed class EventHandlers : CustomEventsHandler
         ev.IsAllowed = false;
         if (ev is {CustomAnnouncement: true, MakeNoise: true})
             KatieAnnouncer.Play(ev.Words, tree, true);
-        else if (!string.IsNullOrEmpty(config.DefaultSignal))
-            KatieAnnouncer.Play(ev.Words, tree, config.DefaultSignal, ev.CustomAnnouncement);
+        else if (!ev.CustomAnnouncement && !string.IsNullOrEmpty(config.DefaultSignal))
+            KatieAnnouncer.Play(ev.Words, tree, config.DefaultSignal, false);
         else
             KatieAnnouncer.Play(ev.Words, tree, ev.MakeNoise, ev.CustomAnnouncement);
     }
