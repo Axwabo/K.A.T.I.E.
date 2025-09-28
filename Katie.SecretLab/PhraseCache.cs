@@ -27,6 +27,7 @@ public static class PhraseCache
 
     private static void InitializeSignals(DirectoryInfo directory)
     {
+        var count = 0;
         foreach (var file in directory.EnumerateFiles("*.wav"))
         {
             var name = Path.GetFileNameWithoutExtension(file.FullName);
@@ -35,7 +36,10 @@ public static class PhraseCache
             var provider = stream.ReadPlayerCompatibleSamples();
             provider.ClipName = name;
             Signals[name.AsSpan().LowercaseHashCode()] = provider;
+            count++;
         }
+
+        Logger.Info($"Loaded {count} signal(s)");
     }
 
     private static void InitializePhrases(DirectoryInfo phrases)
@@ -60,14 +64,42 @@ public static class PhraseCache
 
     private static IEnumerable<WavePhraseBase> EnumeratePhrases(this DirectoryInfo directory, string subdirectory)
     {
-        foreach (var file in Directory.EnumerateFiles(directory.CreateSubdirectory(subdirectory).FullName, "*.wav"))
+        var count = 0;
+        var fullPath = directory.CreateSubdirectory(subdirectory).FullName;
+        var aliases = Path.Combine(fullPath, "aliases.txt");
+        var useAliases = File.Exists(aliases);
+        var phrases = new Dictionary<int, WavePhraseBase>();
+        foreach (var file in Directory.EnumerateFiles(fullPath, "*.wav"))
         {
             var name = Path.GetFileNameWithoutExtension(file);
             Logger.Debug($"Found {subdirectory} phrase: {name}");
             using var stream = CreateAudioReader.Stream(file);
             var samples = stream.ReadPlayerCompatibleSamples();
-            yield return new RawSourcePhrase(samples, name);
+            var phrase = new RawSourcePhrase(samples, name);
+            count++;
+            if (useAliases)
+                phrases[name.AsSpan().LowercaseHashCode()] = phrase;
+            yield return phrase;
         }
+
+        Logger.Info($"Loaded {count} {subdirectory} phrase(s)");
+        if (!useAliases)
+            yield break;
+        count = 0;
+        foreach (var line in File.ReadLines(aliases))
+        {
+            var span = line.AsSpan();
+            var equals = span.IndexOf('=');
+            if (equals == -1 || !phrases.TryGetValue(span[(equals + 1)..].Trim().LowercaseHashCode(), out var phrase))
+                continue;
+            var name = span[..equals].Trim();
+            var alias = WavePhraseAlias.Create(phrase, name.ToString());
+            phrases[name.LowercaseHashCode()] = alias;
+            count++;
+            yield return alias;
+        }
+
+        Logger.Info($"Assigned {count} {subdirectory} alias(es)");
     }
 
 }
