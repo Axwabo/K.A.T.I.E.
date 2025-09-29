@@ -1,9 +1,11 @@
 <Project>
+
     <!-- https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management -->
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <AvaloniaVersion>11.3.6</AvaloniaVersion>
     </PropertyGroup>
+
     <ItemGroup>
         <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
         <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
@@ -13,8 +15,8 @@
         <PackageVersion Include="Avalonia.Browser" Version="$(AvaloniaVersion)" />
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
-        <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
     </ItemGroup>
+
     <ItemGroup>
         <PackageVersion Include="NAudio.Core" Version="2.2.1" />
         <PackageVersion Include="NLayer" Version="1.16.0" />
@@ -23,9 +25,10 @@
         <PackageVersion Include="NAudio.Vorbis" Version="1.5.0" />
         <PackageVersion Include="SoundFlow" Version="1.2.1" />
     </ItemGroup>
+
     <ItemGroup>
         <PackageVersion Include="Lib.Harmony" Version="2.2.2" />
-        <PackageVersion Include="Northwood.LabAPI" Version="1.1.1" />
-        <PackageVersion Include="SecretLabNAudio.Core" Version="1.0.1" />
+        <PackageVersion Include="Northwood.LabAPI" Version="1.1.3" />
+        <PackageVersion Include="SecretLabNAudio.Core" Version="1.0.2" />
     </ItemGroup>
 </Project>
