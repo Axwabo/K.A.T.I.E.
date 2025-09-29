@@ -10,7 +10,7 @@ public static class KatieAnnouncer
 
     public static bool IsKatieSpeaking => AnnouncementManager.Instance.IsSpeaking;
 
-    public static bool IsCassieSpeaking => NineTailedFoxAnnouncer.singleton.queue is [{collection: not Subtitles.Collection}, ..];
+    public static bool IsCassieSpeaking => NineTailedFoxAnnouncer.singleton.queue is [{collection: not SubtitleHandler.Collection}, ..];
 
     public static bool IsAnyAnnouncerSpeaking => IsCassieSpeaking || IsKatieSpeaking;
 

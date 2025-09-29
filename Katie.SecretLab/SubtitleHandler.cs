@@ -7,7 +7,7 @@ using Utils.Networking;
 
 namespace Katie.SecretLab;
 
-public static class Subtitles
+public static class SubtitleHandler
 {
 
     private const string SubtitlePrefix = "<pos=-1px><mark=#000000ff> <color=#88f>Κ．Α．Τ．Ι．Ε．։  </color></mark> ";

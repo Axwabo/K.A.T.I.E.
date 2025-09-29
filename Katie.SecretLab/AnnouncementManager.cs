@@ -74,9 +74,9 @@ internal sealed class AnnouncementManager : MonoBehaviour
         _previousProvider = current;
         if (current == null || !_announcements.Remove(current, out var tuple))
             return;
-        Subtitles.Announce(tuple.Announcement, tuple.Subtitles, tuple.Noisy);
+        SubtitleHandler.Announce(tuple.Announcement, tuple.Subtitles, tuple.Noisy);
         if (!tuple.Noisy)
-            Subtitles.ServerOnlyDelay(EndDelaySeconds);
+            SubtitleHandler.ServerOnlyDelay(EndDelaySeconds);
     }
 
     public bool OverrideCassieAnnouncement(string text, bool noisy)
@@ -105,7 +105,7 @@ internal sealed class AnnouncementManager : MonoBehaviour
             LeadOut = noisy ? Delay + EndNoise : Delay
         };
         _queue.Enqueue(offset);
-        var (announcement, subtitles) = Subtitles.MakeCassieAnnouncement(chain, text);
+        var (announcement, subtitles) = SubtitleHandler.MakeCassieAnnouncement(chain, text);
         _announcements[offset] = (announcement, showSubtitles ? subtitles : null, noisy);
     }
 
