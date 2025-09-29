@@ -8,13 +8,13 @@ namespace Katie.UI.Desktop;
 public static class ServiceProviderExtensions
 {
 
-    private const string Samples = "samples";
-    private const string Signals = "signals";
+    private const string Phrases = "Phrases";
+    private const string Signals = "Signals";
 
     public static IServiceCollection AddInitialProviders(this IServiceCollection builder)
     {
-        if (Directory.Exists(Samples))
-            builder.AddSingleton<IInitialPhraseLoader>(new DirectoryPhraseLoader {Root = Samples});
+        if (Directory.Exists(Phrases))
+            builder.AddSingleton<IInitialPhraseLoader>(new DirectoryPhraseLoader {Root = Phrases});
         if (Directory.Exists(Signals))
             builder.AddSingleton<ISignalProvider>(new DirectorySignalProvider(Signals));
         return builder;
