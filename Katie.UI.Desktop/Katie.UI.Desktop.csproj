@@ -4,6 +4,8 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <PublishSingleFile>true</PublishSingleFile>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -23,5 +25,5 @@
     <ItemGroup>
         <ProjectReference Include="../Katie.UI/Katie.UI.csproj" />
     </ItemGroup>
-    
+
 </Project>
