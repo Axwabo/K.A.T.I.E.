@@ -16,10 +16,10 @@ jobs:
       ReferenceUrl: https://exmod-team.github.io/SL-References/Dev.zip
       ReferencePath: ${{ github.workspace }}/References
       OUT: ${{ github.workspace }}/Out
-      OUT_LINUX: ${{ env.OUT }}/Out/Linux
-      OUT_WINDOWS: ${{ env.OUT }}/Out/Windows
-      OUT_BROWSER: ${{ env.OUT }}/Out/Browser
-      OUT_SL: ${{ env.OUT }}/Out/SL
+      OUT_LINUX: ${{ github.workspace }}/Out/Linux
+      OUT_WINDOWS: ${{ github.workspace }}/Out/Windows
+      OUT_BROWSER: ${{ github.workspace }}/Out/Browser
+      OUT_SL: ${{ github.workspace }}/Out/SL
 
     steps:
 
