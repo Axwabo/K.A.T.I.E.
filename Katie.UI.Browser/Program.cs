@@ -16,9 +16,9 @@ internal static class Program
 
     private static async Task Main()
     {
-        await JSHost.ImportAsync(WebAudioFunctions.Module, $"/{WebAudioFunctions.Module}.js");
-        await JSHost.ImportAsync(PhraseCacheFunctions.Module, $"/{PhraseCacheFunctions.Module}.js");
-        await JSHost.ImportAsync(SignalCacheFunctions.Module, $"/{SignalCacheFunctions.Module}.js");
+        await JSHost.ImportAsync(WebAudioFunctions.Module, $"/K.A.T.I.E./{WebAudioFunctions.Module}.js");
+        await JSHost.ImportAsync(PhraseCacheFunctions.Module, $"/K.A.T.I.E./{PhraseCacheFunctions.Module}.js");
+        await JSHost.ImportAsync(SignalCacheFunctions.Module, $"/K.A.T.I.E./{SignalCacheFunctions.Module}.js");
 
         await BuildAvaloniaApp().StartBrowserAppAsync("out");
     }
