@@ -39,6 +39,7 @@ jobs:
       - name: Bundle Linux
         working-directory: ${{ env.OUT_LINUX }}
         run: |
+          shopt -s extglob
           rm !(Katie.UI.Desktop)
           mkdir bin
           mv Katie.UI.Desktop bin/
@@ -48,6 +49,7 @@ jobs:
       - name: Bundle Windows
         working-directory: ${{ env.OUT_WINDOWS }}
         run: |
+          shopt -s extglob
           rm !(Katie.UI.Desktop.exe)
           mkdir bin
           mv Katie.UI.Desktop.exe bin/
