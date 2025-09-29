@@ -68,7 +68,7 @@ jobs:
           mv Mirror-Publicized.dll Mirror.dll
 
       - name: Build SL
-        working-directory: ${{ github.workspace }}Katie.SecretLab
+        working-directory: ${{ github.workspace }}/Katie.SecretLab
         run: dotnet build -c Release -o ${{ env.OUT_SL }}
 
       - name: Copy SL
