@@ -12,7 +12,7 @@ const prepared = new Map();
  * @param data {MemoryView}
  */
 export function save(name, data) {
-    return signalCache.put(name, new Response(data.slice(), init));
+    return signalCache.put(`/${name}`, new Response(data.slice(), init));
 }
 
 export async function prepare() {

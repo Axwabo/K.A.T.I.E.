@@ -13,7 +13,7 @@ const prepared = new Map();
  * @param data {MemoryView}
  */
 export function save(language, name, data) {
-    return phraseCache.put(language + "/" + name, new Response(data.slice(), init));
+    return phraseCache.put(`/${language}/${name}`, new Response(data.slice(), init));
 }
 
 /** @param language {string} */
