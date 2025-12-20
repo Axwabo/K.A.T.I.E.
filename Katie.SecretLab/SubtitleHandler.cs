@@ -8,7 +8,6 @@ public static class SubtitleHandler
 
     private const string SubtitlePrefix = "<pos=-1px><mark=#000000ff> <color=#88f>Κ．Α．Τ．Ι．Ε．։  </color></mark> ";
     private const string Split = "<split>";
-    private const double SilenceDuration = 0.5;
 
     public static (string Announcement, string Subtitles) MakeCassieAnnouncement(UtteranceChain chain, ReadOnlySpan<char> text)
     {
@@ -25,6 +24,7 @@ public static class SubtitleHandler
             if (wasFullStop)
             {
                 wasFullStop = false;
+                announcementBuilder.AppendSilence(time).Append(Split);
                 subtitleBuilder.Append(text[start..end]).Append(Split).Append(SubtitlePrefix);
                 start = end;
                 time = TimeSpan.Zero;
@@ -39,8 +39,8 @@ public static class SubtitleHandler
 
         return endsWithSplit
             ? (
-                announcementBuilder.RemoveEnd(Split.Length, endsWithSplit).ToString(),
-                subtitleBuilder.RemoveEnd(Split.Length + SubtitlePrefix.Length, endsWithSplit).ToString()
+                announcementBuilder.RemoveEnd(Split.Length).ToString(),
+                subtitleBuilder.RemoveEnd(Split.Length + SubtitlePrefix.Length).ToString()
             )
             : (
                 announcementBuilder.AppendSilence(time).ToString(),
@@ -49,9 +49,11 @@ public static class SubtitleHandler
     }
 
     private static StringBuilder AppendSilence(this StringBuilder builder, TimeSpan time)
-        => builder.Append("$SLEEP_").Append((float) time.TotalSeconds);
+        => time == TimeSpan.Zero
+            ? builder
+            : builder.Append(" $SLEEP_").Append((float) time.TotalSeconds).Append(" $MAXDUR_0 . ");
 
-    private static StringBuilder RemoveEnd(this StringBuilder builder, int characters, bool condition)
-        => condition ? builder.Remove(builder.Length - characters, characters) : builder;
+    private static StringBuilder RemoveEnd(this StringBuilder builder, int characters)
+        => builder.Remove(builder.Length - characters, characters);
 
 }

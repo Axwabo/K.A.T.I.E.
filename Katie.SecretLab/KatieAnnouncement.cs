@@ -40,4 +40,8 @@ public sealed class KatieAnnouncement : CassieAnnouncement
         Provider = provider;
     }
 
+    public override void OnStartedPlaying()
+    {
+    }
+
 }
