@@ -6,6 +6,7 @@ using Mirror;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using SecretLabNAudio.Core.Providers;
+using Utils.Networking;
 
 namespace Katie.SecretLab;
 
@@ -18,6 +19,8 @@ public sealed class KatieAnnouncement : CassieAnnouncement
     private static readonly TimeSpan StartNoise = TimeSpan.FromSeconds(2.5);
 
     private double _signalFinishTime;
+
+    private bool _payloadSent;
 
     public RawSourceSampleProvider? Signal { get; }
 
@@ -37,7 +40,6 @@ public sealed class KatieAnnouncement : CassieAnnouncement
         if (chain == null)
             return;
         ISampleProvider? provider;
-        TimeSpan signalDuration;
         if (!signal.IsEmpty && PhraseCache.TryGetSignal(signal, out var signalProvider))
             provider = signalProvider.FollowedBy(chain);
         else
@@ -61,12 +63,18 @@ public sealed class KatieAnnouncement : CassieAnnouncement
 
     public override void OnStartedPlaying()
     {
-        if (_signalFinishTime != 0)
-            return;
         _signalFinishTime = NetworkTime.time + SignalDuration;
-        var duration = SignalDuration + Chain.TotalTime.TotalSeconds;
+        var duration = (Payload.PlayBackground ? StartNoise.TotalSeconds : SignalDuration) + Chain.TotalTime.TotalSeconds;
         CassieAnnouncementDispatcher.AnnouncementFinishTime = NetworkTime.time + duration;
         CassieAnnouncementDispatcher.NextAnnouncementTime = CassieAnnouncementDispatcher.AnnouncementFinishTime + Cooldown;
+    }
+
+    public override void UpdatePlayed()
+    {
+        if (_payloadSent || !SignalPlayed)
+            return;
+        _payloadSent = true;
+        Payload.SendToAuthenticated();
     }
 
 }

@@ -6,10 +6,8 @@ using HarmonyLib;
 namespace Katie.SecretLab.Patches;
 
 [HarmonyPatch(typeof(CassieAnnouncementDispatcher), nameof(CassieAnnouncementDispatcher.PlayNewAnnouncement))]
-public static class PlayNewAnnouncementPatch
+internal static class PlayNewAnnouncementPatch
 {
-
-    public static bool IsReady(CassieAnnouncement announcement) => announcement is not KatieAnnouncement {SignalPlayed: false};
 
     internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
     {
@@ -19,8 +17,8 @@ public static class PlayNewAnnouncementPatch
         list[index].labels.Add(label);
         list.InsertRange(index, [
             new CodeInstruction(OpCodes.Ldarg_0),
-            CodeInstruction.Call(typeof(PlayNewAnnouncementPatch), nameof(IsReady)),
-            new CodeInstruction(OpCodes.Brtrue, label),
+            new CodeInstruction(OpCodes.Isinst, typeof(KatieAnnouncement)),
+            new CodeInstruction(OpCodes.Brfalse, label),
             new CodeInstruction(OpCodes.Ret)
         ]);
         return list;

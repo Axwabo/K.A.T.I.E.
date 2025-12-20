@@ -10,7 +10,7 @@ internal sealed class EventHandlers : CustomEventsHandler
 
     public override void OnServerCassieAnnouncing(CassieAnnouncingEventArgs ev)
     {
-        if (ev.CustomAnnouncement && OverrideCassieAnnouncement(ev.Words, ev.MakeNoise))
+        if (ev.CustomAnnouncement && OverrideCassieAnnouncement(ev.Words, ev.MakeNoise, ev.CustomSubtitles))
         {
             ev.IsAllowed = false;
             return;
@@ -28,15 +28,14 @@ internal sealed class EventHandlers : CustomEventsHandler
             KatieAnnouncer.Play(ev.Words, tree, ev.MakeNoise, ev.CustomAnnouncement);
     }
 
-    private static bool OverrideCassieAnnouncement(string text, bool noisy)
+    private static bool OverrideCassieAnnouncement(string parameters, bool noisy, string text)
     {
-        var span = text.AsSpan().Trim();
+        var span = parameters.AsSpan().Trim();
         if (!span.TryGetBracketsValue(0, out var languageEnd, out var language) || !PhraseCache.TryGetTree(language.Trim(), out var tree))
             return false;
         languageEnd++;
-        if (span.TryGetBracketsValue(languageEnd, out var signalEnd, out var signal))
-            languageEnd = signalEnd + 1;
-        var announcement = span[languageEnd..].Trim();
+        span.TryGetBracketsValue(languageEnd, out _, out var signal);
+        var announcement = text.AsSpan().Trim();
         KatieAnnouncement.Play(announcement, tree, signal, noisy && signal.Trim().IsEmpty);
         return true;
     }
