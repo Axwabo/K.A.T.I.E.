@@ -1,4 +1,5 @@
-﻿using Katie.Core.DataStructures;
+﻿using Cassie;
+using Katie.Core.DataStructures;
 using Katie.NAudio.Phrases;
 
 namespace Katie.SecretLab;
@@ -10,7 +11,7 @@ public static class KatieAnnouncer
 
     public static bool IsKatieSpeaking => AnnouncementManager.Instance.IsSpeaking;
 
-    public static bool IsCassieSpeaking => LabApi.Features.Wrappers.Cassie.IsSpeaking;
+    public static bool IsCassieSpeaking => CassieAnnouncementDispatcher.CurrentAnnouncement is not null and not KatieAnnouncement;
 
     public static bool IsAnyAnnouncerSpeaking => IsCassieSpeaking || IsKatieSpeaking;
 
