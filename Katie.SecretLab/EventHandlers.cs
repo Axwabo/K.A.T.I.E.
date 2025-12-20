@@ -10,7 +10,7 @@ internal sealed class EventHandlers : CustomEventsHandler
 
     public override void OnServerCassieAnnouncing(CassieAnnouncingEventArgs ev)
     {
-        if (ev.CustomAnnouncement && AnnouncementManager.Instance.OverrideCassieAnnouncement(ev.Words, ev.MakeNoise))
+        if (ev.CustomAnnouncement && AnnouncementManager.OverrideCassieAnnouncement(ev.Words, ev.MakeNoise))
         {
             ev.IsAllowed = false;
             return;

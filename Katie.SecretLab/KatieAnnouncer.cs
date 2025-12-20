@@ -10,16 +10,14 @@ public static class KatieAnnouncer
 
     public static bool IsKatieSpeaking => AnnouncementManager.Instance.IsSpeaking;
 
-    public static bool IsCassieSpeaking => NineTailedFoxAnnouncer.singleton.queue is [{collection: not SubtitleHandler.Collection}, ..];
+    public static bool IsCassieSpeaking => LabApi.Features.Wrappers.Cassie.IsSpeaking;
 
     public static bool IsAnyAnnouncerSpeaking => IsCassieSpeaking || IsKatieSpeaking;
 
     public static void Play(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> signal, bool showSubtitles = true)
-        => AnnouncementManager.Instance.Play(text, tree, signal, false, showSubtitles);
+        => KatieAnnouncement.Play(text, tree, signal, false, showSubtitles);
 
     public static void Play(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, bool noisy, bool showSubtitles = true)
-        => AnnouncementManager.Instance.Play(text, tree, ReadOnlySpan<char>.Empty, noisy, showSubtitles);
-
-    public static void Stop() => AnnouncementManager.Instance.Stop();
+        => KatieAnnouncement.Play(text, tree, ReadOnlySpan<char>.Empty, noisy, showSubtitles);
 
 }

@@ -1,17 +1,10 @@
-﻿using Katie.Core.DataStructures;
-using Katie.NAudio;
-using Katie.NAudio.Phrases;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
+﻿using Cassie;
 using SecretLabNAudio.Core;
 using SecretLabNAudio.Core.Extensions;
 using SecretLabNAudio.Core.Pools;
-using SecretLabNAudio.Core.Providers;
 using UnityEngine;
 
 namespace Katie.SecretLab;
-
-using Announcement = (string Announcement, string? Subtitles, bool Noisy);
 
 internal sealed class AnnouncementManager : MonoBehaviour
 {
@@ -35,18 +28,12 @@ internal sealed class AnnouncementManager : MonoBehaviour
 
     public static void Initialize()
     {
-        var player = AudioPlayer.Create(AudioPlayerPool.NextAvailableId, Settings).WithMasterAmplification(2);
+        var player = AudioPlayer.Create(AudioPlayerPool.NextAvailableId, Settings).WithMasterAmplification(2).UnsetProviderOnEnd();
         Instance = player.gameObject.AddComponent<AnnouncementManager>();
         Instance.Player = player;
     }
 
-    private readonly SampleProviderQueue _queue = new(AudioPlayer.SupportedFormat);
-
-    private readonly Dictionary<ISampleProvider, Announcement> _announcements = [];
-
-    private ISampleProvider? _previousProvider;
-
-    private float _pauseTime;
+    private KatieAnnouncement? _previous;
 
     public AudioPlayer Player { get; private set; } = null!;
 
@@ -55,31 +42,16 @@ internal sealed class AnnouncementManager : MonoBehaviour
 
     private void Awake() => Instance = this;
 
-    private void Start() => Player.SampleProvider = _queue;
-
     private void Update()
     {
-        if (KatieAnnouncer.IsCassieSpeaking)
-            _pauseTime = EndDelaySeconds;
-        if ((_pauseTime -= Time.deltaTime) >= 0)
-        {
-            Player.IsPaused = true;
+        var current = CassieAnnouncementDispatcher.CurrentAnnouncement as KatieAnnouncement;
+        if (current == _previous)
             return;
-        }
-
-        Player.IsPaused = false;
-        var current = _queue.Current;
-        if (current == _previousProvider)
-            return;
-        _previousProvider = current;
-        if (current == null || !_announcements.Remove(current, out var tuple))
-            return;
-        SubtitleHandler.Announce(tuple.Announcement, tuple.Subtitles, tuple.Noisy);
-        if (!tuple.Noisy)
-            SubtitleHandler.ServerOnlyDelay(EndDelaySeconds);
+        Player.SampleProvider = current?.Chain;
+        _previous = current;
     }
 
-    public bool OverrideCassieAnnouncement(string text, bool noisy)
+    public static bool OverrideCassieAnnouncement(string text, bool noisy)
     {
         var span = text.AsSpan().Trim();
         if (!span.TryGetBracketsValue(0, out var languageEnd, out var language) || !PhraseCache.TryGetTree(language.Trim(), out var tree))
@@ -88,31 +60,8 @@ internal sealed class AnnouncementManager : MonoBehaviour
         if (span.TryGetBracketsValue(languageEnd, out var signalEnd, out var signal))
             languageEnd = signalEnd + 1;
         var announcement = span[languageEnd..].Trim();
-        Play(announcement, tree, signal, noisy && signal.Trim().IsEmpty);
+        KatieAnnouncement.Play(announcement, tree, signal, noisy && signal.Trim().IsEmpty);
         return true;
-    }
-
-    public void Play(ReadOnlySpan<char> text, PhraseTree<WavePhraseBase> tree, ReadOnlySpan<char> signal, bool noisy, bool showSubtitles = true)
-    {
-        var chain = UtteranceChain.From(text, tree);
-        if (chain == null)
-            return;
-        if (!signal.IsEmpty && PhraseCache.TryGetSignal(signal, out var signalProvider))
-            _queue.Enqueue(signalProvider.Copy(true));
-        var offset = new OffsetSampleProvider(noisy ? chain.Volume(1.2f) : chain)
-        {
-            DelayBy = noisy ? StartNoise : TimeSpan.Zero,
-            LeadOut = noisy ? Delay + EndNoise : Delay
-        };
-        _queue.Enqueue(offset);
-        var (announcement, subtitles) = SubtitleHandler.MakeCassieAnnouncement(chain, text);
-        _announcements[offset] = (announcement, showSubtitles ? subtitles : null, noisy);
-    }
-
-    public void Stop()
-    {
-        _queue.Clear();
-        _queue.Next();
     }
 
 }
