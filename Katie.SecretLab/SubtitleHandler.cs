@@ -25,7 +25,7 @@ public static class SubtitleHandler
             {
                 wasFullStop = false;
                 announcementBuilder.AppendSilence(time).Append(Split);
-                subtitleBuilder.Append(text[start..end]).Append(Split).Append(SubtitlePrefix);
+                subtitleBuilder.Append(text[start..end].Trim()).Append(Split).Append(SubtitlePrefix);
                 start = end;
                 time = TimeSpan.Zero;
             }
