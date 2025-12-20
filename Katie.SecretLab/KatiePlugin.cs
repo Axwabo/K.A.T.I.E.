@@ -1,4 +1,5 @@
-﻿using LabApi.Events.CustomHandlers;
+﻿using HarmonyLib;
+using LabApi.Events.CustomHandlers;
 using LabApi.Loader;
 using LabApi.Loader.Features.Plugins;
 
@@ -19,14 +20,21 @@ public sealed class KatiePlugin : Plugin<KatieConfig>
 
     private readonly EventHandlers _handlers = new();
 
+    private readonly Harmony _harmony = new("K.A.T.I.E.");
+
     public override void Enable()
     {
         Instance = this;
         var config = this.GetConfigDirectory();
         PhraseCache.Initialize(config);
         CustomHandlersManager.RegisterEventsHandler(_handlers);
+        _harmony.PatchAll();
     }
 
-    public override void Disable() => CustomHandlersManager.UnregisterEventsHandler(_handlers);
+    public override void Disable()
+    {
+        CustomHandlersManager.UnregisterEventsHandler(_handlers);
+        _harmony.UnpatchAll(_harmony.Id);
+    }
 
 }
