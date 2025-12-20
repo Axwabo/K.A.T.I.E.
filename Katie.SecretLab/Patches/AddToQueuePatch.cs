@@ -4,7 +4,7 @@ using HarmonyLib;
 using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.Handlers;
 
-namespace Katie.SecretLab;
+namespace Katie.SecretLab.Patches;
 
 [HarmonyPatch(typeof(CassieAnnouncementDispatcher), nameof(CassieAnnouncementDispatcher.AddToQueue))]
 public static class AddToQueuePatch
@@ -35,7 +35,7 @@ public static class AddToQueuePatch
             CodeInstruction.Call(typeof(AddToQueuePatch), nameof(Queue)),
             new CodeInstruction(OpCodes.Brtrue, label),
             new CodeInstruction(OpCodes.Ldc_I4_0),
-            new CodeInstruction(OpCodes.Ret),
+            new CodeInstruction(OpCodes.Ret)
         ]);
         return list;
     }

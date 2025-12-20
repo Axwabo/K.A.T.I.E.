@@ -8,8 +8,6 @@ namespace Katie.SecretLab;
 public sealed class KatiePlugin : Plugin<KatieConfig>
 {
 
-    private const string ClearQueue = "System.Void Respawning.RespawnEffectsController::RpcClearQueue()";
-
     public static KatiePlugin Instance { get; private set; } = null!;
 
     public override string Name => "K.A.T.I.E. TTS";
