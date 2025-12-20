@@ -39,6 +39,7 @@ internal sealed class AnnouncementManager : MonoBehaviour
         var current = CassieAnnouncementDispatcher.CurrentAnnouncement as KatieAnnouncement;
         if (current == _previous)
             return;
+        current?.Signal?.Restart();
         Player.SampleProvider = current?.Provider;
         _previous = current;
     }
