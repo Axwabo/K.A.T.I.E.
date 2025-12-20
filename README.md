@@ -75,16 +75,19 @@ A sample phrase pack is available:
 2. Download the following files from the [releases page](https://github.com/Axwabo/K.A.T.I.E./releases):
     - `Katie.Core.dll`
     - `Katie.NAudio.dll`
-3. Place the downloaded files in the **dependencies** directory
+3. Download and extract [Harmony 2.2.2](https://github.com/pardeike/Harmony/releases/tag/v2.2.2.0)
+    1. Download the `Harmony.2.2.2.0.zip` asset
+    2. Extract the `net48/0Harmony.dll` file from the archive
+4. Place the downloaded files in the **dependencies** directory
     - Linux: `.config/SCP Secret Laboratory/LabAPI/dependencies/<port>/`
     - Windows: `%appdata%/SCP Secret Laboratory/LabAPI/dependencies/<port>/`
-4. Download the `Katie.SecretLab.dll` file from the releases page
-5. Place the file in the **plugins** directory
+5. Download the `Katie.SecretLab.dll` file from the releases page
+6. Place the file in the **plugins** directory
     - Linux: `.config/SCP Secret Laboratory/LabAPI/plugins/<port>/`
     - Windows: `%appdata%/SCP Secret Laboratory/LabAPI/plugins/<port>/`
-6. Restart the server
-7. [Configure](#config) phrases
-8. Restart the server again
+7. Restart the server
+8. [Configure](#config) phrases
+9. Restart the server again
 
 ### Config
 
@@ -111,11 +114,11 @@ Place signals in the `Signals` directory.
 > If only the Core is installed, reading is limited to `wav` files.
 > Neither sample rate nor channel count matter, regardless of file format.
 
-The `cassie` and `cassie_sl` commands support announcing with K.A.T.I.E., even if `ReplaceCassie` is set to false.
+The C.A.S.S.I.E. Remote Admin GUI supports announcing with K.A.T.I.E., even if `ReplaceCassie` is set to false.
 Examples:
 
-- `cassie_sl [Hungarian] Az 1. vágányra szerelvény érkezik.`
-- `cassie_sl [English] [EC] EuroCity train Semmelweis is arriving at platform two.`
+- Announcement: `[Hungarian]`<br>Custom subtitles: `Az 1. vágányra szerelvény érkezik.`
+- Announcement: `[English] [EC] `<br>Custom subtitles: `cassie_sl EuroCity train Semmelweis is arriving at platform two.`
 
 The language must be specified first, which may be followed by an optional signal.
 
