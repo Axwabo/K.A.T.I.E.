@@ -34,7 +34,7 @@ public sealed class KatieAnnouncement : CassieAnnouncement
         new KatieAnnouncement(chain, provider, new CassieTtsPayload(announcement, subtitles, noisy)).AddToQueue();
     }
 
-    private KatieAnnouncement(UtteranceChain chain, ISampleProvider provider, CassieTtsPayload payload, float priority = 0) : base(payload, priority, 0)
+    private KatieAnnouncement(UtteranceChain chain, ISampleProvider provider, CassieTtsPayload payload, float priority = 1) : base(payload, priority, 0)
     {
         Chain = chain;
         Provider = provider;
