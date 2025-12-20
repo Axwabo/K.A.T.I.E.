@@ -31,7 +31,7 @@ public static class SubtitleHandler
             }
 
             time += segment.Duration;
-            if (segment.EndIndex < 1 || text[segment.EndIndex - 1] != '.')
+            if (segment.EndIndex < 1 || segment.Phrase != null || text[segment.EndIndex - 1] != '.')
                 continue;
             wasFullStop = true;
             end = segment.EndIndex;
