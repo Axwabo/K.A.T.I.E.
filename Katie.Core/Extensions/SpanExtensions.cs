@@ -5,45 +5,50 @@ public static class SpanExtensions
 
     public const string Delimiters = " ,.";
 
-    public static int IndexOfWordDelimiter(this ReadOnlySpan<char> span, int start)
+    extension(ReadOnlySpan<char> span)
     {
-        var indexInSlice = span[start..].IndexOfAny(Delimiters);
-        return indexInSlice == -1 ? -1 : indexInSlice + start;
-    }
 
-    public static int LowercaseHashCode(this ReadOnlySpan<char> span)
-    {
-        var code = 0;
-        foreach (var c in span)
-            code = HashCode.Combine(code, char.ToLowerInvariant(c));
-        return code;
-    }
+        public int IndexOfWordDelimiter(int start)
+        {
+            var indexInSlice = span[start..].IndexOfAny(Delimiters);
+            return indexInSlice == -1 ? -1 : indexInSlice + start;
+        }
 
-    public static int LowercaseHashCode(this ReadOnlySpan<char> first, ReadOnlySpan<char> second)
-    {
-        var code = first.LowercaseHashCode();
-        foreach (var c in second)
-            code = HashCode.Combine(code, char.ToLowerInvariant(c));
-        return code;
-    }
+        public int LowercaseHashCode()
+        {
+            var code = 0;
+            foreach (var c in span)
+                code = HashCode.Combine(code, char.ToLowerInvariant(c));
+            return code;
+        }
 
-    public static ReadOnlySpan<char> TrimDelimeters(this ReadOnlySpan<char> span) => span.Trim(Delimiters);
+        public int LowercaseHashCode(ReadOnlySpan<char> second)
+        {
+            var code = span.LowercaseHashCode();
+            foreach (var c in second)
+                code = HashCode.Combine(code, char.ToLowerInvariant(c));
+            return code;
+        }
 
-    public static bool IsDigit(this ReadOnlySpan<char> span)
-    {
-        foreach (var c in span)
-            if (!char.IsDigit(c))
-                return false;
-        return true;
-    }
+        public ReadOnlySpan<char> TrimDelimeters() => span.Trim(Delimiters);
 
-    public static int Count(this ReadOnlySpan<char> span, char c, Index start)
-    {
-        var count = 0;
-        for (var i = start.GetOffset(span.Length); i < span.Length; i++)
-            if (span[i] == c)
-                count++;
-        return count;
+        public bool IsDigit()
+        {
+            foreach (var c in span)
+                if (!char.IsDigit(c))
+                    return false;
+            return true;
+        }
+
+        public int Count(char c, Index start)
+        {
+            var count = 0;
+            for (var i = start.GetOffset(span.Length); i < span.Length; i++)
+                if (span[i] == c)
+                    count++;
+            return count;
+        }
+
     }
 
 }

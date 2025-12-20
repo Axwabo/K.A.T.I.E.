@@ -5,6 +5,7 @@ using LabApi.Loader.Features.Plugins;
 
 namespace Katie.SecretLab;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public sealed class KatiePlugin : Plugin<KatieConfig>
 {
 

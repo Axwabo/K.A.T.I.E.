@@ -13,9 +13,7 @@ public sealed class StorageWrapper
 
     private readonly HostControl? _host;
 
-    private IStorageProvider? _provider;
-
-    private IStorageProvider? Provider => _provider ??= TopLevel.GetTopLevel(_host?.Host)?.StorageProvider;
+    private IStorageProvider? Provider => field ??= TopLevel.GetTopLevel(_host?.Host)?.StorageProvider;
 
     public StorageWrapper(HostControl? host) => _host = host;
 

@@ -1,5 +1,6 @@
 ﻿namespace Katie.SecretLab;
 
+[Serializable]
 public sealed class KatieConfig
 {
 

@@ -48,12 +48,17 @@ public static class SubtitleHandler
             );
     }
 
-    private static StringBuilder AppendSilence(this StringBuilder builder, TimeSpan time)
-        => time == TimeSpan.Zero
-            ? builder
-            : builder.Append(" $SLEEP_").Append((float) time.TotalSeconds).Append(" $MAXDUR_0 . ");
+    extension(StringBuilder builder)
+    {
 
-    private static StringBuilder RemoveEnd(this StringBuilder builder, int characters)
-        => builder.Remove(builder.Length - characters, characters);
+        private StringBuilder AppendSilence(TimeSpan time)
+            => time == TimeSpan.Zero
+                ? builder
+                : builder.Append(" $SLEEP_").Append((float) time.TotalSeconds).Append(" $MAXDUR_0 . ");
+
+        private StringBuilder RemoveEnd(int characters)
+            => builder.Remove(builder.Length - characters, characters);
+
+    }
 
 }

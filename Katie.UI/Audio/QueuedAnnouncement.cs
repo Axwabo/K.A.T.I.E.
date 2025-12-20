@@ -14,8 +14,6 @@ public sealed record QueuedAnnouncement(string Text, string Language, Queue<Utte
 
     private UtteranceChain? _utteranceChain;
 
-    private ISampleProvider? _provider;
-
     public TimeSpan CurrentTime => _utteranceChain?.CurrentTime ?? TimeSpan.Zero;
 
     public TimeSpan TotalTime => _utteranceChain?.TotalTime ?? TimeSpan.Zero;
@@ -24,13 +22,13 @@ public sealed record QueuedAnnouncement(string Text, string Language, Queue<Utte
     {
         get
         {
-            if (_provider != null)
-                return _provider;
+            if (field != null)
+                return field;
             _utteranceChain = new UtteranceChain(Segments.Dequeue(), Segments, Format);
             ISampleProvider provider = _utteranceChain;
             if (!DefaultSignal)
                 provider = new RestartingSampleProvider(Signal.Provider, Format).FollowedBy(provider);
-            return _provider = provider.LeadOut(TimeSpan.FromSeconds(3));
+            return field = provider.LeadOut(TimeSpan.FromSeconds(3));
         }
     }
 

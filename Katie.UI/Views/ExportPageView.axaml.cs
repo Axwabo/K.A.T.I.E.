@@ -1,11 +1,8 @@
 ﻿namespace Katie.UI.Views;
 
-public partial class ExportPageView : UserControl
+public sealed partial class ExportPageView : UserControl
 {
 
-    public ExportPageView()
-    {
-        InitializeComponent();
-    }
+    public ExportPageView() => InitializeComponent();
 
 }
