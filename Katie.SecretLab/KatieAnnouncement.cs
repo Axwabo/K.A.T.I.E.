@@ -51,7 +51,10 @@ public sealed class KatieAnnouncement : CassieAnnouncement
         }
 
         var (announcement, subtitles) = SubtitleHandler.MakeCassieAnnouncement(chain, text);
-        new KatieAnnouncement(signalProvider, chain, provider, new CassieTtsPayload(announcement, subtitles, noisy)).AddToQueue();
+        var payload = showSubtitles
+            ? new CassieTtsPayload(announcement, subtitles, noisy)
+            : new CassieTtsPayload(announcement, false, noisy);
+        new KatieAnnouncement(signalProvider, chain, provider, payload).AddToQueue();
     }
 
     private KatieAnnouncement(RawSourceSampleProvider? signal, UtteranceChain chain, ISampleProvider provider, CassieTtsPayload payload, float priority = 1) : base(payload, priority, 0)
