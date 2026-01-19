@@ -9,8 +9,9 @@ public static class QueuePlayerExtensions
     extension(QueuePlayer player)
     {
 
-        public void EnqueueAnnouncement(ReadOnlySpan<char> text, PhraseTree<AudioClipPhrase> tree, Signal? signal = null)
+        public TimeSpan EnqueueAnnouncement(ReadOnlySpan<char> text, PhraseTree<AudioClipPhrase> tree, Signal? signal = null)
         {
+            var time = TimeSpan.Zero;
             if (signal)
                 player.Enqueue(signal.Clip, signal.Duration);
             var parser = new PhraseParser<AudioClipPhrase>(text, tree);
@@ -23,10 +24,13 @@ public static class QueuePlayerExtensions
                     player.Enqueue(phrase.Phrase.Clip, seconds);
                 else
                     player.Delay(seconds);
+                time += phrase.Duration;
             }
+
+            return time;
         }
 
-        public void EnqueueAnnouncement(ReadOnlySpan<char> text, PhrasePack pack, Signal? signal = null) => player.EnqueueAnnouncement(text, pack.Tree, signal);
+        public TimeSpan EnqueueAnnouncement(ReadOnlySpan<char> text, PhrasePack pack, Signal? signal = null) => player.EnqueueAnnouncement(text, pack.Tree, signal);
 
     }
 
