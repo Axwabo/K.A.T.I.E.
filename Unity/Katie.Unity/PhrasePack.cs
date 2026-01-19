@@ -10,10 +10,10 @@ public sealed class PhrasePack : ScriptableObject
 #pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
 #nullable disable
     [SerializeField]
-    private AudioClip[] clips;
+    private string language;
 
     [SerializeField]
-    private string language;
+    private AudioClip[] clips;
 
     public PhraseTree<AudioClipPhrase> Tree { get; private set; }
 #nullable restore
