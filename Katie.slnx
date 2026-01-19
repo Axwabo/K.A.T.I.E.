@@ -6,6 +6,7 @@
     </Folder>
     <Folder Name="/Unity/">
         <Project Path="Unity/Katie.SecretLab/Katie.SecretLab.csproj" />
+        <Project Path="Unity/Katie.Unity/Katie.Unity.csproj" />
     </Folder>
     <Project Path="Katie.Core/Katie.Core.csproj" />
     <Project Path="Katie.NAudio/Katie.NAudio.csproj" />
