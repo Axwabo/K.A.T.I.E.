@@ -55,7 +55,7 @@ A sample phrase pack is available:
 
 ## Desktop UI
 
-1. Make sure you have [.NET Desktop Runtime 9](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) installed
+1. Make sure you have [.NET Desktop Runtime 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) installed
 2. Download the platform-specific archive from the [releases page](https://github.com/Axwabo/K.A.T.I.E./releases)
 3. Extract the `bin/Katie.UI.Desktop` (.exe on Windows) file
 4. Run the executable
@@ -127,6 +127,16 @@ The language must be specified first, which may be followed by an optional signa
 
 > [!TIP]
 > See also: [usage](#usage)
+
+## Unity
+
+For Unity projects (where you have access to the editor), download the
+`Katie.Core.dll` and `Katie.Unity.dll` files, and place them in the `Assets/Plugins` directory.
+
+Then, you can create scriptable objects: `PhrasePack` and `Signal`
+
+Use the `QueuePlayer` script and the `QueuePlayerExtensions.EnqueueAnnouncement`
+extension method to play announcements through an `AudioSource`
 
 # Desktop Usage
 
