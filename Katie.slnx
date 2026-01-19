@@ -4,10 +4,8 @@
         <Project Path="Katie.UI.Desktop/Katie.UI.Desktop.csproj" />
         <Project Path="Katie.UI/Katie.UI.csproj" />
     </Folder>
-    <Folder Name="/Unity/">
-        <Project Path="Unity/Katie.SecretLab/Katie.SecretLab.csproj" />
-        <Project Path="Unity/Katie.Unity/Katie.Unity.csproj" />
-    </Folder>
     <Project Path="Katie.Core/Katie.Core.csproj" />
     <Project Path="Katie.NAudio/Katie.NAudio.csproj" />
+    <Project Path="Katie.SecretLab/Katie.SecretLab.csproj" />
+    <Project Path="Katie.Unity/Katie.Unity.csproj" />
 </Solution>

@@ -1,5 +1,6 @@
 <Project>
-    <Import Project="$(MSBuildProjectDirectory)/ReferencePath.props.user" Condition="Exists('$(MSBuildProjectDirectory)/ReferencePath.props.user')" />
+
+    <Import Project="ReferencePath.props.user" Condition="Exists('ReferencePath.props.user')" />
 
     <PropertyGroup>
         <ReferencePath Condition="$(ReferencePath) == ''">$(SL_REFERENCES)</ReferencePath>
@@ -8,7 +9,7 @@
 
     <Target Name="NotifyIncompleteSetup" BeforeTargets="PrepareForBuild" Condition="$(ReferencePath) == ''">
         <PropertyGroup>
-            <Props>$(MSBuildProjectDirectory)/ReferencePath.props.user</Props>
+            <Props>$(MSBuildThisFileDirectory)ReferencePath.props.user</Props>
             <Template><![CDATA[
 <Project>
     <PropertyGroup>
