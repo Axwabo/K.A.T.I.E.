@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <PackageReference Include="SecretLabNAudio.Core" />
-    </ItemGroup>
-
-    <ItemGroup>
         <Reference Include="UnityEngine.AudioModule" />
         <Reference Include="UnityEngine.CoreModule" />
     </ItemGroup>
