@@ -1,6 +1,7 @@
 ﻿using NAudio.Wave;
 using SoundFlow.Enums;
 using SoundFlow.Interfaces;
+using SoundFlow.Metadata.Models;
 
 namespace Katie.UI.Desktop;
 
@@ -25,6 +26,7 @@ public sealed class NAudioDataProvider : ISoundDataProvider
     public int SampleRate { get; }
 
     public bool IsDisposed => false;
+    public SoundFormatInfo? FormatInfo { get; }
 
     public event EventHandler<EventArgs>? EndOfStreamReached;
 
