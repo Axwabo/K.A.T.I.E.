@@ -3,7 +3,7 @@
 public static class SpanExtensions
 {
 
-    public const string Delimiters = " ,.:";
+    public const string Delimiters = " ,.?!";
 
     extension(ReadOnlySpan<char> span)
     {
