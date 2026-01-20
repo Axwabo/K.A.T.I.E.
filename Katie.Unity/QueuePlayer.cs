@@ -12,6 +12,17 @@ public sealed class QueuePlayer : MonoBehaviour
 
     private readonly Queue<(AudioClip?, float)> _queue = new();
 
+    public double EndDspTime
+    {
+        get
+        {
+            var end = _playAt;
+            foreach (var (_, duration) in _queue) 
+                end += duration;
+            return end;
+        }
+    }
+
     public bool IsYapping => _playAt > AudioSettings.dspTime || _source.isPlaying;
 
     private void Awake() => _source = GetComponent<AudioSource>();
