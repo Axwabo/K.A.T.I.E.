@@ -82,7 +82,7 @@ public ref struct PhraseParser<T> where T : PhraseBase
     {
         var duration = _text[_index] switch
         {
-            '.' => 0.5,
+            '.' or '?' or '!' => 0.5,
             ',' => 0.3,
             _ => 0
         };
