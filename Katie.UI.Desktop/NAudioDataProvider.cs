@@ -26,7 +26,8 @@ public sealed class NAudioDataProvider : ISoundDataProvider
     public int SampleRate { get; }
 
     public bool IsDisposed => false;
-    public SoundFormatInfo? FormatInfo { get; }
+
+    public SoundFormatInfo? FormatInfo => null;
 
     public event EventHandler<EventArgs>? EndOfStreamReached;
 
