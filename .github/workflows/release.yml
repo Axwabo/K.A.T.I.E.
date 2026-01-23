@@ -9,25 +9,20 @@ permissions:
 
 jobs:
 
-  build:
+  linux:
     runs-on: ubuntu-latest
 
     env:
       OUT: ${{ github.workspace }}/Out
       OUT_LINUX: ${{ github.workspace }}/Out/Linux
-      OUT_WINDOWS: ${{ github.workspace }}/Out/Windows
-      OUT_BROWSER: ${{ github.workspace }}/Out/Browser
-      OUT_SL: ${{ github.workspace }}/Out/SL
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build Desktop
         working-directory: Katie.UI.Desktop
-        run: |
-          dotnet publish -r linux-x64 -o ${{ env.OUT_LINUX }}
-          dotnet publish -r win-x64 -o ${{ env.OUT_WINDOWS }}
+        run: dotnet publish -r linux-x64 -o ${{ env.OUT_LINUX }}
 
       - name: Bundle Linux
         working-directory: ${{ env.OUT_LINUX }}
@@ -39,6 +34,26 @@ jobs:
           cp -r ${{ github.workspace }}/THIRD_PARTY_LICENSES LICENSES
           zip -r ${{ env.OUT }}/Katie.UI.Desktop-Linux-x64.zip .
 
+      - name: Upload Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.OUT }}/*
+  
+  windows:
+    runs-on: ubuntu-latest
+
+    env:
+      OUT: ${{ github.workspace }}/Out
+      OUT_WINDOWS: ${{ github.workspace }}/Out/Windows
+
+    steps:
+
+      - uses: actions/checkout@v6
+
+      - name: Build Desktop
+        working-directory: Katie.UI.Desktop
+        run: dotnet publish -r win-x64 -o ${{ env.OUT_WINDOWS }}
+
       - name: Bundle Windows
         working-directory: ${{ env.OUT_WINDOWS }}
         run: |
@@ -48,6 +63,17 @@ jobs:
           mv Katie.UI.Desktop.exe bin/
           cp -r ${{ github.workspace }}/THIRD_PARTY_LICENSES LICENSES
           zip -r ${{ env.OUT }}/Katie.UI.Desktop-Windows-x64.zip .
+
+  SL-and-Unity:
+    runs-on: ubuntu-latest
+
+    env:
+      OUT: ${{ github.workspace }}/Out
+      OUT_SL: ${{ github.workspace }}/Out/SL
+
+    steps:
+
+      - uses: actions/checkout@v6
 
       - name: Download SL References
         uses: Axwabo/scpsl-references-downloader@v1
@@ -60,10 +86,29 @@ jobs:
         working-directory: ${{ env.OUT_SL }}
         run: cp Katie.*.dll ${{ env.OUT }}/
 
+      - name: Build Unity
+        working-directory: Katie.Unity
+        run: dotnet build -c Release -o ${{ env.OUT_SL }}
+
+      - name: Copy Unity
+        working-directory: ${{ env.OUT_SL }}
+        run: cp Katie.Unity.dll ${{ env.OUT }}/
+
       - name: Upload Assets
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.OUT }}/*
+
+  browser:
+    runs-on: ubuntu-latest
+
+    env:
+      OUT: ${{ github.workspace }}/Out
+      OUT_BROWSER: ${{ github.workspace }}/Out/Browser
+
+    steps:
+
+      - uses: actions/checkout@v6
 
       - name: Install wasm-tools
         run: dotnet workload install wasm-tools
@@ -77,10 +122,10 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ env.OUT_BROWSER }}/wwwroot
-  
+
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: browser
 
     permissions:
       pages: write
