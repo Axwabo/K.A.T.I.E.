@@ -64,6 +64,11 @@ jobs:
           cp -r ${{ github.workspace }}/THIRD_PARTY_LICENSES LICENSES
           zip -r ${{ env.OUT }}/Katie.UI.Desktop-Windows-x64.zip .
 
+      - name: Upload Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.OUT }}/*
+
   SL-and-Unity:
     runs-on: ubuntu-latest
 
