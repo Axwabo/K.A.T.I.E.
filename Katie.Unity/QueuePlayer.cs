@@ -30,12 +30,17 @@ public sealed class QueuePlayer : MonoBehaviour
     public void Enqueue(AudioClip? clip)
     {
         if (clip)
-            _queue.Enqueue((clip, clip.length));
+            Enqueue(clip, clip.length);
     }
 
-    public void Enqueue(AudioClip? clip, float length) => _queue.Enqueue((clip, length));
+    public void Enqueue(AudioClip? clip, float length)
+    {
+        _queue.Enqueue((clip, length));
+        if (!IsYapping)
+            _playAt = AudioSettings.dspTime + length;
+    }
 
-    public void Delay(float length) => _queue.Enqueue((null, length));
+    public void Delay(float length) => Enqueue(null, length);
 
     private void Update()
     {
