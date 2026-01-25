@@ -167,7 +167,7 @@ Examples:
 - `passenger  train` - invalid (two consecutive spaces)
 - `Budapest-Keleti` - will match `Budapest-Keleti` but not `Budapest Keleti` nor `Budapest -Keleti`
 
-The parser steps word-by-word (delimited by spaces or `.` or `,`)
+The parser steps word-by-word (delimited by spaces or `.` or `,` or `?` or `!`)
 and tries to add a known phrase with the longest joined text.
 
 If a word doesn't map to any known phrase, it will be replaced with silence.
