@@ -36,7 +36,7 @@ public sealed class QueuePlayer : MonoBehaviour
     public void Enqueue(AudioClip? clip, float length)
     {
         _queue.Enqueue((clip, length));
-        if (!IsYapping)
+        if (_queue.Count == 0)
             _playAt = AudioSettings.dspTime + length;
     }
 
