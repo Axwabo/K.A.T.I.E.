@@ -37,7 +37,7 @@ public sealed class QueuePlayer : MonoBehaviour
     {
         _queue.Enqueue((clip, length));
         if (_queue.Count == 1)
-            _playAt = AudioSettings.dspTime + length;
+            _playAt = AudioSettings.dspTime;
     }
 
     public void Delay(float length) => Enqueue(null, length);
